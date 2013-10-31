@@ -1125,7 +1125,7 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
 
 
 
-
+        // TODO
         if ( ok < 0 ) {
             printf("  * The Stiffness Matrix is not positive-definite *\n");
             printf("    Check that all six rigid-body translations are restrained\n");
@@ -1133,7 +1133,7 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
             /*   return; */
         }
 
-        printf("\nL O A D   C A S E   %d   O F   %d  ... \n\n", lc, nL);
+        // printf("\nL O A D   C A S E   %d   O F   %d  ... \n\n", lc, nL);
 
 
         for (j=1; j<= nN; j++) {
@@ -1145,8 +1145,6 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
             displacements[lc-1].yrot[j-1] = D[6*j-1];
             displacements[lc-1].zrot[j-1] = D[6*j];
         }
-
-        printf("here1\n");
 
 
         for (n=1; n<= nE; n++) {
@@ -1191,9 +1189,9 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
             reactionForces[lc-1].Mxx[j-1] = vals[2];
             reactionForces[lc-1].Myy[j-1] = vals[1];
             reactionForces[lc-1].Mzz[j-1] = vals[0];
-
-
         }
+
+        // TODO
         printf("R M S    R E L A T I V E    E Q U I L I B R I U M    E R R O R: %9.3e\n", rms_resid );
 
 
