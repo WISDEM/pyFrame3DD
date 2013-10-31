@@ -328,7 +328,7 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
 #undef SQ
 
         L[b] = sqrt( L[b] );
-        Le[b] = L[b] - r[n1] - r[n2];
+        Le[b] = L[b] - rj[n1] - rj[n2];
         if ( n1 == n2 || L[b] == 0.0 ) {
             sprintf(errMsg,
               " Frame elements must start and stop at different nodes\n  frame element %d  N1= %d N2= %d L= %e\n   Perhaps frame element number %d has not been specified.\n  or perhaps the Input Data file is missing expected data.\n",
@@ -338,7 +338,7 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
         }
         if ( Le[b] <= 0.0 ) {
             sprintf(errMsg, " Node  radii are too large.\n  frame element %d  N1= %d N2= %d L= %e \n  r1= %e r2= %e Le= %e \n",
-              b, n1,n2, L[b], r[n1], r[n2], Le[b] );
+              b, n1,n2, L[b], rj[n1], rj[n2], Le[b] );
             errorMsg(errMsg);
             exit(61);
         }
@@ -1017,7 +1017,7 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
 
         /*  assemble stiffness matrix [K({D}^(i))], {D}^(0)={0} (i=0) */
         assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
-                    Ax, Asy, Asz, Jx,Iy,Iz, E, G, p,
+                    Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
                     shear, geom, Q, debug );
 
 #ifdef MATRIX_DEBUG
@@ -1171,17 +1171,27 @@ void readinputs(Nodes* nodes, Reactions* reactions, Elements* elements,
         }
 
 
-        printf("here1\n");
+        double *Flocal = F[lc];
+        double vals[6];
 
         for (j=1; j<=nN; j++) {
 
             reactionForces[lc-1].node[j-1] = j;
-            reactionForces[lc-1].Fx[j-1] = F[lc][6*j-5];
-            reactionForces[lc-1].Fy[j-1] = F[lc][6*j-4];
-            reactionForces[lc-1].Fz[j-1] = F[lc][6*j-3];
-            reactionForces[lc-1].Mxx[j-1] = F[lc][6*j-2];
-            reactionForces[lc-1].Myy[j-1] = F[lc][6*j-1];
-            reactionForces[lc-1].Mzz[j-1] = F[lc][6*j];
+
+            for (i=5; i>=0; i--) {
+                vals[i] = 0.0;
+                if (r[6*j-i]){
+                    vals[i] = Flocal[6*j-i];
+                }
+            }
+
+            reactionForces[lc-1].Fx[j-1] = vals[5];
+            reactionForces[lc-1].Fy[j-1] = vals[4];
+            reactionForces[lc-1].Fz[j-1] = vals[3];
+            reactionForces[lc-1].Mxx[j-1] = vals[2];
+            reactionForces[lc-1].Myy[j-1] = vals[1];
+            reactionForces[lc-1].Mzz[j-1] = vals[0];
+
 
         }
         printf("R M S    R E L A T I V E    E Q U I L I B R I U M    E R R O R: %9.3e\n", rms_resid );

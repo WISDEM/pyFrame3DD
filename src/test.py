@@ -331,6 +331,45 @@ _frame3dd.readinputs(nodes, reactions, elements, shear, geom, exagg_static, dx, 
 # x = np.ctypeslib.as_array(disp[0].x, shape=(nN,))
 
 print ddx
+print ddy
+print ddz
+print ddxrot
+print ddyrot
+print ddzrot
+
+print
+
+print Eelement
+print Enode
+print ENx
+print EVy
+print EVz
+print ETxx
+print EMyy
+print EMzz
+
+print
+
+print Rnode
+print RFx
+print RFy
+print RFz
+print RMxx
+print RMyy
+print RMzz
+
+# 0.0
+# 0.010776
+# 0.035528
+# 0.060279
+# 0.086295
+# 0.112311
+# 0.129754
+# 0.100000
+# 0.089226
+# 0.059394
+# 0.029563
+# 0.012122
 
 
 

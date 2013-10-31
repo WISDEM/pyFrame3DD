@@ -56,7 +56,7 @@ For compilation/installation, see README.txt.
 
 
 // compile the Frame3DD analysis into another code, such as a GUI
-#ifdef WITH_GLOBALS	
+#ifdef WITH_GLOBALS
  int run_kernel ( int argc, char *argv[] ) {
 #endif
 
@@ -81,29 +81,29 @@ For compilation/installation, see README.txt.
 
 	float	*rj = NULL,	// node size radius, for finite sizes
 		*Ax,*Asy, *Asz,	// cross section areas, incl. shear
-		*Jx,*Iy,*Iz,	// section inertias		
+		*Jx,*Iy,*Iz,	// section inertias
 		*E=NULL, *G=NULL,// elastic modulus and shear moduli
-		*p=NULL,	// roll of each member, radians	
+		*p=NULL,	// roll of each member, radians
 		***U=NULL,	// uniform distributed member loads
 		***W=NULL,	// trapizoidal distributed member loads
-		***P=NULL,	// member concentrated loads	
+		***P=NULL,	// member concentrated loads
 		***T=NULL,	// member temperature  loads
 		**Dp=NULL,	// prescribed node displacements
 		*d, *EMs=NULL,	// member densities and extra inertia
 		*NMs=NULL, 	// mass of a node
-		*NMx,*NMy,*NMz,	// inertia of a node in global coord	
-		gX[_NL_],	// gravitational acceleration in global X 
+		*NMx,*NMy,*NMz,	// inertia of a node in global coord
+		gX[_NL_],	// gravitational acceleration in global X
 		gY[_NL_],	// gravitational acceleration in global Y
 		gZ[_NL_],	// gravitational acceleration in global Z
 		pan=1.0,	// >0: pan during animation; 0: don't
 		dx=1.0;		// x-increment for internal force data
 
 	double	**K=NULL,	// equilibrium stiffness matrix
-		// **Ks=NULL,	// Broyden secant stiffness matrix	
+		// **Ks=NULL,	// Broyden secant stiffness matrix
 		traceK = 0.0,	// trace of the global stiffness matrix
 		**M = NULL,	// global mass matrix
 		traceM = 0.0,	// trace of the global mass matrix
-		**F_mech=NULL,	// mechanical load vectors,  load cases	
+		**F_mech=NULL,	// mechanical load vectors,  load cases
 		**F_temp=NULL,	// thermal load vectors, all load cases
 		**F = NULL, 	// general load vectors	for each load case
 		***feF_mech=NULL,// fixed end forces from mech loads
@@ -116,9 +116,9 @@ For compilation/installation, see README.txt.
 		**Q = NULL,	// local member node end-forces
 		tol = 1.0e-9,	// tolerance for modal convergence
 		shift = 0.0,	// shift-factor for rigid-body-modes
-		struct_mass,	// mass of structural system	
-		total_mass,	// total structural mass and extra mass 
-		*f  = NULL,	// resonant frequencies	
+		struct_mass,	// mass of structural system
+		total_mass,	// total structural mass and extra mass
+		*f  = NULL,	// resonant frequencies
 		**V = NULL,	// resonant mode-shapes
 		rms_resid=1.0,	// root mean square of residual displ. error
 		error = 1.0,	// rms equilibrium error and reactions
@@ -144,13 +144,13 @@ For compilation/installation, see README.txt.
 		*N1, *N2,	// begin and end node numbers
 		shear=0,	// indicates shear deformation
 		geom=0,		// indicates  geometric nonlinearity
-		anlyz=1,	// 1: stiffness analysis, 0: data check	
+		anlyz=1,	// 1: stiffness analysis, 0: data check
 		*q=NULL,*r=NULL,sumR,	// reaction data, total no. of reactions
 		nM=0,		// number of desired modes
 		Mmethod,	// 1: Subspace Jacobi, 2: Stodola
 		nM_calc,	// number of modes to calculate
 		lump=1,		// 1: lumped, 0: consistent mass matrix
-		iter=0,		// number of iterations	
+		iter=0,		// number of iterations
 		ok=1,		// number of (-ve) diag. terms of L D L'
 		anim[20],	// the modes to be animated
 		Cdof=0,		// number of condensed degrees o freedom
@@ -161,15 +161,15 @@ For compilation/installation, see README.txt.
 		debug=0,	// 1: debugging screen output, 0: none
 		verbose=1;	// 1: copious screen output, 0: none
 
-	int	shear_flag= -1,	//   over-ride input file value	
+	int	shear_flag= -1,	//   over-ride input file value
 		geom_flag = -1,	//   over-ride input file value
 		anlyz_flag= -1,	//   over-ride input file value
 		D3_flag = -1,	//   over-ride 3D plotting check
 		lump_flag = -1,	//   over-ride input file value
-		modal_flag= -1,	//   over-ride input file value	
+		modal_flag= -1,	//   over-ride input file value
 		write_matrix=-1,//   write stiffness and mass matrix
 		axial_sign=-1,  //   suppress 't' or 'c' in output data
-		condense_flag=-1; // over-ride input file value	
+		condense_flag=-1; // over-ride input file value
 
 	int	sfrv=0;		// *scanf return value for err checking
 
@@ -182,10 +182,10 @@ For compilation/installation, see README.txt.
 	char	extn[16];	// Input Data file name extension
 
 
-	parse_options ( argc, argv, IN_file, OUT_file, 
-			&shear_flag, &geom_flag, &anlyz_flag, &exagg_flag, 
-			&D3_flag, 
-			&lump_flag, &modal_flag, &tol_flag, &shift_flag, 
+	parse_options ( argc, argv, IN_file, OUT_file,
+			&shear_flag, &geom_flag, &anlyz_flag, &exagg_flag,
+			&D3_flag,
+			&lump_flag, &modal_flag, &tol_flag, &shift_flag,
 			&pan_flag, &write_matrix, &axial_sign, &condense_flag,
 			&verbose, &debug);
 
@@ -204,12 +204,12 @@ For compilation/installation, see README.txt.
 
 	if ((fp = fopen (IN_file, "r")) == NULL) { /* open input data file */
 		sprintf (errMsg,"\n ERROR: cannot open input data file '%s'\n", IN_file);
-		errorMsg(errMsg); 
+		errorMsg(errMsg);
 		display_help();
 		if ( argc == 1 ) {
 			fprintf(stderr," Press the 'Enter' key to close.\n");
-			(void) getchar();	// clear the buffer ?? 
-			while( !getchar() ) ;	// wait for the Enter key 
+			(void) getchar();	// clear the buffer ??
+			while( !getchar() ) ;	// wait for the Enter key
 		}
 		exit(11);
 	}
@@ -224,7 +224,7 @@ For compilation/installation, see README.txt.
 
 	if ((fp = fopen (strippedInputFile, "r")) == NULL) { /* open stripped input file */
 		sprintf(errMsg,"\n ERROR: cannot open stripped input data file '%s'\n", strippedInputFile);
-		errorMsg(errMsg); 
+		errorMsg(errMsg);
 		exit(13);
 	}
 
@@ -294,7 +294,7 @@ For compilation/installation, see README.txt.
 
 
 	read_run_data ( fp, OUT_file, &shear, shear_flag, &geom, geom_flag,
-			meshpath, plotpath, infcpath, 
+			meshpath, plotpath, infcpath,
 			&exagg_static, exagg_flag, &dx, &anlyz, anlyz_flag,
 			debug );
 
@@ -306,12 +306,12 @@ For compilation/installation, see README.txt.
 	}
 
 	if ( nL < 1 ) {	/* not enough load cases */
-		errorMsg("\n ERROR: the number of load cases must be at least 1\n"); 
+		errorMsg("\n ERROR: the number of load cases must be at least 1\n");
 		exit(101);
 	}
 	if ( nL >= _NL_ ) { /* too many load cases */
 		sprintf(errMsg,"\n ERROR: maximum of %d load cases allowed\n", _NL_-1);
-		errorMsg(errMsg); 
+		errorMsg(errMsg);
 		exit(102);
 	}
 					/* allocate memory for loads ... */
@@ -360,16 +360,16 @@ For compilation/installation, see README.txt.
 	read_mass_data( fp, IN_file, nN, nE, &nI, &nX,
 			d, EMs, NMs, NMx, NMy, NMz,
 			L, Ax, &total_mass, &struct_mass, &nM,
-			&Mmethod, modal_flag, 
+			&Mmethod, modal_flag,
 			&lump, lump_flag, &tol, tol_flag, &shift, shift_flag,
-			&exagg_modal, modepath, anim, &pan, pan_flag, 
+			&exagg_modal, modepath, anim, &pan, pan_flag,
 			verbose, debug );
 	if ( verbose ) {	/* display mass data complete */
 		fprintf(stdout,"                                                     ");
 		fprintf(stdout," mass data ... complete\n");
 	}
 
-	read_condensation_data( fp, nN,nM, &nC, &Cdof, 
+	read_condensation_data( fp, nN,nM, &nC, &Cdof,
 			&Cmethod, condense_flag, c,m, verbose );
 
 	if( nC>0 && verbose ) {	/*  display condensation data complete */
@@ -389,7 +389,7 @@ For compilation/installation, see README.txt.
 
 	write_input_data ( fp, title, nN,nE,nL, nD,nR, nF,nU,nW,nP,nT,
 			xyz, rj, N1,N2, Ax,Asy,Asz, Jx,Iy,Iz, E,G, p,
-			d, gX, gY, gZ, 
+			d, gX, gY, gZ,
 			F_temp, F_mech, Dp, r, U, W, P, T,
 			shear, anlyz, geom );
 
@@ -409,7 +409,7 @@ For compilation/installation, see README.txt.
 		}
 
 		/*  initialize displacements and displ. increment to {0}  */
-		for (i=1; i<=DoF; i++)	D[i] = dD[i] = 0.0;	
+		for (i=1; i<=DoF; i++)	D[i] = dD[i] = 0.0;
 
 		/*  initialize internal forces to {0}	*/
 		for (i=1; i<=nE; i++)	for (j=1;j<=12;j++)	Q[i][j] = 0.0;
@@ -447,7 +447,7 @@ For compilation/installation, see README.txt.
 		}
 
 		/* ... then apply mechanical loads only, if there are any ... */
-		if ( nF[lc]>0 || nU[lc]>0 || nW[lc]>0 || nP[lc]>0 || nD[lc]>0 || 
+		if ( nF[lc]>0 || nU[lc]>0 || nW[lc]>0 || nP[lc]>0 || nD[lc]>0 ||
 		     gX[lc] != 0 || gY[lc] != 0 || gZ[lc] != 0 ) {
 			if ( verbose )
 				fprintf(stdout," Linear Elastic Analysis ... Mechanical Loads\n");
@@ -464,9 +464,9 @@ For compilation/installation, see README.txt.
 		}
 
 		/*  combine {F} = {F_t} + {F_m} */
-		for (i=1; i<=DoF; i++)	F[lc][i] = F_temp[lc][i] + F_mech[lc][i]; 
+		for (i=1; i<=DoF; i++)	F[lc][i] = F_temp[lc][i] + F_mech[lc][i];
 
-		/*  element forces {Q} for displacements {D}	*/ 
+		/*  element forces {Q} for displacements {D}	*/
 		element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
 				Ax, Asy,Asz, Jx,Iy,Iz, E,G, p, D, shear, geom );
 
@@ -474,8 +474,8 @@ For compilation/installation, see README.txt.
 			fprintf(stdout,"\n Non-Linear Elastic Analysis ...\n");
 
 		/* initialize Broyden secant stiffness matrix, Ks */
-/*  
-		if ( geom ) {	
+/*
+		if ( geom ) {
 			Ks  = dmatrix( 1, DoF, 1, DoF );
 			for (i=1;i<=DoF;i++) {
 				for(j=i;j<=DoF;j++) {
@@ -501,7 +501,7 @@ For compilation/installation, see README.txt.
 			/*  convergence criteria = || {dF}^(i) ||  /  || F || */
 			error = equilibrium_error ( dF, F[lc], K, D, DoF, q );
 
-			// Powell-Symmetric-Broyden secant stiffness update 
+			// Powell-Symmetric-Broyden secant stiffness update
 			// PSB_update ( Ks, dF, dD, DoF );  /* not helpful? */
 
 			/*  solve {dF}^(i) = [K({D}^(i))] * {dD}^(i) */
@@ -516,11 +516,11 @@ For compilation/installation, see README.txt.
 			/*  increment {D}^(i+1} = {D}^{i} + {dD}^(i) */
 			for (i=1; i<=DoF; i++)	if (q[i])	D[i] += dD[i];
 
-			/*  compute element forces {Q} for displacements {D}^(i) */ 
+			/*  compute element forces {Q} for displacements {D}^(i) */
 			element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
 				Ax, Asy,Asz, Jx,Iy,Iz, E,G, p, D, shear, geom );
 
-			if ( verbose ) { 
+			if ( verbose ) {
 				fprintf(stdout,"   NR iteration %3d ---", iter);
 				printf(" RMS relative equilibrium error = %8.2e \n",error);
 			}
@@ -554,7 +554,7 @@ For compilation/installation, see README.txt.
 		}
 
 /*
- *		if ( verbose ) 
+ *		if ( verbose )
  *		 printf("\n   If the program pauses here for very long,"
  *		 " hit CTRL-C to stop execution, \n"
  *		 "    reduce exagg_static in the Input Data,"
@@ -562,7 +562,7 @@ For compilation/installation, see README.txt.
  */
 
 		write_internal_forces ( infcpath, lc, nL, title, dx, xyz,
-					Q, nN, nE, L, N1, N2, 
+					Q, nN, nE, L, N1, N2,
 					Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
 					d, gX[lc], gY[lc], gZ[lc],
 					nU[lc],U[lc],nW[lc],W[lc],nP[lc],P[lc],
@@ -575,7 +575,7 @@ For compilation/installation, see README.txt.
 
 	 } /* end load case loop */
 	} else {
-	
+
 	 if ( verbose ) {	/* display data check only */
 	 	fprintf(stdout,"\n * %s *\n", title );
 	 	fprintf(stdout,"  DATA CHECK ONLY.\n");
@@ -685,7 +685,7 @@ For compilation/installation, see README.txt.
 		}
 		if ( Cmethod == 3 && nM > 0 ) {
 			dyn_conden(M,K, DoF, r, c, Cdof, Mc,Kc, V,f, m, verbose );
-			if ( verbose ) 
+			if ( verbose )
 				fprintf(stdout,"   dynamic condensation of K and M complete\n");
 		}
 		save_dmatrix("Kc", Kc, 1,Cdof, 1,Cdof, 0, "w" );
@@ -701,7 +701,7 @@ For compilation/installation, see README.txt.
 			xyz, rj, L, Le, N1, N2, q,r,
 			Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
 			U,W,P,T, Dp, F_mech, F_temp,
-			feF_mech, feF_temp, F, dF, 
+			feF_mech, feF_temp, F, dF,
 			K, Q, D, dD,
 			d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m
 	);
@@ -712,8 +712,8 @@ For compilation/installation, see README.txt.
 	   fprintf(stderr," The Output Data was appended to %s \n", OUT_file );
 	   fprintf(stderr," A Gnuplot script was written to %s \n", plotpath );
 	   fprintf(stderr," Press the 'Enter' key to close.\n");
-	   (void) getchar();	// clear the buffer ?? 
-	   while( !getchar() ) ;	// wait for the Enter key to be hit 
+	   (void) getchar();	// clear the buffer ??
+	   while( !getchar() ) ;	// wait for the Enter key to be hit
 	}
 	color(0);
 
