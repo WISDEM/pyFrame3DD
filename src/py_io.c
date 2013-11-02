@@ -11,13 +11,15 @@ Mimics frame3d_io.c but allows direct initialization rather than input files
 #include <assert.h>
 
 #include "common.h"
-#include "frame3dd_io.h"
+// #include "frame3dd_io.h"
 #include "coordtrans.h"
 #include "HPGmatrix.h"
 #include "HPGutil.h"
 #include "NRutil.h"
+#include "py_io.h"
 
-// TODO: import structs
+
+
 
 
 /*------------------------------------------------------------------------------
@@ -181,7 +183,13 @@ void read_frame_element_data (Elements *elements,
 READ_RUN_DATA  -  read information for analysis
 Oct 31, 2013
 ------------------------------------------------------------------------------*/
-void read_run_data (int *shear, int *geom, double  *exagg_static, float *dx){
+
+void read_run_data (OtherElementData *other, int *shear, int *geom, double *exagg_static, float *dx){
+
+    *shear = other->shear;
+    *geom = other->geom;
+    *exagg_static = other->exagg_static;
+    *dx = other->dx;
 
     if (*shear != 0 && *shear != 1) {
         errorMsg(" Rember to specify shear deformations with a 0 or a 1 \n after the frame element property info.\n");
@@ -235,7 +243,7 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
         exit(80);
     }
 
-    int *values[6];
+    int values[6];
 
     for (i=1; i <= *nR; i++) {
         j = reactions->N[i-1];
@@ -344,6 +352,9 @@ void read_and_assemble_loads (
     LoadCase lcase;
     PointLoads pL;
     UniformLoads uL;
+    TrapezoidalLoads tL;
+    ElementLoads eL;
+    TemperatureLoads tempL;
     PrescribedDisplacements pD;
 
     for (lc = 1; lc <= nL; lc++) {      /* begin load-case loop */
@@ -352,8 +363,8 @@ void read_and_assemble_loads (
         pL = lcase.pointLoads;
         uL = lcase.uniformLoads;
         tL = lcase.trapezoidalLoads;
-        eL = lcase.elementPointLoads;
-        tL = lcase.temperatureLoads;
+        eL = lcase.elementLoads;
+        tempL = lcase.temperatureLoads;
         pD = lcase.prescribedDisplacements;
 
         if ( verbose ) {  /*  display the load case number */
@@ -761,7 +772,7 @@ void read_and_assemble_loads (
         }                 /* end element point loads */
 
         /* thermal loads    */
-        nT[lc] = tL.nT;
+        nT[lc] = tempL.nT;
         if ( verbose ) {
             fprintf(stdout,"  number of temperature changes ");
             dots(stdout,21); fprintf(stdout," nT = %3d\n", nT[lc] );
@@ -775,20 +786,20 @@ void read_and_assemble_loads (
             exit(160);
         }
         for (i=1; i <= nT[lc]; i++) { /* ! local element coordinates ! */
-            n = tL.EL[i-1];
+            n = tempL.EL[i-1];
             if ( n < 1 || n > nE ) {
                 sprintf(errMsg,"\n  error in temperature loads: frame element number %d is out of range\n",n);
                 errorMsg(errMsg);
                 exit(161);
             }
             T[lc][i][1] = (double) n;
-            T[lc][i][2] = tL.a[i-1];
-            T[lc][i][3] = tL.hy[i-1];
-            T[lc][i][4] = tL.hz[i-1];
-            T[lc][i][5] = tL.Typ[i-1];
-            T[lc][i][6] = tL.Tym[i-1];
-            T[lc][i][7] = tL.Tzp[i-1];
-            T[lc][i][8] = tL.Tzm[i-1];
+            T[lc][i][2] = tempL.a[i-1];
+            T[lc][i][3] = tempL.hy[i-1];
+            T[lc][i][4] = tempL.hz[i-1];
+            T[lc][i][5] = tempL.Typ[i-1];
+            T[lc][i][6] = tempL.Tym[i-1];
+            T[lc][i][7] = tempL.Tzp[i-1];
+            T[lc][i][8] = tempL.Tzm[i-1];
 
             a  = T[lc][i][2];
             hy = T[lc][i][3];
@@ -885,31 +896,30 @@ void read_mass_data (
         int *lump,
         double *tol, double *shift,
         double *exagg_modal,
-        char modepath[],
         int anim[], float *pan,
         int verbose, int debug){
 
 
     int i,j, jnt, m, b, nA;
-    int full_len=0, len=0;
+    // int full_len=0, len=0;
 
     char    errMsg[MAXL];
 
     *total_mass = *struct_mass = 0.0;
 
-    *nM = dynamic.nM;
+    *nM = dynamic->nM;
 
     if ( verbose ) {
         fprintf(stdout," number of dynamic modes ");
         dots(stdout,28);    fprintf(stdout," nM = %3d\n", *nM);
     }
 
-    if ( *nM < 1 || sfrv != 1 ) {
+    if ( *nM < 1 ) {
         *nM = 0;
         return;
     }
 
-    *Mmethod = dynamic.Mmethod;
+    *Mmethod = dynamic->Mmethod;
 
     if ( verbose ) {
         fprintf(stdout," modal analysis method ");
@@ -918,29 +928,29 @@ void read_mass_data (
         if ( *Mmethod == 2 ) fprintf(stdout," (Stodola)\n");
     }
 
-    *lump = dynamic.lump;
-    *tol = dynamic.tol;
-    *shift = dynamic.shift;
-    *exagg_modal = dynamic.exagg_modal;
+    *lump = dynamic->lump;
+    *tol = dynamic->tol;
+    *shift = dynamic->shift;
+    *exagg_modal = dynamic->exagg_modal;
 
     /* number of nodes with extra inertias */
-    *nI = extraInertia.nI;
+    *nI = extraInertia->nI;
     if ( verbose ) {
         fprintf(stdout," number of nodes with extra lumped inertia ");
         dots(stdout,10);    fprintf(stdout," nI = %3d\n",*nI);
     }
     for (j=1; j <= *nI; j++) {
-        jnt = extraInertia.N[j-1];
+        jnt = extraInertia->N[j-1];
         if ( jnt < 1 || jnt > nN ) {
                 sprintf(errMsg,"\n  error in node mass data: node number out of range    Node : %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
             jnt, *nI );
             errorMsg(errMsg);
             exit(86);
         }
-        NMs[jnt] = extraInertia.EMs[j-1];
-        NMx[jnt] = extraInertia.EMx[j-1];
-        NMy[jnt] = extraInertia.EMy[j-1];
-        NMz[jnt] = extraInertia.EMz[j-1];
+        NMs[jnt] = extraInertia->EMs[j-1];
+        NMx[jnt] = extraInertia->EMx[j-1];
+        NMy[jnt] = extraInertia->EMy[j-1];
+        NMz[jnt] = extraInertia->EMz[j-1];
 
         *total_mass += NMs[jnt];
 
@@ -949,21 +959,20 @@ void read_mass_data (
     }
 
     /* number of frame elements with extra beam mass */
-    *nX = extraMass.nX;
+    *nX = extraMass->nX;
     if ( verbose ) {
         fprintf(stdout," number of frame elements with extra mass ");
         dots(stdout,11);    fprintf(stdout," nX = %3d\n",*nX);
-        if (sfrv != 1) sferr("element value in extra element mass data");
     }
     for (m=1; m <= *nX; m++) {
-        b = extraMass.EL[m-1];
+        b = extraMass->EL[m-1];
         if ( b < 1 || b > nE ) {
             sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
             b, *nX );
             errorMsg(errMsg);
             exit(87);
         }
-        EMs[b] = extraMass.EMs[m-1];
+        EMs[b] = extraMass->EMs[m-1];
     }
 
 
@@ -1048,7 +1057,7 @@ void read_condensation_data (
 
     *Cmethod = *nC = *Cdof = 0;
 
-    *Cmethod = condensation.Cmethod;
+    *Cmethod = condensation->Cmethod;
 
     if ( *Cmethod <= 0 )  {
         *Cmethod = *nC = *Cdof = 0;
@@ -1064,7 +1073,7 @@ void read_condensation_data (
         if ( *Cmethod == 3 )    fprintf(stdout," (dynamic) \n");
     }
 
-    *nC = condensation.nC;
+    *nC = condensation->nC;
 
     if ( verbose ) {
         fprintf(stdout," number of nodes with condensed DoF's ");
@@ -1081,13 +1090,13 @@ void read_condensation_data (
     cm = imatrix( 1, *nC, 1,7 );
 
     for ( i=1; i <= *nC; i++) {
-        cm[i][1] = condensation.N[i-1];
-        cm[i][2] = condensation.cx[i-1];
-        cm[i][3] = condensation.cy[i-1];
-        cm[i][4] = condensation.cz[i-1];
-        cm[i][5] = condensation.cxx[i-1];
-        cm[i][6] = condensation.cyy[i-1];
-        cm[i][7] = condensation.czz[i-1];
+        cm[i][1] = condensation->N[i-1];
+        cm[i][2] = condensation->cx[i-1];
+        cm[i][3] = condensation->cy[i-1];
+        cm[i][4] = condensation->cz[i-1];
+        cm[i][5] = condensation->cxx[i-1];
+        cm[i][6] = condensation->cyy[i-1];
+        cm[i][7] = condensation->czz[i-1];
         if ( cm[i][1] < 1 || cm[i][1] > nN ) {     /* error check */
             sprintf(errMsg,"\n  error in matrix condensation data: \n  condensed node number out of range\n  cj[%d] = %d  ... nN = %d  \n", i, cm[i][1], nN );
             errorMsg(errMsg);
@@ -1108,7 +1117,7 @@ void read_condensation_data (
     }
 
     for (i=1; i<= *Cdof; i++) {
-        m[i] = condensation.m[i-1];
+        m[i] = condensation->m[i-1];
         if ( (m[i] < 0 || m[i] > nM) && *Cmethod == 3 ) {
             sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n",
             i, m[i], nM );
@@ -1131,9 +1140,9 @@ void write_static_results (
         int nN, int nE, int nL, int lc, int DoF,
         int *J1, int *J2,
         double *F, double *D, int *r, double **Q,
-        double err, int ok, int axial_sign){
+        double err, int ok){
 
-    double  disp;
+    // double  disp;
     int i,j,n;
     char errMsg[MAXL];
 
@@ -1214,7 +1223,7 @@ write internal forces and local displacements to an output data file
 Oct 31, 2013
 ------------------------------------------------------------------------------*/
 void write_internal_forces (
-        InternalForces *internalForces,
+        InternalForces **internalForces,
         int lc, int nL, float dx,
         vec3 *xyz,
         double **Q, int nN, int nE, double *L, int *J1, int *J2,
@@ -1252,7 +1261,7 @@ void write_internal_forces (
         i, nx,      /* number of sections alont x axis  */
         n1,n2,i1,i2;    /* starting and stopping node no's  */
 
-    char    errMsg[MAXL];
+    // char    errMsg[MAXL];
     time_t  now;        /* modern time variable type        */
 
     if (dx == -1.0) return; // skip calculation of internal forces and displ
@@ -1492,17 +1501,17 @@ void write_internal_forces (
 
     // write results to the internal frame element force output data file
         for (i=0; i<=nx; i++) {
-            internalForces[m-1].x[i] = x[i];
-            internalForces[m-1].Nx[i] = Nx[i];
-            internalForces[m-1].Vy[i] = Vy[i];
-            internalForces[m-1].Vz[i] = Vz[i];
-            internalForces[m-1].Tx[i] = Tx[i];
-            internalForces[m-1].My[i] = My[i];
-            internalForces[m-1].Mz[i] = Mz[i];
-            internalForces[m-1].Dx[i] = Dx[i];
-            internalForces[m-1].Dy[i] = Dy[i];
-            internalForces[m-1].Dz[i] = Dz[i];
-            internalForces[m-1].Rx[i] = Rx[i];
+            internalForces[lc-1][m-1].x[i] = x[i];
+            internalForces[lc-1][m-1].Nx[i] = Nx[i];
+            internalForces[lc-1][m-1].Vy[i] = Vy[i];
+            internalForces[lc-1][m-1].Vz[i] = Vz[i];
+            internalForces[lc-1][m-1].Tx[i] = Tx[i];
+            internalForces[lc-1][m-1].My[i] = My[i];
+            internalForces[lc-1][m-1].Mz[i] = Mz[i];
+            internalForces[lc-1][m-1].Dx[i] = Dx[i];
+            internalForces[lc-1][m-1].Dy[i] = Dy[i];
+            internalForces[lc-1][m-1].Dz[i] = Dz[i];
+            internalForces[lc-1][m-1].Rx[i] = Rx[i];
         }
 
     // free memory
@@ -1541,7 +1550,7 @@ void write_modal_results(
     int i, j, k, m, num_modes;
     double  mpfX, mpfY, mpfZ,   /* mode participation factors   */
         *msX, *msY, *msZ;
-    double  fs;
+    // double  fs;
 
     msX = dvector(1,DoF);
     msY = dvector(1,DoF);
@@ -1557,19 +1566,18 @@ void write_modal_results(
     if ( (DoF - sumR) > nM )    num_modes = nM;
     else    num_modes = DoF - sumR;
 
-    massR.totalMass = total_mass;
-    massR.struct_mass = struct_mass;
-    massR.N
-    X-mass      Y-mass      Z-mass      X-inrta     Y-inrta     Z-inrta
+    massR->total_mass = total_mass;
+    massR->struct_mass = struct_mass;
+
     for (j=1; j <= nN; j++) {
         k = 6*(j-1);
-        massR.N[j-1] = j;
-        massR.xmass[j-1] = M[k+1][k+1];
-        massR.ymass[j-1] = M[k+2][k+2];
-        massR.zmass[j-1] = M[k+3][k+3];
-        massR.xinrta[j-1] = M[k+4][k+4];
-        massR.yinrta[j-1] = M[k+5][k+5];
-        massR.zinrta[j-1] = M[k+6][k+6];
+        massR->N[j-1] = j;
+        massR->xmass[j-1] = M[k+1][k+1];
+        massR->ymass[j-1] = M[k+2][k+2];
+        massR->zmass[j-1] = M[k+3][k+3];
+        massR->xinrta[j-1] = M[k+4][k+4];
+        massR->yinrta[j-1] = M[k+5][k+5];
+        massR->zinrta[j-1] = M[k+6][k+6];
     }
 
     //TODO use tol
@@ -1577,19 +1585,19 @@ void write_modal_results(
         mpfX = 0.0; for (i=1; i<=DoF; i++)    mpfX += V[i][m]*msX[i];
         mpfY = 0.0; for (i=1; i<=DoF; i++)    mpfY += V[i][m]*msY[i];
         mpfZ = 0.0; for (i=1; i<=DoF; i++)    mpfZ += V[i][m]*msZ[i];
-        modalR.freq[m-1] = f[m];
-        modalR.xmodal[m-1] = mpfX;
-        modalR.ymodal[m-1] = mpfY;
-        modalR.zmodal[m-1] = mpfZ;
+        modalR[m-1].freq = f[m];
+        modalR[m-1].xmpf = mpfX;
+        modalR[m-1].ympf = mpfY;
+        modalR[m-1].zmpf = mpfZ;
 
         for (j=1; j<= nN; j++) {
-            modalR.mode[m-1].N[j-1] = j;
-            modalR.mode[m-1].xdsp[j-1] = V[6*j-5][m];
-            modalR.mode[m-1].ydsp[j-1] = V[6*j-4][m];
-            modalR.mode[m-1].zdsp[j-1] = V[6*j-3][m];
-            modalR.mode[m-1].xrot[j-1] = V[6*j-2][m];
-            modalR.mode[m-1].yrot[j-1] = V[6*j-1][m];
-            modalR.mode[m-1].zrot[j-1] = V[6*j][m];
+            modalR[m-1].N[j-1] = j;
+            modalR[m-1].xdsp[j-1] = V[6*j-5][m];
+            modalR[m-1].ydsp[j-1] = V[6*j-4][m];
+            modalR[m-1].zdsp[j-1] = V[6*j-3][m];
+            modalR[m-1].xrot[j-1] = V[6*j-2][m];
+            modalR[m-1].yrot[j-1] = V[6*j-1][m];
+            modalR[m-1].zrot[j-1] = V[6*j][m];
         }
     }
 
@@ -1612,3 +1620,12 @@ void write_modal_results(
 }
 
 
+
+
+/*------------------------------------------------------------------------------
+DOTS  -  print a set of dots (periods)
+------------------------------------------------------------------------------*/
+void dots ( FILE *fp, int n ) {
+    int i;
+    for (i=1; i<=n; i++)    fprintf(fp,".");
+}

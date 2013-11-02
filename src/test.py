@@ -9,6 +9,7 @@ Copyright (c) NREL. All rights reserved.
 
 
 import numpy as np
+import math
 from ctypes import POINTER, c_int, c_double, c_float, Structure, byref, cast
 
 c_int_p = POINTER(c_int)
@@ -23,6 +24,10 @@ def dp(x):
     return x.ctypes.data_as(c_double_p)
 
 
+
+# --------------
+# General Inputs
+# --------------
 
 class Nodes(Structure):
     _fields_ = [('nN', c_int),
@@ -76,6 +81,22 @@ class Elements(Structure):
                    dp(Jx), dp(Iy), dp(Iz), dp(E), dp(G), dp(roll), dp(density))
 
 
+class OtherElementData(Structure):
+    _fields_ = [('shear', c_int),
+                ('geom', c_int),
+                ('exagg_static', c_double),
+                ('dx', c_double)]
+
+    @classmethod
+    def setup(cls, shear, geom, exagg_static, dx):
+        return cls(shear, geom, exagg_static, dx)
+
+
+
+# --------------
+# Load Inputs
+# --------------
+
 
 class PointLoads(Structure):
     _fields_ = [('nF', c_int),
@@ -106,6 +127,61 @@ class UniformLoads(Structure):
         return cls(len(EL), ip(EL), dp(Ux), dp(Uy), dp(Uz))
 
 
+
+class TrapezoidalLoads(Structure):
+    _fields_ = [('nW', c_int),
+                ('EL', c_int_p),
+                ('xx1', c_double_p),
+                ('xx2', c_double_p),
+                ('wx1', c_double_p),
+                ('wx2', c_double_p),
+                ('xy1', c_double_p),
+                ('xy2', c_double_p),
+                ('wy1', c_double_p),
+                ('wy2', c_double_p),
+                ('xz1', c_double_p),
+                ('xz2', c_double_p),
+                ('wz1', c_double_p),
+                ('wz2', c_double_p)]
+
+    @classmethod
+    def setup(cls, EL, xx1, xx2, wx1, wx2, xy1, xy2, wy1, wy2, xz1, xz2, wz1, wz2):
+        return cls(len(EL), ip(EL), dp(xx1), dp(xx2), dp(wx1), dp(wx2),
+            dp(xy1), dp(xy2), dp(wy1), dp(wy2), dp(xz1), dp(xz2), dp(wz1), dp(wz2))
+
+
+class ElementLoads(Structure):
+    _fields_ = [('nP', c_int),
+                ('EL', c_int_p),
+                ('Px', c_double_p),
+                ('Py', c_double_p),
+                ('Pz', c_double_p),
+                ('x', c_double_p)]
+
+    @classmethod
+    def setup(cls, EL, Px, Py, Pz, x):
+        return cls(len(EL), ip(EL), dp(Px), dp(Py), dp(Pz), dp(x))
+
+
+class TemperatureLoads(Structure):
+    _fields_ = [('nT', c_int),
+                ('EL', c_int_p),
+                ('a', c_double_p),
+                ('hy', c_double_p),
+                ('hz', c_double_p),
+                ('Typ', c_double_p),
+                ('Tym', c_double_p),
+                ('Tzp', c_double_p),
+                ('Tzm', c_double_p),
+                ]
+
+    @classmethod
+    def setup(cls, EL, a, hy, hz, Typ, Tym, Tzp, Tzm):
+        return cls(len(EL), ip(EL), dp(a), dp(hy), dp(hz), dp(Typ),
+            dp(Tym), dp(Tzp), dp(Tzm))
+
+
+
 class PrescribedDisplacements(Structure):
     _fields_ = [('nD', c_int),
                 ('N', c_int_p),
@@ -129,14 +205,78 @@ class LoadCase(Structure):
                 ('gz', c_double),
                 ('pointLoads', PointLoads),
                 ('uniformLoads', UniformLoads),
+                ('trapezoidalLoads', TrapezoidalLoads),
+                ('elementLoads', ElementLoads),
+                ('temperatureLoads', TemperatureLoads),
                 ('prescribedDisplacements', PrescribedDisplacements)]
 
     @classmethod
-    def setup(cls, gx, gy, gz, pL, uL, pD):
-        return cls(gx, gy, gz, pL, uL, pD)
+    def setup(cls, gx, gy, gz, pL, uL, tL, eL, tempL, pD):
+        return cls(gx, gy, gz, pL, uL, tL, eL, tempL, pD)
 
 
+# --------------
+# Dynamic Inputs
+# --------------
 
+
+class DynamicData(Structure):
+    _fields_ = [('nM', c_int),
+                ('Mmethod', c_int),
+                ('lump', c_int),
+                ('tol', c_double),
+                ('shift', c_double),
+                ('exagg_modal', c_double)]
+
+    @classmethod
+    def setup(cls, nM, Mmethod, lump, tol, shift, exagg_modal):
+        return cls(nM, Mmethod, lump, tol, shift, exagg_modal)
+
+
+class ExtraInertia(Structure):
+    _fields_ = [('nI', c_int),
+                ('N', c_int_p),
+                ('EMs', c_double_p),
+                ('EMx', c_double_p),
+                ('EMy', c_double_p),
+                ('EMz', c_double_p)]
+
+    @classmethod
+    def setup(cls, N, EMs, EMx, EMy, EMz):
+        return cls(len(N), ip(N), dp(EMs), dp(EMx), dp(EMy), dp(EMz))
+
+
+class ExtraMass(Structure):
+    _fields_ = [('nX', c_int),
+                ('EL', c_int_p),
+                ('EMs', c_double_p)]
+
+    @classmethod
+    def setup(cls, EL, EMs):
+        return cls(len(EL), ip(EL), dp(EMs))
+
+
+class Condensation(Structure):
+    _fields_ = [('Cmethod', c_int),
+                ('nC', c_int),
+                ('N', c_int_p),
+                ('cx', c_double_p),
+                ('cy', c_double_p),
+                ('cz', c_double_p),
+                ('cxx', c_double_p),
+                ('cyy', c_double_p),
+                ('czz', c_double_p),
+                ('m', c_int_p)]
+
+    @classmethod
+    def setup(cls, Cmethod, N, cx, cy, cz, cxx, cyy, czz, m):
+        return cls(Cmethod, len(N), ip(N), dp(cx), dp(cy), dp(cz),
+            dp(cxx), dp(cyy), dp(czz), ip(m))
+
+
+# --------------
+# Static Data Outputs
+# --------------
 
 class Displacements(Structure):
     _fields_ = [('node', c_int_p),
@@ -183,6 +323,80 @@ class ReactionForces(Structure):
     def setup(cls, node, Fx, Fy, Fz, Mxx, Myy, Mzz):
         return cls(ip(node), dp(Fx), dp(Fy), dp(Fz),
                    dp(Mxx), dp(Myy), dp(Mzz))
+
+
+
+# --------------
+# Internal Force Outputs
+# --------------
+
+
+class InternalForces(Structure):
+    _fields_ = [('x', c_double_p),
+                ('Nx', c_double_p),
+                ('Vy', c_double_p),
+                ('Vz', c_double_p),
+                ('Tx', c_double_p),
+                ('My', c_double_p),
+                ('Mz', c_double_p),
+                ('Dx', c_double_p),
+                ('Dy', c_double_p),
+                ('Dz', c_double_p),
+                ('Rx', c_double_p),
+                ]
+
+    @classmethod
+    def setup(cls, x, Nx, Vy, Vz, Tx, My, Mz, Dx, Dy, Dz, Rx):
+        return cls(dp(x), dp(Nx), dp(Vy), dp(Vz), dp(Tx), dp(My), dp(Mz), dp(Dx), dp(Dy), dp(Dz), dp(Rx))
+
+
+
+
+
+# --------------
+# Modal Outputs
+# --------------
+
+
+class MassResults(Structure):
+    _fields_ = [('total_mass', c_double),
+                ('struct_mass', c_double),
+                ('N', c_int_p),
+                ('xmass', c_double_p),
+                ('ymass', c_double_p),
+                ('zmass', c_double_p),
+                ('xinrta', c_double_p),
+                ('yinrta', c_double_p),
+                ('zinrta', c_double_p),
+                ]
+
+    @classmethod
+    def setup(cls, total_mass, struct_mass, N, xmass, ymass, zmass, xinrta, yinrta, zinrta):
+        return cls(total_mass, struct_mass, ip(N),
+            dp(xmass), dp(ymass), dp(zmass), dp(xinrta), dp(yinrta), dp(zinrta))
+
+
+class ModalResults(Structure):
+    _fields_ = [('freq', c_double),
+                ('xmpf', c_double),
+                ('ympf', c_double),
+                ('zmpf', c_double),
+                ('N', c_int_p),
+                ('xdsp', c_double_p),
+                ('ydsp', c_double_p),
+                ('zdsp', c_double_p),
+                ('xrot', c_double_p),
+                ('yrot', c_double_p),
+                ('zrot', c_double_p),
+                ]
+
+    @classmethod
+    def setup(cls, freq, xmpf, ympf, zmpf, N, xdsp, ydsp, zdsp, xrot, yrot, zrot):
+        return cls(freq, xmpf, ympf, zmpf, ip(N),
+            dp(xdsp), dp(ydsp), dp(zdsp), dp(xrot), dp(yrot), dp(zrot))
+
+
+
 
 
 
@@ -233,6 +447,8 @@ geom = 0                # 1: include geometric stiffness
 exagg_static = 10.0     # exaggerate mesh deformations
 dx = 10.0               # x-axis increment for internal forces
 
+other = OtherElementData.setup(shear, geom, exagg_static, dx)
+
 
 # load cases
 
@@ -251,11 +467,50 @@ Mzz = np.zeros(5)
 pL = PointLoads.setup(nF, Fx, Fy, Fz, Mxx, Myy, Mzz)
 
 
-ELU = np.array([])
+ELU = np.array([], dtype=np.int32)
 Ux = np.array([])
 Uy = np.array([])
 Uz = np.array([])
 uL = UniformLoads.setup(ELU, Ux, Uy, Uz)
+
+
+ELT = np.array([], dtype=np.int32)
+xx1 = np.array([])
+xx2 = np.array([])
+wx1 = np.array([])
+wx2 = np.array([])
+xy1 = np.array([])
+xy2 = np.array([])
+wy1 = np.array([])
+wy2 = np.array([])
+xz1 = np.array([])
+xz2 = np.array([])
+wz1 = np.array([])
+wz2 = np.array([])
+
+tL = TrapezoidalLoads.setup(ELT, xx1, xx2, wx1, wx2, xy1, xy2, wy1, wy2, xz1, xz2, wz1, wz2)
+
+
+EEL = np.array([], dtype=np.int32)
+EPx = np.array([])
+EPy = np.array([])
+EPz = np.array([])
+EEx = np.array([])
+
+eL = ElementLoads.setup(EEL, EPx, EPy, EPz, EEx)
+
+
+TEL = np.array([], dtype=np.int32)
+Ta = np.array([])
+Thy = np.array([])
+Thz = np.array([])
+TTyp = np.array([])
+TTym = np.array([])
+TTzp = np.array([])
+TTzm = np.array([])
+
+tempL = TemperatureLoads.setup(TEL, Ta, Thy, Thz, TTyp, TTym, TTzp, TTzm)
+
 
 nD = np.array([8], dtype=np.int32)
 Dx = np.array([0.1])
@@ -266,10 +521,51 @@ Dyy = np.array([0.0])
 Dzz = np.array([0.0])
 pD = PrescribedDisplacements.setup(nD, Dx, Dy, Dz, Dxx, Dyy, Dzz)
 
-l1 = LoadCase.setup(gx, gy, gz, pL, uL, pD)
+l1 = LoadCase.setup(gx, gy, gz, pL, uL, tL, eL, tempL, pD)
 nCases = 1
 
 cases = (LoadCase * nCases)(l1)
+
+
+nM = 0
+Mmethod = 1
+lump = 0
+tol = 1e-4
+shift = 0.0
+exagg_modal = 0.0
+
+
+dynamic = DynamicData.setup(nM, Mmethod, lump, tol, shift, exagg_modal)
+
+
+Ninertia = np.array([], dtype=np.int32)
+EMs = np.array([])
+EMx = np.array([])
+EMy = np.array([])
+EMz = np.array([])
+
+inertia = ExtraInertia.setup(Ninertia, EMs, EMx, EMy, EMz)
+
+
+ELmass = np.array([], dtype=np.int32)
+EMsmass = np.array([])
+
+mass = ExtraMass.setup(ELmass, EMsmass)
+
+
+Cmethod = 0
+CN = np.array([], dtype=np.int32)
+cx = np.array([])
+cy = np.array([])
+cz = np.array([])
+cxx = np.array([])
+cyy = np.array([])
+czz = np.array([])
+Cm = np.array([], dtype=np.int32)
+
+condensation = Condensation.setup(Cmethod, CN, cx, cy, cz, cxx, cyy, czz, Cm)
+
+
 
 
 # outputs
@@ -285,7 +581,6 @@ ddyrot = np.zeros(nN)
 ddzrot = np.zeros(nN)
 
 disp1 = Displacements.setup(ddnodes, ddx, ddy, ddz, ddxrot, ddyrot, ddzrot)
-
 
 
 Eelement = np.zeros(nE*2, dtype=np.int32)
@@ -310,20 +605,96 @@ RMzz = np.zeros(nN)
 
 reactionForces1 = ReactionForces.setup(Rnode, RFx, RFy, RFz, RMxx, RMyy, RMzz)
 
+
+intF = []
+
+
+for i in range(nE):
+
+    L = math.sqrt(
+        (x[N2[i]-1] - x[N1[i]-1])**2 +
+        (y[N2[i]-1] - y[N1[i]-1])**2 +
+        (z[N2[i]-1] - z[N1[i]-1])**2
+        )
+
+    length = int(max(math.floor(L/dx), 1))
+
+    xrf = np.zeros(length)
+    Nxrf = np.zeros(length)
+    Vyrf = np.zeros(length)
+    Vzrf = np.zeros(length)
+    Txrf = np.zeros(length)
+    Myrf = np.zeros(length)
+    Mzrf = np.zeros(length)
+    Dxrf = np.zeros(length)
+    Dyrf = np.zeros(length)
+    Dzrf = np.zeros(length)
+    Rxrf = np.zeros(length)
+
+    fi = InternalForces.setup(xrf, Nxrf, Vyrf, Vzrf, Txrf, Myrf, Mzrf, Dxrf, Dyrf, Dzrf, Rxrf)
+    intF.append(fi)
+
+internalForces1 = (InternalForces * nE)(*intF)
+
+
+total_mass = 0.0
+struct_mass = 0.0
+
+MN = np.zeros(nN, dtype=np.int32)
+Mxmass = np.zeros(nN)
+Mymass = np.zeros(nN)
+Mzmass = np.zeros(nN)
+Mxinrta = np.zeros(nN)
+Myinrta = np.zeros(nN)
+Mzinrta = np.zeros(nN)
+
+massResults = MassResults.setup(total_mass, struct_mass, MN, Mxmass, Mymass, Mzmass, Mxinrta, Myinrta, Mzinrta)
+
+
+
+modalResults = (ModalResults * nM)()
+
+for i in range(nM):
+
+    freq = 0.0
+    xmpf = 0.0
+    ympf = 0.0
+    zmpf = 0.0
+    Nmodal = np.zeros(nN)
+    xdsp = np.zeros(nN)
+    ydsp = np.zeros(nN)
+    zdsp = np.zeros(nN)
+    xrot = np.zeros(nN)
+    yrot = np.zeros(nN)
+    zrot = np.zeros(nN)
+
+    mR = ModalResults.setup(freq, xmpf, ympf, zmpf, Nmodal, xdsp, ydsp, zdsp, xrot, yrot, zrot)
+
+    modalResults[i] = mR
+
+
+
+
 disp = (Displacements * nCases)(disp1)
 forces = (Forces * nCases)(forces1)
 reactionForces = (ReactionForces * nCases)(reactionForces1)
+internalForces = (POINTER(InternalForces) * nCases)(internalForces1)
+
 
 _frame3dd = np.ctypeslib.load_library('_pyframe3dd', '.')
 
-_frame3dd.readinputs.argtypes = [POINTER(Nodes), POINTER(Reactions), POINTER(Elements),
-    c_int, c_int, c_double, c_float, c_int, POINTER(LoadCase),
-    POINTER(Displacements), POINTER(Forces), POINTER(ReactionForces)]
-_frame3dd.readinputs.restype = None
+_frame3dd.run.argtypes = [POINTER(Nodes), POINTER(Reactions), POINTER(Elements),
+    POINTER(OtherElementData), c_int, POINTER(LoadCase),
+    POINTER(DynamicData), POINTER(ExtraInertia), POINTER(ExtraMass),
+    POINTER(Condensation),
+    POINTER(Displacements), POINTER(Forces), POINTER(ReactionForces),
+    POINTER(POINTER(InternalForces)), POINTER(MassResults), POINTER(ModalResults)]
+_frame3dd.run.restype = c_int
 
 
-_frame3dd.readinputs(nodes, reactions, elements, shear, geom, exagg_static, dx, nCases, cases,
-    disp, forces, reactionForces)
+_frame3dd.run(nodes, reactions, elements, other, nCases, cases,
+    dynamic, inertia, mass, condensation,
+    disp, forces, reactionForces, internalForces, massResults, modalResults)
 
 # x = np.ctypeslib.ndpointer(dtype=c_double, shape=(nN,))
 
