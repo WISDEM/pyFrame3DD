@@ -201,15 +201,15 @@ typedef struct {
 
 
 typedef struct {
-    double total_mass, struct_mass;
+    double *total_mass, *struct_mass;
     int *N;
     double *xmass, *ymass, *zmass, *xinrta, *yinrta, *zinrta;
 
 } MassResults;
 
 typedef struct {
-    double freq;
-    double xmpf, ympf, zmpf;
+    double *freq;
+    double *xmpf, *ympf, *zmpf;
     int *N;
     double *xdsp, *ydsp, *zdsp, *xrot, *yrot, *zrot;
 

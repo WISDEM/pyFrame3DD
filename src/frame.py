@@ -9,7 +9,7 @@ Copyright (c) NREL. All rights reserved.
 
 import numpy as np
 import math
-from ctypes import POINTER, c_int, c_double, Structure
+from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
 
 
@@ -284,8 +284,8 @@ class C_InternalForces(Structure):
 
 
 class C_MassResults(Structure):
-    _fields_ = [('total_mass', c_double),
-                ('struct_mass', c_double),
+    _fields_ = [('total_mass', c_double_p),
+                ('struct_mass', c_double_p),
                 ('N', c_int_p),
                 ('xmass', c_double_p),
                 ('ymass', c_double_p),
@@ -298,10 +298,10 @@ class C_MassResults(Structure):
 
 
 class C_ModalResults(Structure):
-    _fields_ = [('freq', c_double),
-                ('xmpf', c_double),
-                ('ympf', c_double),
-                ('zmpf', c_double),
+    _fields_ = [('freq', c_double_p),
+                ('xmpf', c_double_p),
+                ('ympf', c_double_p),
+                ('zmpf', c_double_p),
                 ('N', c_int_p),
                 ('xdsp', c_double_p),
                 ('ydsp', c_double_p),
@@ -346,8 +346,13 @@ class Frame(object):
         self.elements = elements
         self.other = other
 
-        # convert to C int size (not longs) and save to prevent releasing (b/c address space is shared by c)
+        # convert to C int size (not longs) and copy to prevent releasing (b/c address space is shared by c)
         self.nnode = nodes.node.astype(np.int32)
+        self.nx = np.copy(nodes.x)
+        self.ny = np.copy(nodes.y)
+        self.nz = np.copy(nodes.z)
+        self.nr = np.copy(nodes.r)
+
         self.rnode = reactions.node.astype(np.int32)
         self.rRx = reactions.Rx.astype(np.int32)
         self.rRy = reactions.Ry.astype(np.int32)
@@ -355,23 +360,34 @@ class Frame(object):
         self.rRxx = reactions.Rxx.astype(np.int32)
         self.rRyy = reactions.Ryy.astype(np.int32)
         self.rRzz = reactions.Rzz.astype(np.int32)
+
         self.eelement = elements.element.astype(np.int32)
         self.eN1 = elements.N1.astype(np.int32)
         self.eN2 = elements.N2.astype(np.int32)
+        self.eAx = np.copy(elements.Ax)
+        self.eAsy = np.copy(elements.Asy)
+        self.eAsz = np.copy(elements.Asz)
+        self.eJx = np.copy(elements.Jx)
+        self.eIy = np.copy(elements.Iy)
+        self.eIz = np.copy(elements.Iz)
+        self.eE = np.copy(elements.E)
+        self.eG = np.copy(elements.G)
+        self.eroll = np.copy(elements.roll)
+        self.edensity = np.copy(elements.density)
 
 
         # create c objects
-        self.c_nodes = C_Nodes(len(self.nnode), ip(self.nnode), dp(nodes.x),
-            dp(nodes.y), dp(nodes.z), dp(nodes.r))
+        self.c_nodes = C_Nodes(len(self.nnode), ip(self.nnode), dp(self.nx),
+            dp(self.ny), dp(self.nz), dp(self.nr))
 
         self.c_reactions = C_Reactions(len(self.rnode), ip(self.rnode),
             ip(self.rRx), ip(self.rRy), ip(self.rRz),
             ip(self.rRxx), ip(self.rRyy), ip(self.rRzz))
 
         self.c_elements = C_Elements(len(self.eelement), ip(self.eelement),
-            ip(self.eN1), ip(self.eN2), dp(elements.Ax), dp(elements.Asy),
-            dp(elements.Asz), dp(elements.Jx), dp(elements.Iy), dp(elements.Iz),
-            dp(elements.E), dp(elements.G), dp(elements.roll), dp(elements.density))
+            ip(self.eN1), ip(self.eN2), dp(self.eAx), dp(self.eAsy),
+            dp(self.eAsz), dp(self.eJx), dp(self.eIy), dp(self.eIz),
+            dp(self.eE), dp(self.eG), dp(self.eroll), dp(self.edensity))
 
         self.c_other = C_OtherElementData(other.shear, other.geom, other.exagg_static, other.dx)
 
@@ -469,7 +485,7 @@ class Frame(object):
             np.zeros(nN), np.zeros(nN), np.zeros(nN)
         )
         modalout = Modes(np.zeros(nM), np.zeros(nM), np.zeros(nM), np.zeros(nM),
-            np.zeros((nM, nN)), np.zeros((nM, nN)), np.zeros((nM, nN)),
+            np.zeros((nM, nN), dtype=np.int32), np.zeros((nM, nN)), np.zeros((nM, nN)),
             np.zeros((nM, nN)), np.zeros((nM, nN)), np.zeros((nM, nN)),
             np.zeros((nM, nN))
         )
@@ -478,45 +494,57 @@ class Frame(object):
 
         # create c structs
 
-        loadcases = (C_LoadCase * nCases)()
-        disp = (C_Displacements * nCases)()
-        forces = (C_Forces * nCases)()
-        reactions = (C_ReactionForces * nCases)()
-        internalForces = (POINTER(C_InternalForces) * nCases)()
+        c_loadcases = (C_LoadCase * nCases)()
+        c_disp = (C_Displacements * nCases)()
+        c_forces = (C_Forces * nCases)()
+        c_reactions = (C_ReactionForces * nCases)()
+        c_internalForces = (POINTER(C_InternalForces) * nCases)()
 
 
         for i in range(nCases):
             lci = self.loadCases[i]
-            loadcases[i] = C_LoadCase(lci.gx, lci.gy, lci.gz, lci.pL,
+            c_loadcases[i] = C_LoadCase(lci.gx, lci.gy, lci.gz, lci.pL,
                 lci.uL, lci.tL, lci.eL, lci.tempL, lci.pD)
-            disp[i] = C_Displacements(ip(dout.node[i, :]),
+            c_disp[i] = C_Displacements(ip(dout.node[i, :]),
                 dp(dout.dx[i, :]), dp(dout.dy[i, :]), dp(dout.dz[i, :]),
                 dp(dout.dxrot[i, :]), dp(dout.dyrot[i, :]), dp(dout.dzrot[i, :]))
-            forces[i] = C_Forces(ip(fout.element[i, :]), ip(fout.node[i, :]),
+            c_forces[i] = C_Forces(ip(fout.element[i, :]), ip(fout.node[i, :]),
                 dp(fout.Nx[i, :]), dp(fout.Vy[i, :]), dp(fout.Vz[i, :]),
                 dp(fout.Txx[i, :]), dp(fout.Myy[i, :]), dp(fout.Mzz[i, :]))
-            reactions[i] = C_ReactionForces(ip(rout.node[i, :]),
+            c_reactions[i] = C_ReactionForces(ip(rout.node[i, :]),
                 dp(rout.Fx[i, :]), dp(rout.Fy[i, :]), dp(rout.Fz[i, :]),
                 dp(rout.Mxx[i, :]), dp(rout.Myy[i, :]), dp(rout.Mzz[i, :]))
 
-            internalForces[i] = (C_InternalForces * nE)()
+            c_internalForces[i] = (C_InternalForces * nE)()
             for j in range(nE):
-                (internalForces[i])[j] = C_InternalForces(dp(ifout[j].x[i, :]), dp(ifout[j].Nx[i, :]),
+                (c_internalForces[i])[j] = C_InternalForces(dp(ifout[j].x[i, :]), dp(ifout[j].Nx[i, :]),
                     dp(ifout[j].Vy[i, :]), dp(ifout[j].Vz[i, :]), dp(ifout[j].Tx[i, :]),
                     dp(ifout[j].My[i, :]), dp(ifout[j].Mz[i, :]), dp(ifout[j].Dx[i, :]),
                     dp(ifout[j].Dy[i, :]), dp(ifout[j].Dz[i, :]), dp(ifout[j].Rx[i, :]))
 
+        total_mass = c_double()
+        struct_mass = c_double()
 
-        massResults = C_MassResults(mout.total_mass, mout.struct_mass, ip(mout.node),
+        c_massResults = C_MassResults(pointer(total_mass), pointer(struct_mass), ip(mout.node),
             dp(mout.xmass), dp(mout.ymass), dp(mout.zmass),
             dp(mout.xinrta), dp(mout.yinrta), dp(mout.zinrta))
 
-        modalResults = (C_ModalResults * nM)()
+        c_modalResults = (C_ModalResults * nM)()
+
+        freq = [0]*nM
+        xmpf = [0]*nM
+        ympf = [0]*nM
+        zmpf = [0]*nM
 
         for i in range(nM):
 
-            modalResults[i] = C_ModalResults(modalout.freq[i], modalout.xmpf[i],
-                modalout.ympf[i], modalout.zmpf[i], ip(modalout.node[i, :]),
+            freq[i] = c_double()
+            xmpf[i] = c_double()
+            ympf[i] = c_double()
+            zmpf[i] = c_double()
+
+            c_modalResults[i] = C_ModalResults(pointer(freq[i]), pointer(xmpf[i]),
+                pointer(ympf[i]), pointer(zmpf[i]), ip(modalout.node[i, :]),
                 dp(modalout.xdsp[i, :]), dp(modalout.ydsp[i, :]), dp(modalout.zdsp[i, :]),
                 dp(modalout.xrot[i, :]), dp(modalout.yrot[i, :]), dp(modalout.zrot[i, :])
             )
@@ -526,10 +554,21 @@ class Frame(object):
 
 
         self._frame3dd.run(self.c_nodes, self.c_reactions, self.c_elements, self.c_other,
-            nCases, loadcases,
+            nCases, c_loadcases,
             d.dynamicData, d.extraInertia, d.extraMass, d.condensation,
-            disp, forces, reactions, internalForces, massResults, modalResults)
+            c_disp, c_forces, c_reactions, c_internalForces, c_massResults, c_modalResults)
 
+        # put mass values back in since tuple is read only
+        mout = NodeMasses(total_mass.value, struct_mass.value, mout.node,
+            mout.xmass, mout.ymass, mout.zmass,
+            mout.xinrta, mout.yinrta, mout.zinrta)
+
+        # put modal results back in
+        for i in range(nM):
+            modalout.freq[i] = freq[i].value
+            modalout.xmpf[i] = xmpf[i].value
+            modalout.ympf[i] = ympf[i].value
+            modalout.zmpf[i] = zmpf[i].value
 
         return dout, fout, rout, ifout, mout, modalout
 
@@ -698,7 +737,7 @@ class DynamicAnalysis(object):
         self.ELM = EL.astype(np.int32)
         self.EMsM = np.copy(EMs)
 
-        self.extraMass = C_ExtraMass(len(EL), ip(self.ELM), dp(self.EMs))
+        self.extraMass = C_ExtraMass(len(EL), ip(self.ELM), dp(self.EMsM))
 
 
 

@@ -111,10 +111,10 @@ int run(Nodes* nodes, Reactions* reactions, Elements* elements,
         Cmethod=0,  // matrix condensation method
         *c=NULL,    // vector of DoF's to condense
         *m=NULL,    // vector of modes to condense
-        write_matrix=-1,  //   write stiffness and mass matrix
+        write_matrix=0,  //   write stiffness and mass matrix
         // filetype=0, // 1 if .CSV, 2 if file is Matlab
         debug=0,    // 1: debugging screen output, 0: none
-        verbose=1;  // 1: copious screen output, 0: none
+        verbose=0;  // 1: copious screen output, 0: none
 
 
     if ( verbose ) { /*  display program name, version and license type */
@@ -564,9 +564,10 @@ int run(Nodes* nodes, Reactions* reactions, Elements* elements,
             d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m
     );
 
-    if ( verbose ) fprintf(stdout,"\n");
-
-    color(0);
+    if ( verbose ) {
+        fprintf(stdout,"\n");
+        color(0);
+    }
 
 
     return(0);

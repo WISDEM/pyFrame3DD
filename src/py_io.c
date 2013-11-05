@@ -1566,8 +1566,8 @@ void write_modal_results(
     if ( (DoF - sumR) > nM )    num_modes = nM;
     else    num_modes = DoF - sumR;
 
-    massR->total_mass = total_mass;
-    massR->struct_mass = struct_mass;
+    *(massR->total_mass) = total_mass;
+    *(massR->struct_mass) = struct_mass;
 
     for (j=1; j <= nN; j++) {
         k = 6*(j-1);
@@ -1585,10 +1585,10 @@ void write_modal_results(
         mpfX = 0.0; for (i=1; i<=DoF; i++)    mpfX += V[i][m]*msX[i];
         mpfY = 0.0; for (i=1; i<=DoF; i++)    mpfY += V[i][m]*msY[i];
         mpfZ = 0.0; for (i=1; i<=DoF; i++)    mpfZ += V[i][m]*msZ[i];
-        modalR[m-1].freq = f[m];
-        modalR[m-1].xmpf = mpfX;
-        modalR[m-1].ympf = mpfY;
-        modalR[m-1].zmpf = mpfZ;
+        *(modalR[m-1].freq) = f[m];
+        *(modalR[m-1].xmpf) = mpfX;
+        *(modalR[m-1].ympf) = mpfY;
+        *(modalR[m-1].zmpf) = mpfZ;
 
         for (j=1; j<= nN; j++) {
             modalR[m-1].N[j-1] = j;

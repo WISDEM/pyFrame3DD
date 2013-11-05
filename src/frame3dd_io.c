@@ -51,13 +51,13 @@ static void getline_no_comment(
 
 
 /*------------------------------------------------------------------------------
-PARSE_OPTIONS -  parse command line options		
-command line options over-ride values in the input data file	 	
+PARSE_OPTIONS -  parse command line options
+command line options over-ride values in the input data file
 04 Mar 2009, 22 Sep 2009
 ------------------------------------------------------------------------------*/
 void parse_options (
-	int argc, char *argv[], 
-	char IN_file[], char OUT_file[], 
+	int argc, char *argv[],
+	char IN_file[], char OUT_file[],
 	int *shear_flag,
 	int *geom_flag,
 	int *anlyz_flag,
@@ -65,7 +65,7 @@ void parse_options (
 	int *D3_flag,
 	int *lump_flag,
 	int *modal_flag,
-	double *tol_flag, 
+	double *tol_flag,
 	double *shift_flag,
 	float *pan_flag,
 	int *write_matrix,
@@ -116,7 +116,7 @@ void parse_options (
 	 }
 	}
 
-	// remaining unused flags ... b j k n u y 
+	// remaining unused flags ... b j k n u y
 
 	while ((option=getopt(argc,argv, "i:o:acdhqvwxzs:e:f:g:l:m:p:r:t:")) != -1){
 		switch ( option ) {
@@ -248,7 +248,7 @@ void parse_options (
 
 
 /*------------------------------------------------------------------------------
-DISPLAY_HELP -  display help information to stderr	
+DISPLAY_HELP -  display help information to stderr
 04 Mar 2009, 22 Sep 2009
 ------------------------------------------------------------------------------*/
 void display_help()
@@ -297,7 +297,7 @@ void display_help()
 
 
 /*------------------------------------------------------------------------------
-DISPLAY_USAGE -  display usage information to stderr	
+DISPLAY_USAGE -  display usage information to stderr
 04 Mar 2009
 ------------------------------------------------------------------------------*/
 void display_usage()
@@ -330,8 +330,8 @@ void display_version()
 
 
 /*------------------------------------------------------------------------------
-DISPLAY_VERSION_ABOUT-  display version and website to stderr for 
-running as a background process 
+DISPLAY_VERSION_ABOUT-  display version and website to stderr for
+running as a background process
 22 Sep 2009
 Contributed by Barry Sanford, barry.sanford@trimjoist.com
 ------------------------------------------------------------------------------*/
@@ -349,7 +349,7 @@ void display_version_about()
 
 
 /*------------------------------------------------------------------------------
-READ_NODE_DATA  -  read node location data		
+READ_NODE_DATA  -  read node location data
 04 Jan 2009
 ------------------------------------------------------------------------------*/
 void read_node_data( FILE *fp, int nN, vec3 *xyz, float *r )
@@ -376,7 +376,7 @@ void read_node_data( FILE *fp, int nN, vec3 *xyz, float *r )
 
 
 /*------------------------------------------------------------------------------
-READ_FRAME_ELEMENT_DATA  -  read frame element property data		
+READ_FRAME_ELEMENT_DATA  -  read frame element property data
 04 Jan 2009
 ------------------------------------------------------------------------------*/
 void read_frame_element_data (
@@ -514,7 +514,7 @@ READ_RUN_DATA  -  read information for analysis
 29 Dec 2008
 ------------------------------------------------------------------------------*/
 void read_run_data (
-	FILE	*fp, 
+	FILE	*fp,
 	char	*OUT_file,	/* output data file name */
 	int	*shear,
 	int	shear_flag,
@@ -535,7 +535,7 @@ void read_run_data (
 	char	mesh_file[96] = "EMPTY_MESH";
 	int	sfrv=0;		/* *scanf return value */
 
-	strcpy(base_file,OUT_file);	
+	strcpy(base_file,OUT_file);
 	while ( base_file[len++] != '\0' )
 		/* the length of the base_file */ ;
 	full_len = len;
@@ -551,7 +551,7 @@ void read_run_data (
 	strcat(infcpath,".if");
 
 	while ( base_file[len] != '/' && base_file[len] != '\\' && len > 0 )
-		len--;	/* find the last '/' or '\' in base_file */ 
+		len--;	/* find the last '/' or '\' in base_file */
 	i = 0;
 	while ( base_file[len] != '\0' )
 		mesh_file[i++] = base_file[len++];
@@ -589,7 +589,7 @@ void read_run_data (
 	    errorMsg(" Remember to specify a frame element increment greater than zero.\n");
 	    exit(74);
 	}
-	
+
 
 	/* over-ride values from input data file with command-line options */
 	if ( shear_flag != -1   )	*shear = shear_flag;
@@ -630,7 +630,7 @@ static const char sep = '/';
 
 /*----------------------------------------------------------------------------
 TEMP_DIR
-return platform-specific temp file location -- 
+return platform-specific temp file location --
 John Pye, Feb 2009
 ----------------------------------------------------------------------------*/
 static const char *temp_dir(){
@@ -644,7 +644,7 @@ static const char *temp_dir(){
 "write its temporary files.  Set one of these variable, then re-run Frame3DD."
 "The Frame3DD on-line documentation provides help on this issue.");
 		exit(15);
-	} 
+	}
 #else
 	const char *tmp = "/tmp";	/* Linux, Unix, OS X	*/
 #endif
@@ -655,7 +655,7 @@ static const char *temp_dir(){
 /*------------------------------------------------------------------------------
 OUTPUT_PATH
 return path for output files using either current directory, or FRAME3DD_OUTDIR
-if specified. -- 
+if specified. --
 John Pye, Feb 2009.
 ------------------------------------------------------------------------------*/
 void output_path(const char *fname, char fullpath[], const int len, const char *default_outdir) {
@@ -664,7 +664,7 @@ void output_path(const char *fname, char fullpath[], const int len, const char *
 
 	/*			deprecated code, January 15 2010 ...
 	if ( fname[0]==sep ) {	in Win32 absolute path starts with C:\ not \ ??
-		// absolute output path specified 
+		// absolute output path specified
 //		res = snprintf(fullpath,len,"%s",fname);
 		res = sprintf(fullpath,"%s",fname);
 	} else {
@@ -720,9 +720,9 @@ void parse_input(FILE *fp, const char *tpath){
 
 
 /*-----------------------------------------------------------------------------
-GETLINE_NO_COMMENT                                                
+GETLINE_NO_COMMENT
  get a line into a character string. from K&R
- get the line only up to one of the following characters:  \n  %  #  ;  ? 
+ get the line only up to one of the following characters:  \n  %  #  ;  ?
  ignore all comma (,) characters, ignore all double quote (") characters
 09 Feb 2009
 -----------------------------------------------------------------------------*/
@@ -841,20 +841,20 @@ void read_and_assemble_loads (
 		float *Ax, float *Asy, float *Asz,
 		float *Iy, float *Iz, float *E, float *G,
 		float *p,
-		float *d, float *gX, float *gY, float *gZ, 
+		float *d, float *gX, float *gY, float *gZ,
 		int *r,
 		int shear,
 		int *nF, int *nU, int *nW, int *nP, int *nT, int *nD,
 		double **Q,
-		double **F_temp, double **F_mech, double **Fo, 
+		double **F_temp, double **F_mech, double **Fo,
 		float ***U, float ***W, float ***P, float ***T, float **Dp,
-		double ***feF_mech, double ***feF_temp, 
+		double ***feF_mech, double ***feF_temp,
 		int verbose
 ){
 	float	hy, hz;			/* section dimensions in local coords */
 
 	float	x1,x2, w1,w2;
-	double	Ln, R1o, R2o, f01, f02; 
+	double	Ln, R1o, R2o, f01, f02;
 
 	double	Nx1, Vy1, Vz1, Mx1=0.0, My1=0.0, Mz1=0.0, /* fixed end forces */
 		Nx2, Vy2, Vz2, Mx2=0.0, My2=0.0, Mz2=0.0,
@@ -976,7 +976,7 @@ void read_and_assemble_loads (
 	  	if (sfrv != 1) sferr("frame element number in uniform load data");
 		if ( n < 1 || n > nE ) {
 		    sprintf(errMsg,"\n  error in uniform distributed loads: element number %d is out of range\n",n);
-		    errorMsg(errMsg); 
+		    errorMsg(errMsg);
 		    exit(132);
 		}
 		U[lc][i][1] = (double) n;
@@ -1033,7 +1033,7 @@ void read_and_assemble_loads (
 			   printf(" feF %d = %9.2e ", l, feF_mech[lc][n][l] );
 		}
 		printf("\n");
-		*/ 
+		*/
 	  }				/* end uniformly distributed loads */
 
 	  sfrv=fscanf(fp,"%d", &nW[lc] ); /* trapezoidally distributed loads */
@@ -1079,7 +1079,7 @@ void read_and_assemble_loads (
 		  exit(142);
 		}
 		if ( W[lc][i][ 2] > W[lc][i][3] ) {
-		  sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n", 
+		  sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n",
 		  lc, n, i , W[lc][i][2], W[lc][i][3] );
 		  errorMsg(errMsg);
 		  exit(143);
@@ -1142,9 +1142,9 @@ void read_and_assemble_loads (
 		x1 =  W[lc][i][6];  x2 = W[lc][i][7];
 		w1 =  W[lc][i][8]; w2 =  W[lc][i][9];
 
-		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 + 
+		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
 			 3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
-		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 - 
+		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
 			(2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
 
 		f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
@@ -1169,7 +1169,7 @@ void read_and_assemble_loads (
 		x1 =  W[lc][i][10]; x2 =  W[lc][i][11];
 		w1 =  W[lc][i][12]; w2 =  W[lc][i][13];
 
-		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 + 
+		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
 			 3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
 		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
 			(2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
@@ -1225,7 +1225,7 @@ void read_and_assemble_loads (
 
 		/* debugging ... check feF data
 		for (l=1;l<=13;l++) printf(" %9.2e ", W[lc][i][l] );
-		printf("\n"); 
+		printf("\n");
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
 			if (feF_mech[lc][n][l] != 0)
@@ -1258,7 +1258,7 @@ void read_and_assemble_loads (
 		    exit(151);
 		}
 		P[lc][i][1] = (double) n;
-		for (l=2; l<=5; l++) { 
+		for (l=2; l<=5; l++) {
 			sfrv=fscanf(fp,"%f", &P[lc][i][l] );
 			if (sfrv != 1) sferr("value in point load data");
 		}
@@ -1391,14 +1391,14 @@ void read_and_assemble_loads (
 		feF_temp[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 	  }				/* end thermal loads	*/
 
-	  /* debugging ...  check feF's prior to asembly 
-	  for (n=1; n<=nE; n++) {	
+	  /* debugging ...  check feF's prior to asembly
+	  for (n=1; n<=nE; n++) {
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
 			if (feF_mech[lc][n][l] != 0)
 			   printf(" feF %d = %9.2e ", l, feF_mech[lc][n][l] );
 		}
-		printf("\n"); 
+		printf("\n");
 	  }
 	  */
 
@@ -1442,16 +1442,16 @@ READ_MASS_DATA  -  read element densities and extra inertial mass data	16aug01
 ------------------------------------------------------------------------------*/
 void read_mass_data (
 		FILE *fp,
-		char *OUT_file, 
-		int nN, int nE, int *nI, int *nX, 
+		char *OUT_file,
+		int nN, int nE, int *nI, int *nX,
 		float *d, float *EMs,
 		float *NMs, float *NMx, float *NMy, float *NMz,
 		double *L, float *Ax,
 		double *total_mass, double *struct_mass,
-		int *nM, int *Mmethod, int modal_flag, 
-		int *lump, int lump_flag, 
+		int *nM, int *Mmethod, int modal_flag,
+		int *lump, int lump_flag,
 		double *tol, double tol_flag, double *shift, double shift_flag,
-		double *exagg_modal, 
+		double *exagg_modal,
 		char modepath[],
 		int anim[], float *pan, float pan_flag,
 		int verbose, int debug
@@ -1554,8 +1554,8 @@ void read_mass_data (
 		sfrv=fscanf(fp, "%d", &b );
 		if (sfrv != 1) sferr("element number in extra element mass data");
 		if ( b < 1 || b > nE ) {
-			sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n", 
-			b, *nX ); 
+			sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
+			b, *nX );
 			errorMsg(errMsg);
 	    		exit(87);
 		}
@@ -1613,7 +1613,7 @@ void read_mass_data (
 	if ( pan_flag != -0.0 )	*pan = pan_flag;
 
 
-	strcpy(base_file,OUT_file);	
+	strcpy(base_file,OUT_file);
 	while ( base_file[len++] != '\0' )
 		/* the length of the base_file */ ;
 	full_len = len;
@@ -1624,7 +1624,7 @@ void read_mass_data (
 	base_file[++len] = '\0';	/* end base_file at the last '.' */
 
 	while ( base_file[len] != '/' && base_file[len] != '\\' && len > 0 )
-		len--;	/* find the last '/' or '\' in base_file */ 
+		len--;	/* find the last '/' or '\' in base_file */
 	i = 0;
 	while ( base_file[len] != '\0' )
 		mode_file[i++] = base_file[len++];
@@ -1683,7 +1683,7 @@ void read_condensation_data (
 	}
 
 	if ( (*nC) > nN ) {
-	  sprintf(errMsg,"\n  error in matrix condensation data: \n error: nC > nN ... nC=%d; nN=%d;\n The number of nodes with condensed DoF's may not exceed the total number of nodes.\n", 
+	  sprintf(errMsg,"\n  error in matrix condensation data: \n error: nC > nN ... nC=%d; nN=%d;\n The number of nodes with condensed DoF's may not exceed the total number of nodes.\n",
 	  *nC, nN );
 	  errorMsg(errMsg);
 	  exit(90);
@@ -1719,7 +1719,7 @@ void read_condensation_data (
 	 sfrv=fscanf( fp, "%d", &m[i] );
 	 if (sfrv != 1) sferr("mode number in condensation data");
 	 if ( (m[i] < 0 || m[i] > nM) && *Cmethod == 3 ) {
-	  sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n", 
+	  sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n",
 	  i, m[i], nM );
 	  errorMsg(errMsg);
 	  exit(92);
@@ -1742,8 +1742,8 @@ void write_input_data (
 	vec3 *xyz, float *r,
 	int *J1, int *J2,
 	float *Ax, float *Asy, float *Asz, float *Jx, float *Iy, float *Iz,
-	float *E, float *G, float *p, float *d, 
-	float *gX, float *gY, float *gZ, 
+	float *E, float *G, float *p, float *d,
+	float *gX, float *gY, float *gZ,
 	double **Ft, double **Fm, float **Dp,
 	int *R,
 	float ***U, float ***W, float ***P, float ***T,
@@ -1777,9 +1777,9 @@ void write_input_data (
 
 	for (i=1; i<=80; i++)	fprintf(fp,"_");	fprintf(fp,"\n");
 
-	fprintf(fp,"%5d NODES          ", nN ); 
+	fprintf(fp,"%5d NODES          ", nN );
 	fprintf(fp,"%5d FIXED NODES    ", nR );
-	fprintf(fp,"%5d FRAME ELEMENTS ", nE ); 
+	fprintf(fp,"%5d FRAME ELEMENTS ", nE );
 	fprintf(fp,"%3d LOAD CASES   \n", nL );
 
 	for (i=1; i<=80; i++)	fprintf(fp,"_"); fprintf(fp,"\n");
@@ -2172,10 +2172,10 @@ and the number of available significant figures
 12 Dec 2009
 ------------------------------------------------------------------------------*/
 /*
-void write_value ( 
-		FILE *fp, 
-		int sig_figs, 
-		float threshold, 
+void write_value (
+		FILE *fp,
+		int sig_figs,
+		float threshold,
 		char *spaces,
 		double x
 ){
@@ -2190,7 +2190,7 @@ void write_value (
 
 
 /*------------------------------------------------------------------------------
-WRITE_STATIC_MFILE -  						
+WRITE_STATIC_MFILE -
 save node displacements and frame element end forces in an m-file
 this function interacts with frame_3dd.m, an m-file interface to frame3dd
 09 Sep 2008
@@ -2328,7 +2328,7 @@ void write_static_mfile (
 
 
 /*------------------------------------------------------------------------------
-WRITE_INTERNAL_FORCES - 
+WRITE_INTERNAL_FORCES -
 calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
 calculate frame element local displacements, Rx, Dx, Dy, Dz
 write internal forces and local displacements to an output data file
@@ -2336,8 +2336,8 @@ write internal forces and local displacements to an output data file
 ------------------------------------------------------------------------------*/
 void write_internal_forces (
 		char infcpath[], int lc, int nL, char title[], float dx,
-		vec3 *xyz, 
-		double **Q, int nN, int nE, double *L, int *J1, int *J2, 
+		vec3 *xyz,
+		double **Q, int nN, int nE, double *L, int *J1, int *J2,
 		float *Ax,float *Asy,float *Asz,float *Jx,float *Iy,float *Iz,
 		float *E, float *G, float *p,
 		float *d, float gX, float gY, float gZ,
@@ -2351,10 +2351,10 @@ void write_internal_forces (
 		xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
 		xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
 
-	double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i] 
+	double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i]
 		wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
 		wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
-		tx=0.0, tx_=0.0;  // distributed torque about local x coord 
+		tx=0.0, tx_=0.0;  // distributed torque about local x coord
 
 	double	xp;		/* location of internal point loads	*/
 
@@ -2383,7 +2383,7 @@ void write_internal_forces (
 
 	/* file name for internal force data for load case "lc" */
 	sprintf(fnif,"%s%02d",infcpath,lc);
-	
+
 	/* open the interior force data file */
 	if ((fpif = fopen (fnif, "w")) == NULL) {
          sprintf (errMsg,"\nERROR: cannot open interior force data file '%s'\n",fnif);
@@ -2424,8 +2424,8 @@ void write_internal_forces (
 		Dz = dvector(0,nx);
 
 	// the local x-axis for frame element "m" starts at 0 and ends at L[m]
-		for (i=0; i<nx; i++)	x[i] = i*dx;	
-		x[nx] = L[m];		
+		for (i=0; i<nx; i++)	x[i] = i*dx;
+		x[nx] = L[m];
 		dxnx = x[nx]-x[nx-1];	// length of the last x-axis increment
 
 	// write header information for each frame element
@@ -2497,7 +2497,7 @@ void write_internal_forces (
 			    }
 			}
 
-			// trapezoidal integration of distributed loads 
+			// trapezoidal integration of distributed loads
 			// for axial forces, shear forces and torques
 			if (i==nx)	dx_ = dxnx;
 			Nx[i] = Nx[i-1] - 0.5*(wx+wx_)*dx_;
@@ -2510,8 +2510,8 @@ void write_internal_forces (
 			wy_ = wy;
 			wz_ = wz;
 			tx_ = tx;
-			
-			// add interior point loads 
+
+			// add interior point loads
 			for (n=1; n<=10*nE && cP<nP; n++) {
 			    if ( (int) P[n][1] == m ) { // load n on element m
 				if (i==nx) ++cP;
@@ -2520,7 +2520,7 @@ void write_internal_forces (
 					Nx[i] -= P[n][2] * 0.5 * (1.0 - (xp-x[i])/dx);
 					Vy[i] -= P[n][3] * 0.5 * (1.0 - (xp-x[i])/dx);
 					Vz[i] -= P[n][4] * 0.5 * (1.0 - (xp-x[i])/dx);
-					
+
 				}
 				if ( x[i]-dx <= xp && xp < x[i] ) {
 					Nx[i] -= P[n][2] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
@@ -2552,7 +2552,7 @@ void write_internal_forces (
 			Mz[i] -= (Mz[nx]-Q[m][12]) * i/nx;
 		}
 
-	// find interior transverse displacements 
+	// find interior transverse displacements
 
 		i1 = 6*(n1-1);	i2 = 6*(n2-1);
 
@@ -2593,7 +2593,7 @@ void write_internal_forces (
 		for (i=1; i<=nx; i++) {
 			Dx[i] -= (Dx[nx]-u7) * i/nx;
 		}
-		
+
 		// torsional rotation along frame element "m"
 		dx_ = dx;
 		for (i=1; i<=nx; i++) {
@@ -2604,7 +2604,7 @@ void write_internal_forces (
 		for (i=1; i<=nx; i++) {
 			Rx[i] -= (Rx[nx]-u10) * i/nx;
 		}
-		
+
 		// transverse slope along frame element "m"
 		dx_ = dx;
 		for (i=1; i<=nx; i++) {
@@ -2671,7 +2671,7 @@ void write_internal_forces (
 
 
 /*------------------------------------------------------------------------------
-WRITE_MODAL_RESULTS -  save modal frequencies and mode shapes	
+WRITE_MODAL_RESULTS -  save modal frequencies and mode shapes
 16 Aug 2001
 ------------------------------------------------------------------------------*/
 void write_modal_results(
@@ -2763,7 +2763,7 @@ STATIC_MESH  -
 create mesh data of deformed and undeformed mesh, use gnuplot	22 Feb 1999
 useful gnuplot options: set noxtics noytics noztics noborder view nokey
 This function illustrates how to read the internal force output data file.
-The internal force output data file contains all the information required 
+The internal force output data file contains all the information required
 to plot deformed meshes, internal axial force, internal shear force, internal
 torsion, and internal bending moment diagrams.
 ------------------------------------------------------------------------------*/
@@ -2772,7 +2772,7 @@ void static_mesh(
 		char infcpath[], char meshpath[], char plotpath[],
 		char *title, int nN, int nE, int nL, int lc, int DoF,
 		vec3 *xyz, double *L,
-		int *N1, int *N2, float *p, double *D, 
+		int *N1, int *N2, float *p, double *D,
 		double exagg_static, int D3_flag, int anlyz, float dx
 ){
 	FILE	*fpif=NULL, *fpm=NULL;
@@ -2795,7 +2795,7 @@ void static_mesh(
 
 	// write gnuplot plotting script commands
 
-	for ( j=1; j<=nN; j++ ) { // check for three-dimensional frame 
+	for ( j=1; j<=nN; j++ ) { // check for three-dimensional frame
 		if (xyz[j].x != 0.0) X=1;
 		if (xyz[j].y != 0.0) Y=1;
 		if (xyz[j].z != 0.0) Z=1;
@@ -2820,7 +2820,7 @@ void static_mesh(
 	    }
 	}
 
-	// file name for deformed mesh data for load case "lc" 
+	// file name for deformed mesh data for load case "lc"
 	if ( lc >= 1 && anlyz )	sprintf( meshfl, "%sf.%03d", meshpath, lc );
 
 	// write header, plot-setup cmds, node label, and element label data
@@ -2841,8 +2841,8 @@ void static_mesh(
 	 fprintf(fpm,"set nozeroaxis\n");
 	 fprintf(fpm,"set nokey\n");
 	 fprintf(fpm,"set nolabel\n");
-	 fprintf(fpm,"set size ratio -1    # 1:1 2D axis scaling \n");	
-	 fprintf(fpm,"# set view equal xyz # 1:1 3D axis scaling \n");	
+	 fprintf(fpm,"set size ratio -1    # 1:1 2D axis scaling \n");
+	 fprintf(fpm,"# set view equal xyz # 1:1 3D axis scaling \n");
 
  	 fprintf(fpm,"# NODE NUMBER LABELS\n");
 	 for (j=1; j<=nN; j++)
@@ -2870,7 +2870,7 @@ void static_mesh(
 	 fprintf(fpm,"%c set zlabel 'z'\n", D3 );
 //	 fprintf(fpm,"%c set nolabel\n", D3 );
 
-	} 
+	}
 
 	// different plot title for each load case
 
@@ -2934,7 +2934,7 @@ void static_mesh(
 
 	// write deformed mesh data
 
-	// open the deformed mesh data file for writing 
+	// open the deformed mesh data file for writing
 	if ((fpm = fopen (meshfl, "w")) == NULL) {
 		sprintf (errMsg,"\n  error: cannot open meshpath: %s\n", meshfl );
 		errorMsg(errMsg);
@@ -2949,10 +2949,10 @@ void static_mesh(
 	fprintf(fpm,"# D E F O R M E D   M E S H   D A T A ");
 	fprintf(fpm,"  deflection exaggeration: %.1f\n", exagg_static );
 	fprintf(fpm,"#       X-dsp        Y-dsp        Z-dsp\n");
-	
-	// open the interior force data file for reading 
+
+	// open the interior force data file for reading
 	if ( dx > 0.0 && anlyz ) {
-	 // file name for internal force data for load case "lc" 
+	 // file name for internal force data for load case "lc"
 	 sprintf( fnif, "%s%02d", infcpath, lc );
 	 if ((fpif = fopen (fnif, "r")) == NULL) {
           sprintf (errMsg,"\nERROR: cannot open interior force data file '%s'\n",fnif);
@@ -2963,13 +2963,13 @@ void static_mesh(
 
 	for (m=1; m<=nE; m++) {	// write deformed shape data for each element
 
-		ch = 'a'; 
+		ch = 'a';
 
 		fprintf( fpm, "\n# element %5d \n", m );
 		if ( dx < 0.0 && anlyz ) {
 			cubic_bent_beam ( fpm,
 				N1[m],N2[m], xyz, L[m],p[m], D, exagg_static );
-		} 
+		}
 		if ( dx > 0.0 && anlyz ) {
 			while ( ch != '@' )	ch = getc(fpif);
 			sfrv=fscanf(fpif,"%d %d %d %f %f %f %f %f %f %d",
@@ -2979,11 +2979,11 @@ void static_mesh(
 			 fprintf(stderr," error in static_mesh parsing\n");
 			 fprintf(stderr,"  frel = %d; m = %d; nx = %d \n", frel,m,nx );
 			}
-			/* debugging ... check mesh data 
+			/* debugging ... check mesh data
 			printf("  frel = %3d; m = %3d; n1 =%4d; n2 = %4d; nx = %3d L = %f \n", frel,m,n1,n2,nx,L[m] );
 			*/
 			while ( ch != '~' )	ch = getc(fpif);
-			force_bent_beam ( fpm, fpif, fnif, nx, 
+			force_bent_beam ( fpm, fpif, fnif, nx,
 				N1[m],N2[m], xyz, L[m],p[m], D, exagg_static );
 		}
 
@@ -3105,7 +3105,7 @@ void modal_mesh(
 		if (!anlyz) fprintf(fpm," lw %d lt 1 \n", lw );
 		else fprintf(fpm," lw 1 lt 5 , '%s' u 1:2 t 'mode-shape %d' w l lw %d lt 3\n", modefl, m, lw );
 
-		// 3D plot command 
+		// 3D plot command
 
 		fprintf(fpm,"%c splot '%s' u 2:3:4 t 'undeformed mesh' w l ",
 								D3, meshpath);
@@ -3136,7 +3136,7 @@ void animate(
 	int nN, int nE, int DoF, int nM,
 	vec3 *xyz, double *L, float *p,
 	int *J1, int *J2, double *f, double **V,
-	double exagg_modal, int D3_flag, 
+	double exagg_modal, int D3_flag,
 	float pan
 ){
 	FILE	*fpm;
@@ -3201,11 +3201,11 @@ void animate(
 	 if ( i==0 ) {
 
 	   fprintf(fpm,"\n# --- M O D E   S H A P E   A N I M A T I O N ---\n");
-	   fprintf(fpm,"# rot_x_init  = %7.2f\n", rot_x_init ); 
-	   fprintf(fpm,"# rot_x_final = %7.2f\n", rot_x_final ); 
-	   fprintf(fpm,"# rot_z_init  = %7.2f\n", rot_z_init ); 
-	   fprintf(fpm,"# rot_z_final = %7.2f\n", rot_z_final ); 
-	   fprintf(fpm,"# zoom_init   = %7.2f\n", zoom_init ); 
+	   fprintf(fpm,"# rot_x_init  = %7.2f\n", rot_x_init );
+	   fprintf(fpm,"# rot_x_final = %7.2f\n", rot_x_final );
+	   fprintf(fpm,"# rot_z_init  = %7.2f\n", rot_z_init );
+	   fprintf(fpm,"# rot_z_final = %7.2f\n", rot_z_final );
+	   fprintf(fpm,"# zoom_init   = %7.2f\n", zoom_init );
 	   fprintf(fpm,"# zoom_final  = %7.2f\n", zoom_init );
 	   fprintf(fpm,"# pan rate    = %7.2f \n", pan );
 	   fprintf(fpm,"set noborder\n");
@@ -3428,9 +3428,9 @@ void cubic_bent_beam(
 	lu_dcmp ( A, 4, b, 0, 1, &pd );		/* solve for cubic coef's */
 
 	// debug ... if deformed mesh exageration is too big, some elements
-	// may not be plotted.  
+	// may not be plotted.
 	//fprintf( fpm, "# u1=%e  L+u7=%e, dx = %e \n",
-	//				u1, fabs(L+u7), fabs(L+u7-u1)/10.0); 
+	//				u1, fabs(L+u7), fabs(L+u7-u1)/10.0);
 	for ( s = u1; fabs(s) <= 1.01*fabs(L+u7); s += fabs(L+u7-u1) / 10.0 ) {
 
 			/* deformed shape in local coordinates */
@@ -3457,10 +3457,10 @@ void cubic_bent_beam(
 
 /*------------------------------------------------------------------------------
 FORCE_BENT_BEAM  -  reads internal frame element forces and deflections
-from the internal force and deflection data file.  
-Saves deflected shapes to a file.  These bent shapes are exact. 
+from the internal force and deflection data file.
+Saves deflected shapes to a file.  These bent shapes are exact.
 Note: It would not be difficult to adapt this function to plot
-internal axial force, shear force, torques, or bending moments. 
+internal axial force, shear force, torques, or bending moments.
 9 Jan 2010
 ------------------------------------------------------------------------------*/
 void force_bent_beam(
@@ -3492,7 +3492,7 @@ void force_bent_beam(
 //		    printf("x = %12.4f\n", x );		/* debug */
 		    if (sfrv != 11) sferr(fnif);
 		    ++n;
-		} 
+		}
 
 		/* exaggerated deformed shape in global coordinates */
 		dX = exagg * ( t1*Dx + t4*Dy + t7*Dz );
@@ -3598,9 +3598,9 @@ void dots ( FILE *fp, int n ) {
 
 
 /*------------------------------------------------------------------------------
-EVALUATE -  displays a randomly-generated goodbye message.  
+EVALUATE -  displays a randomly-generated goodbye message.
 ------------------------------------------------------------------------------*/
-void evaluate ( float error, float rms_resid, float tol, int geom ) 
+void evaluate ( float error, float rms_resid, float tol, int geom )
 {
 	int r;
 
@@ -3620,7 +3620,7 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 		fprintf(stdout," !! not converged !! ");
 	}
 	(void) fflush(stdout);
-	color(0);	
+	color(0);
 	fprintf(stdout,"\n");
 	fprintf(stdout,"  RMS residual incremental displ. = %9.3e ", rms_resid);
 	dots(stdout,17);
@@ -3630,19 +3630,19 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','b','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," * brilliant!  * "); break; 
-		case 1: fprintf(stdout," *  chuffed!   * "); break; 
-		case 2: fprintf(stdout," *  woo-hoo!   * "); break; 
-		case 3: fprintf(stdout," *  wicked!    * "); break; 
-		case 4: fprintf(stdout," *   beaut!    * "); break; 
-		case 5: fprintf(stdout," *   flash!    * "); break; 
-		case 6: fprintf(stdout," *  well done! * "); break; 
-		case 7: fprintf(stdout," *  priceless! * "); break; 
-		case 8: fprintf(stdout," *  sweet as!  * "); break; 
-		case 9: fprintf(stdout," *good as gold!* "); break; 
+		case 0: fprintf(stdout," * brilliant!  * "); break;
+		case 1: fprintf(stdout," *  chuffed!   * "); break;
+		case 2: fprintf(stdout," *  woo-hoo!   * "); break;
+		case 3: fprintf(stdout," *  wicked!    * "); break;
+		case 4: fprintf(stdout," *   beaut!    * "); break;
+		case 5: fprintf(stdout," *   flash!    * "); break;
+		case 6: fprintf(stdout," *  well done! * "); break;
+		case 7: fprintf(stdout," *  priceless! * "); break;
+		case 8: fprintf(stdout," *  sweet as!  * "); break;
+		case 9: fprintf(stdout," *good as gold!* "); break;
 	    }
 	    (void) fflush(stdout);
-	    color(0);	
+	    color(0);
 	    fprintf(stdout,"\n");
 	    return;
 	}
@@ -3651,40 +3651,40 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','g','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout,"   acceptable!   "); break; 
-		case 1: fprintf(stdout,"      bling!     "); break; 
-		case 2: fprintf(stdout,"  that will do!  "); break; 
-		case 3: fprintf(stdout,"   not shabby!   "); break; 
-		case 4: fprintf(stdout,"   reasonable!   "); break; 
-		case 5: fprintf(stdout,"   very good!    "); break; 
-		case 6: fprintf(stdout,"   up to snuff!  "); break; 
-		case 7: fprintf(stdout,"     bully!      "); break; 
-		case 8: fprintf(stdout,"      nice!      "); break; 
-		case 9: fprintf(stdout,"     choice!     "); break; 
+		case 0: fprintf(stdout,"   acceptable!   "); break;
+		case 1: fprintf(stdout,"      bling!     "); break;
+		case 2: fprintf(stdout,"  that will do!  "); break;
+		case 3: fprintf(stdout,"   not shabby!   "); break;
+		case 4: fprintf(stdout,"   reasonable!   "); break;
+		case 5: fprintf(stdout,"   very good!    "); break;
+		case 6: fprintf(stdout,"   up to snuff!  "); break;
+		case 7: fprintf(stdout,"     bully!      "); break;
+		case 8: fprintf(stdout,"      nice!      "); break;
+		case 9: fprintf(stdout,"     choice!     "); break;
 	    }
 	    (void) fflush(stdout);
-	    color(0);	
+	    color(0);
 	    fprintf(stdout,"\n");
 	    return;
 	}
-	
+
 	if ( rms_resid < 1e-12 ) {
 
 	    textColor('y','c','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," adequate. "); break; 
-		case 1: fprintf(stdout," passable. "); break; 
-		case 2: fprintf(stdout," all right. "); break; 
-		case 3: fprintf(stdout," ok. "); break; 
-		case 4: fprintf(stdout," not bad. "); break; 
-		case 5: fprintf(stdout," fine. "); break; 
-		case 6: fprintf(stdout," fair. "); break; 
-		case 7: fprintf(stdout," respectable. "); break; 
-		case 8: fprintf(stdout," tolerable. "); break; 
-		case 9: fprintf(stdout," just ok. "); break; 
+		case 0: fprintf(stdout," adequate. "); break;
+		case 1: fprintf(stdout," passable. "); break;
+		case 2: fprintf(stdout," all right. "); break;
+		case 3: fprintf(stdout," ok. "); break;
+		case 4: fprintf(stdout," not bad. "); break;
+		case 5: fprintf(stdout," fine. "); break;
+		case 6: fprintf(stdout," fair. "); break;
+		case 7: fprintf(stdout," respectable. "); break;
+		case 8: fprintf(stdout," tolerable. "); break;
+		case 9: fprintf(stdout," just ok. "); break;
 	    }
 	    (void) fflush(stdout);
-	    color(0);	
+	    color(0);
 	    fprintf(stdout,"\n");
 	    return;
 	}
@@ -3693,19 +3693,19 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','r','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," abominable! "); break; 
-		case 1: fprintf(stdout," puckeroo! "); break; 
-		case 2: fprintf(stdout," atrocious! "); break; 
-		case 3: fprintf(stdout," not ok! "); break; 
-		case 4: fprintf(stdout," wonky! "); break; 
-		case 5: fprintf(stdout," crappy! "); break; 
-		case 6: fprintf(stdout," oh noooo! "); break; 
-		case 7: fprintf(stdout," abominable! "); break; 
-		case 8: fprintf(stdout," munted! "); break; 
-		case 9: fprintf(stdout," awful! "); break; 
+		case 0: fprintf(stdout," abominable! "); break;
+		case 1: fprintf(stdout," puckeroo! "); break;
+		case 2: fprintf(stdout," atrocious! "); break;
+		case 3: fprintf(stdout," not ok! "); break;
+		case 4: fprintf(stdout," wonky! "); break;
+		case 5: fprintf(stdout," crappy! "); break;
+		case 6: fprintf(stdout," oh noooo! "); break;
+		case 7: fprintf(stdout," abominable! "); break;
+		case 8: fprintf(stdout," munted! "); break;
+		case 9: fprintf(stdout," awful! "); break;
 	    }
 	    (void) fflush(stdout);
-	    color(0);	
+	    color(0);
 	    fprintf(stdout,"\n");
 	    return;
 	}
