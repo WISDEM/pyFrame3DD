@@ -900,7 +900,8 @@ void read_mass_data (
         int verbose, int debug){
 
 
-    int i,j, jnt, m, b, nA;
+    int j, jnt, m, b;
+    // int i,j, jnt, m, b, nA;
     // int full_len=0, len=0;
 
     char    errMsg[MAXL];
@@ -964,6 +965,11 @@ void read_mass_data (
         fprintf(stdout," number of frame elements with extra mass ");
         dots(stdout,11);    fprintf(stdout," nX = %3d\n",*nX);
     }
+
+    for (m=1;m<=nE;m++){
+        EMs[m] = 0.0;
+    }
+
     for (m=1; m <= *nX; m++) {
         b = extraMass->EL[m-1];
         if ( b < 1 || b > nE ) {

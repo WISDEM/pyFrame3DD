@@ -11,6 +11,7 @@ import numpy as np
 import math
 from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
+import os
 
 
 c_int_p = POINTER(c_int)
@@ -402,7 +403,8 @@ class Frame(object):
 
 
         # load c module
-        self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', '.')
+        dir = os.path.dirname(os.path.realpath(__file__))  # get path to this file
+        self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', dir)
 
         self._frame3dd.run.argtypes = [POINTER(C_Nodes), POINTER(C_Reactions), POINTER(C_Elements),
             POINTER(C_OtherElementData), c_int, POINTER(C_LoadCase),
