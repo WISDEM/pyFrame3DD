@@ -917,6 +917,13 @@ void read_mass_data (
 
     if ( *nM < 1 ) {
         *nM = 0;
+
+        /* calculate the total mass and the structural mass */
+        for (b=1; b <= nE; b++) {
+            *total_mass  += d[b]*Ax[b]*L[b];
+            *struct_mass += d[b]*Ax[b]*L[b];
+        }
+
         return;
     }
 

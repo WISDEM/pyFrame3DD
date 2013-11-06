@@ -337,10 +337,10 @@ Modes = namedtuple('Modes', ['freq', 'xmpf', 'ympf', 'zmpf', 'node', 'xdsp', 'yd
 
 
 class Frame(object):
-    """docstring for Frame"""
 
 
     def __init__(self, nodes, reactions, elements, other):
+        """docstring"""
 
         self.nodes = nodes
         self.reactions = reactions
@@ -896,9 +896,3 @@ if __name__ == '__main__':
     print
 
     print mass.total_mass
-    print mass.struct_mass
-
-    print
-
-    print modal.freq
-

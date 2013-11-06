@@ -497,6 +497,11 @@ int run(Nodes* nodes, Reactions* reactions, Elements* elements,
                 total_mass, struct_mass,
                 iter, sumR, nM, shift, lump, tol, ok );
         }
+    } else{
+
+        // save masses regardless of whether or not we run modal analysis
+        *(massResults->total_mass) = total_mass;
+        *(massResults->struct_mass) = struct_mass;
     }
 
     // no animation for now
