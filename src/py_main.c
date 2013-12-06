@@ -19,9 +19,21 @@ Analog of main.c for direct calling (no input file needed)
 #include "NRutil.h"
 #include "py_io.h"
 
+// for Windows to allow run() to be seen by DLL
+#ifdef _WIN64
+    #define ALLOW_DLL_CALL __declspec( dllexport )
+#elif _WIN32
+    #define ALLOW_DLL_CALL __declspec( dllexport )
+#else
+    #define ALLOW_DLL_CALL
+#endif
+
+// for Windows if building with Python's Distribute
+void init_pyframe3dd() { }
 
 
-int run(Nodes* nodes, Reactions* reactions, Elements* elements,
+
+ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     OtherElementData* other, int nL, LoadCase* loadcases,
     DynamicData *dynamic, ExtraInertia *extraInertia, ExtraMass *extraMass,
     Condensation *condensation, // end of inputs, rest are outputs

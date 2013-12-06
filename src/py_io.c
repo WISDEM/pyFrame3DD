@@ -225,6 +225,7 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
 
     int i,j,l;
     char errMsg[MAXL];
+    int values[6];
 
     for (i=1; i<=DoF; i++)  r[i] = 0;
 
@@ -243,7 +244,6 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
         exit(80);
     }
 
-    int values[6];
 
     for (i=1; i <= *nR; i++) {
         j = reactions->N[i-1];
@@ -334,8 +334,14 @@ void read_and_assemble_loads (
         a, b,           /* point load locations */
         t1, t2, t3, t4, t5, t6, t7, t8, t9; /* 3D coord Xfrm coeffs */
     int i,j,l, lc, n, n1, n2;
-
     char errMsg[MAXL];
+    LoadCase lcase;
+    PointLoads pL;
+    UniformLoads uL;
+    TrapezoidalLoads tL;
+    ElementLoads eL;
+    TemperatureLoads tempL;
+    PrescribedDisplacements pD;
 
     for (j=1; j<=DoF; j++)
         for (lc=1; lc <= nL; lc++)
@@ -349,13 +355,6 @@ void read_and_assemble_loads (
 
     for (i=1;i<=nE;i++) for(j=1;j<=12;j++)  Q[i][j] = 0.0;
 
-    LoadCase lcase;
-    PointLoads pL;
-    UniformLoads uL;
-    TrapezoidalLoads tL;
-    ElementLoads eL;
-    TemperatureLoads tempL;
-    PrescribedDisplacements pD;
 
     for (lc = 1; lc <= nL; lc++) {      /* begin load-case loop */
 
@@ -1158,6 +1157,7 @@ void write_static_results (
     // double  disp;
     int i,j,n;
     char errMsg[MAXL];
+    double vals[6];
 
     if ( ok < 0 ) {
         sprintf(errMsg,"  * The Stiffness Matrix is not positive-definite *\n");
@@ -1201,7 +1201,6 @@ void write_static_results (
     }
 
 
-    double vals[6];
 
     for (j=1; j<=nN; j++) {
 
