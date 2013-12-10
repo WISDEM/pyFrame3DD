@@ -946,6 +946,12 @@ void read_mass_data (
         fprintf(stdout," number of nodes with extra lumped inertia ");
         dots(stdout,10);    fprintf(stdout," nI = %3d\n",*nI);
     }
+    for (j = 1; j <= nN; j++){
+        NMs[j] = 0.0;
+        NMx[j] = 0.0;
+        NMy[j] = 0.0;
+        NMz[j] = 0.0;
+    }
     for (j=1; j <= *nI; j++) {
         jnt = extraInertia->N[j-1];
         if ( jnt < 1 || jnt > nN ) {
