@@ -6,7 +6,7 @@
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
  Copyright (C) 1992-2009  Henri P. Gavin
- 
+
     FRAME3DD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 #include "eig.h"
-#include "common.h" 
+#include "common.h"
 #include "HPGmatrix.h"
 #include "HPGutil.h"
 #include "NRutil.h"
@@ -52,7 +52,7 @@ void eigsort ( double *e, double **v, int n, int m);
 int sturm ( double **K, double **M, int n, int m, double shift, double ws, int verbose );
 
 /*-----------------------------------------------------------------------------
-SUBSPACE - Find the lowest m eigen-values, w, and eigen-vectors, V, of the 
+SUBSPACE - Find the lowest m eigen-values, w, and eigen-vectors, V, of the
 general eigen-problem  ...       K V = w M V using sub-space / Jacobi iteration
 where
   K is an n by n  symmetric real (stiffness) matrix
@@ -80,7 +80,7 @@ void subspace(
 		disp = 0,	/* display convergence info.	*/
 		*idx;
 	char	errMsg[MAXL];
-	
+
 	if ( m > n ) {
 		sprintf(errMsg,"subspace: Number of eigen-values must be less than the problem dimension.\n Desired number of eigen-values=%d \n Dimension of the problem= %d \n", m, n);
 		errorMsg(errMsg);
@@ -136,7 +136,7 @@ void subspace(
 	    }
 	    if ( idx[k] == 0 ) {
 			i = idx[1];
-			for ( j=1; j<k; j++ ) if ( i < idx[j] ) i = idx[j]; 
+			for ( j=1; j<k; j++ ) if ( i < idx[j] ) i = idx[j];
 			idx[k] = i+1;
 			km = d[i+1];
 	    }
@@ -146,7 +146,7 @@ void subspace(
 //	for (k=1; k<=m; k++) printf(" idx[%d] = %d \n", k, idx[k] ); /*debug*/
 	for (k=1; k<=m; k++) {
 		V[idx[k]][k] = 1.0;
-		*ok = idx[k] % 6; 
+		*ok = idx[k] % 6;
 //		printf(" idx[%3d] = %3d   ok = %d \n", k , idx[k], *ok); /*debug*/
 		switch ( *ok ) {
 			case 1:	i =  1;	j =  2;	break;
@@ -160,7 +160,7 @@ void subspace(
 	}
 
 /*	for (i=1; i<=n; i++)	V[i][1] = M[i][i];	// diag(M)	*/
-	
+
 	*iter = 0;
 	do { 					/* Begin sub-space iterations */
 
@@ -208,7 +208,7 @@ void subspace(
 		}
 
 	} while	( error > tol );		/* End   sub-space iterations */
-			
+
 
 	for (k=1; k<=m; k++) {			/* shift eigen-values */
 	    if ( w[k] > shift )	w[k] = w[k] - shift;
@@ -217,12 +217,12 @@ void subspace(
 
 	if ( verbose ) {
 		fprintf(stdout," %4d sub-space iterations,   error: %.4e \n", *iter, error );
-		for ( k=1; k<=m; k++ ) 
+		for ( k=1; k<=m; k++ )
 			fprintf(stdout,"  mode: %2d\tDoF: %5d\t %9.4lf Hz\n",
 				k, idx[k], sqrt(w[k])/(2.0*PI) );
 	}
 
-	*ok = sturm ( K, M, n, m, shift, w[modes]+tol, verbose ); 
+	*ok = sturm ( K, M, n, m, shift, w[modes]+tol, verbose );
 
 	for (i=1;i<=n;i++) for (j=i;j<=n;j++) K[i][j] -= shift*M[i][j];
 
@@ -238,7 +238,7 @@ void subspace(
 /*-----------------------------------------------------------------------------
  JACOBI - Find all eigen-values, E, and eigen-vectors, V,
  of the general eigen-problem  K V = E M V
- using Jacobi iteration, with efficient matrix rotations.  
+ using Jacobi iteration, with efficient matrix rotations.
  K is a symmetric real (stiffness) matrix
  M is a symmetric positive definate real (mass) matrix
  E is a diagonal matrix of eigen-values
@@ -251,7 +251,7 @@ void jacobi ( double **K, double **M, double *E, double **V, int n )
 {
 	int	iter,
 		d,i,j,k;
-	double	Kii, Kjj, Kij, Mii, Mjj, Mij, Vki, Vkj, 
+	double	Kii, Kjj, Kij, Mii, Mjj, Mij, Vki, Vkj,
 		alpha, beta, gamma,
 		s, tol=0.0;
 
@@ -281,7 +281,7 @@ void jacobi ( double **K, double **M, double *E, double **V, int n )
 
 		if  ( s >= 0.0 ) gamma = 0.5*s + sqrt( 0.25*s*s + Kii*Kjj );
 		else		 gamma = 0.5*s - sqrt( 0.25*s*s + Kii*Kjj );
-		
+
 		alpha =  Kjj / gamma ;
 		beta  = -Kii / gamma ;
 
@@ -303,7 +303,7 @@ void jacobi ( double **K, double **M, double *E, double **V, int n )
 		Mjj = sqrt(M[j][j]);
 		for (i=1; i<=n; i++)	V[i][j] /= Mjj;
 	}
-			
+
 	for (j=1; j<=n; j++)
 		E[j] = K[j][j]/M[j][j];		/* eigen-values */
 
@@ -314,7 +314,7 @@ void jacobi ( double **K, double **M, double *E, double **V, int n )
 /*-----------------------------------------------------------------------------
 ROTATE - rotate an n by n symmetric matrix A such that A[i][j] = A[j][i] = 0
      A = P' * A * P  where diag(P) = 1 and P[i][j] = alpha and P[j][i] = beta.
-     Since P is sparse, this matrix multiplcation can be done efficiently.  
+     Since P is sparse, this matrix multiplcation can be done efficiently.
 -----------------------------------------------------------------------------*/
 void rotate ( double **A, int n, double alpha, double beta, int i, int j )
 {
@@ -331,8 +331,8 @@ void rotate ( double **A, int n, double alpha, double beta, int i, int j )
 		Aj[k] = A[j][k];
 	}
 
-	Aii = A[i][i];	
-	Ajj = A[j][j];	
+	Aii = A[i][i];
+	Ajj = A[j][j];
 	Aij = A[i][j];
 
 	A[i][i] = Aii + 2*beta *Aij + beta *beta *Ajj ;
@@ -363,7 +363,7 @@ with shifting. 								15oct98
 void stodola (
 	double **K, double **M, /* stiffness and mass matrices */
 	int n, int m, /* DoF and number of required modes	*/
-	double *w, double **V, double tol, double shift, int *iter, int *ok, 
+	double *w, double **V, double tol, double shift, int *iter, int *ok,
 	int verbose
 ){
 	double	**D,		/* the dynamics matrix, D = K^(-1) M	*/
@@ -399,7 +399,7 @@ void stodola (
 	if (*ok<0) {
 		sprintf(errMsg," Make sure that all six rigid body translation are restrained.\n");
 		errorMsg(errMsg);
-		exit(32); 
+		exit(32);
 	}
 						/* calculate  D = K^(-1) M */
 	for (j=1; j<=n; j++) {
@@ -438,11 +438,11 @@ void stodola (
 			i_ex = i;
 		}
 	    }
-	    u[i_ex] = 1.0;  u[i_ex+1] = 1.e-4; 
+	    u[i_ex] = 1.0;  u[i_ex+1] = 1.e-4;
 	    d_old = d_max;
 
 	    vMv = xtAy ( u, M, u, n, d );		/* mass-normalize */
-	    for (i=1; i<=n; i++)	u[i] /= sqrt ( vMv ); 
+	    for (i=1; i<=n; i++)	u[i] /= sqrt ( vMv );
 
 	    for (j=1; j<k; j++) {			/* purge lower modes */
 		for (i=1; i<=n; i++)	v[i] = V[i][j];
@@ -450,9 +450,9 @@ void stodola (
 	    }
 	    for (j=1; j<k; j++)
 		for (i=1; i<=n; i++)	u[i] -= c[j] * V[i][j];
-			
+
 	    vMv = xtAy ( u, M, u, n, d );		/* mass-normalize */
-	    for (i=1; i<=n; i++)	u[i] /= sqrt ( vMv ); 
+	    for (i=1; i<=n; i++)	u[i] /= sqrt ( vMv );
 	    RQ  = xtAy ( u, K, u, n, d );		/* Raleigh quotient */
 
 	    do {					/* iterate	*/
@@ -462,7 +462,7 @@ void stodola (
 		}
 
 		vMv = xtAy ( v, M, v, n, d );		/* mass-normalize */
-		for (i=1; i<=n; i++)	v[i] /= sqrt ( vMv ); 
+		for (i=1; i<=n; i++)	v[i] /= sqrt ( vMv );
 
 		for (j=1; j<k; j++) {			/* purge lower modes */
 			for (i=1; i<=n; i++)	u[i] = V[i][j];
@@ -472,7 +472,7 @@ void stodola (
 			for (i=1; i<=n; i++)	v[i] -= c[j] * V[i][j];
 
 		vMv = xtAy ( v, M, v,  n, d );		/* mass-normalize */
-		for (i=1; i<=n; i++)	u[i] = v[i] / sqrt ( vMv ); 
+		for (i=1; i<=n; i++)	u[i] = v[i] / sqrt ( vMv );
 
 		RQold = RQ;
 		RQ = xtAy ( u, K, u, n, d );		/* Raleigh quotient */
@@ -492,9 +492,11 @@ void stodola (
 	    if ( w[k] > shift )	w[k] = w[k] - shift;
 	    else		w[k] = shift - w[k];
 
-	    fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
-	    fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
-		sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
+	    if (verbose){
+	    	fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
+	    	fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
+			sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
+		}
 	}
 
 	eigsort ( w, V, n, m );
@@ -548,14 +550,14 @@ void eigsort ( double *e, double **v, int n, int m )
 
 /*-----------------------------------------------------------------------------
 STURM  -  Determine the number of eigenvalues, w, of the general eigen-problem
-  K V = w M V which are below the value ws,  
+  K V = w M V which are below the value ws,
   K is an n by n  symmetric real (stiffness) matrix
   M is an n by n  symmetric positive definate real (mass) matrix
   w is a diagonal matrix of eigen-values
-  ws is the limit 
-  n is the number of DoF 
+  ws is the limit
+  n is the number of DoF
   m is the number of required modes
- 
+
 
  H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  30 Aug 2001
  Bathe, Finite Element Procecures in Engineering Analysis, Prentice Hall, 1982
@@ -566,7 +568,7 @@ int sturm(
 ){
 	double	ws_shift, *d;
 	int	ok=0, i,j, modes;
-	
+
 	d  = dvector(1,n);
 
 	modes = (int) ( (float)(0.5*m) > (float)(m-8.0) ? (int)(m/2.0) : m-8 );
@@ -584,7 +586,7 @@ int sturm(
 		fprintf(stderr," Try increasing the number of modes in \n");
 		fprintf(stderr," order to get the missing modes below %f Hz.\n",
 							sqrt(ws)/(2.0*PI) );
-	} else if ( verbose ) 
+	} else if ( verbose )
 		fprintf(stdout,"  All %d modes were found.\n",modes);
 
 	for (i=1; i<=n; i++) for (j=i; j<=n; j++) K[i][j] += ws_shift*M[i][j];
