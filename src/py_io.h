@@ -123,6 +123,8 @@ void read_mass_data(
     int *nX,    /**< number of elements with extra mass     */
     float *d, float *EMs, /**< density, extra frame element mass    */
     float *NMs, float *NMx, float *NMy, float *NMz, /**< node inertia*/
+    float *NMxy, float *NMxz, float *NMyz,
+    float *rhox, float *rhoy, float *rhoz,
     double *L,  /**< length of each frame element       */
     float *Ax,  /**< cross section area of each frame element   */
     double *total_mass, /**< total mass of structure and extra mass */

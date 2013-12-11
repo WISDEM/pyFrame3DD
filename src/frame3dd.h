@@ -6,7 +6,7 @@
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
  Copyright (C) 1992-2010  Henri P. Gavin
- 
+
     FRAME3DD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -55,8 +55,8 @@ void assemble_K(
 
 
 /* compute_reaction_forces --- comput [K(r,q)] * {D(q)} + [K(r,r)] * {D(r)} */
- 
-void compute_reaction_forces( 
+
+void compute_reaction_forces(
 	double *F,	/**< vector of external loads and reaction forces  */
 	double **K,	/**< stiffness matrix				*/
 	double *D,	/**< displacement vector to be solved		*/
@@ -108,7 +108,7 @@ void element_end_forces(
 
 
 /** add fixed end forces to internal element forces */
-void add_feF(	
+void add_feF(
 	vec3 *xyz,	/**< XYZ locations of each node		*/
 	double *L,	/**< length of each frame element, effective	*/
 	int *N1, int *N2, /**< node connectivity			*/
@@ -140,6 +140,8 @@ void assemble_M(
 	float *EMs,	/**< extra frame element mass			*/
 	float *NMs,	/**< node mass					*/
 	float *NMx, float *NMy, float *NMz,	/**< node inertias	*/
+	float *NMxy, float *NMxz, float *NMyz,
+	float *rhox, float *rhoy, float *rhoz,
 	int lump,	/**< 1: lumped mass matrix, 0: consistent mass	*/
 	int debug	/**< 1: write element mass matrices	 	*/
 );
@@ -195,7 +197,7 @@ void dyn_conden(
 /**
 	release allocated memory
 */
-void deallocate( 
+void deallocate(
 	int nN, int nE, int nL, int *nF, int *nU, int *nW, int *nP, int *nT, int DoF,
 	int modes,
 	vec3 *xyz, float *rj, double *L, double *Le,
@@ -207,12 +209,14 @@ void deallocate(
 	float ***U, float ***W, float ***P, float ***T,
 	float **Dp,
 	double **F_mech, double **F_temp,
-	double ***feF_mech, double ***feF_temp, double **F, double *dF, 
+	double ***feF_mech, double ***feF_temp, double **F, double *dF,
 	double **K, double **Q,
 	double *D, double *dD,
 	float *d, float *EMs,
 	float *NMs, float *NMx, float *NMy, float *NMz,
-	double **M, double *f, double **V, 
+	float *NMxy, float *NMxz, float *NMyz,
+	float *rhox, float *rhoy, float *rhoz,
+	double **M, double *f, double **V,
 	int *c, int *m
 );
 

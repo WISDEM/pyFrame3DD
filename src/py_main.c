@@ -58,6 +58,8 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
         *d, *EMs=NULL,  // member densities and extra inertia
         *NMs=NULL,  // mass of a node
         *NMx,*NMy,*NMz, // inertia of a node in global coord
+        *NMxy,*NMxz,*NMyz, // inertia of a node in global coord
+        *rhox, *rhoy, *rhoz, // location of mass offset in global coord realtive to node
         gX[_NL_],   // gravitational acceleration in global X
         gY[_NL_],   // gravitational acceleration in global Y
         gZ[_NL_],   // gravitational acceleration in global Z
@@ -237,6 +239,12 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     NMx =  vector(1,nN);    /* node inertia about global X axis */
     NMy =  vector(1,nN);    /* node inertia about global Y axis */
     NMz =  vector(1,nN);    /* node inertia about global Z axis */
+    NMxy =  vector(1,nN);    /* node inertia about global XY axis */
+    NMxz =  vector(1,nN);    /* node inertia about global XZ axis */
+    NMyz =  vector(1,nN);    /* node inertia about global YZ axis */
+    rhox =  vector(1,nN);    /* node inertia location in global X axis relative to node */
+    rhoy =  vector(1,nN);    /* node inertia location in global Y axis relative to node */
+    rhoz =  vector(1,nN);    /* node inertia location in global Z axis relative to node */
 
     c = ivector(1,DoF);     /* vector of condensed degrees of freedom */
     m = ivector(1,DoF);     /* vector of condensed mode numbers */
@@ -257,6 +265,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 
     read_mass_data( dynamic, extraInertia, extraMass, nN, nE, &nI, &nX,
             d, EMs, NMs, NMx, NMy, NMz,
+            NMxy, NMxz, NMyz, rhox, rhoy, rhoz,
             L, Ax, &total_mass, &struct_mass, &nM,
             &Mmethod, &lump, &tol, &shift,
             &exagg_modal, anim, &pan,
@@ -470,7 +479,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 
         assemble_M ( M, DoF, nN, nE, xyz, rj, L, N1,N2,
                 Ax, Jx,Iy,Iz, p, d, EMs, NMs, NMx, NMy, NMz,
-                lump, debug );
+                NMxy, NMxz, NMyz, rhox, rhoy, rhoz, lump, debug );
 
 #ifdef MATRIX_DEBUG
         save_dmatrix ( "Mf", M, 1,DoF, 1,DoF, 0, "w" ); /* free mass matrix */
@@ -578,7 +587,9 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
             U,W,P,T, Dp, F_mech, F_temp,
             feF_mech, feF_temp, F, dF,
             K, Q, D, dD,
-            d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m
+            d,EMs,NMs,NMx,NMy,NMz,
+            NMxy, NMxz, NMyz, rhox, rhoy, rhoz,
+            M,f,V, c, m
     );
 
     if ( verbose ) {

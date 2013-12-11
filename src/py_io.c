@@ -889,6 +889,8 @@ void read_mass_data (
         int nN, int nE, int *nI, int *nX,
         float *d, float *EMs,
         float *NMs, float *NMx, float *NMy, float *NMz,
+        float *NMxy, float *NMxz, float *NMyz,
+        float *rhox, float *rhoy, float *rhoz,
         double *L, float *Ax,
         double *total_mass, double *struct_mass,
         int *nM, int *Mmethod,
@@ -951,6 +953,13 @@ void read_mass_data (
         NMx[j] = 0.0;
         NMy[j] = 0.0;
         NMz[j] = 0.0;
+        NMxy[j] = 0.0;
+        NMxz[j] = 0.0;
+        NMyz[j] = 0.0;
+        rhox[j] = 0.0;
+        rhoy[j] = 0.0;
+        rhoz[j] = 0.0;
+
     }
     for (j=1; j <= *nI; j++) {
         jnt = extraInertia->N[j-1];
@@ -964,10 +973,16 @@ void read_mass_data (
         NMx[jnt] = extraInertia->EMx[j-1];
         NMy[jnt] = extraInertia->EMy[j-1];
         NMz[jnt] = extraInertia->EMz[j-1];
+        NMxy[jnt] = extraInertia->EMxy[j-1];
+        NMxz[jnt] = extraInertia->EMxz[j-1];
+        NMyz[jnt] = extraInertia->EMyz[j-1];
+        rhox[jnt] = extraInertia->rhox[j-1];
+        rhoy[jnt] = extraInertia->rhoy[j-1];
+        rhoz[jnt] = extraInertia->rhoz[j-1];
 
         *total_mass += NMs[jnt];
 
-        if ( NMs[jnt]==0 && NMx[jnt]==0 && NMy[jnt]==0 && NMz[jnt]==0 )
+        if ( NMs[jnt]==0 && NMx[jnt]==0 && NMy[jnt]==0 && NMz[jnt]==0 && NMxy[jnt]==0 && NMxz[jnt]==0 && NMyz[jnt]==0 )
             fprintf(stderr,"\n  Warning: All extra node inertia at node %d  are zero\n", jnt );
     }
 

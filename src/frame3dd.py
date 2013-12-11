@@ -193,7 +193,13 @@ class C_ExtraInertia(Structure):
                 ('EMs', c_double_p),
                 ('EMx', c_double_p),
                 ('EMy', c_double_p),
-                ('EMz', c_double_p)]
+                ('EMz', c_double_p),
+                ('EMxy', c_double_p),
+                ('EMxz', c_double_p),
+                ('EMyz', c_double_p),
+                ('rhox', c_double_p),
+                ('rhoy', c_double_p),
+                ('rhoz', c_double_p)]
 
 
 class C_ExtraMass(Structure):
@@ -712,7 +718,7 @@ class DynamicAnalysis(object):
         i = np.array([], dtype=np.int32)
         d = np.array([])
 
-        self.changeExtraInertia(i, d, d, d, d)
+        self.changeExtraInertia(i, d, d, d, d, d, d, d, d, d, d)
 
         self.changeExtraMass(i, d)
 
@@ -720,17 +726,24 @@ class DynamicAnalysis(object):
 
 
 
-    def changeExtraInertia(self, N, EMs, EMx, EMy, EMz):
+    def changeExtraInertia(self, N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz):
 
         self.NI = N.astype(np.int32)
         self.EMs = np.copy(EMs)
         self.EMx = np.copy(EMx)
         self.EMy = np.copy(EMy)
         self.EMz = np.copy(EMz)
+        self.EMxy = np.copy(EMxy)
+        self.EMxz = np.copy(EMxz)
+        self.EMyz = np.copy(EMyz)
+        self.rhox = np.copy(rhox)
+        self.rhoy = np.copy(rhoy)
+        self.rhoz = np.copy(rhoz)
 
 
         self.extraInertia = C_ExtraInertia(len(N), ip(self.NI), dp(self.EMs),
-            dp(self.EMx), dp(self.EMy), dp(self.EMz))
+            dp(self.EMx), dp(self.EMy), dp(self.EMz), dp(self.EMxy), dp(self.EMxz), dp(self.EMyz),
+            dp(self.rhox), dp(self.rhoy), dp(self.rhoz))
 
 
 

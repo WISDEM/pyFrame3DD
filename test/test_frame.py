@@ -569,7 +569,13 @@ class FrameTestEXB(unittest.TestCase):
         EMx = np.array([0.0])
         EMy = np.array([0.0])
         EMz = np.array([0.0])
-        dynamic.changeExtraInertia(N, EMs, EMx, EMy, EMz)
+        EMxy = np.array([0.0])
+        EMxz = np.array([0.0])
+        EMyz = np.array([0.0])
+        rhox = np.array([0.0])
+        rhoy = np.array([0.0])
+        rhoz = np.array([0.0])
+        dynamic.changeExtraInertia(N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz)
 
         frame.useDynamicAnalysis(dynamic)
 

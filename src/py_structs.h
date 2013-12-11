@@ -128,7 +128,8 @@ typedef struct {
 typedef struct {
     int nI;
     int *N;
-    double *EMs, *EMx, *EMy, *EMz;
+    double *EMs, *EMx, *EMy, *EMz, *EMxy, *EMxz, *EMyz;
+    double *rhox, *rhoy, *rhoz;
 
 } ExtraInertia;
 

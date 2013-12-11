@@ -6,7 +6,7 @@
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
  Copyright (C) 1992-2010  Henri P. Gavin
- 
+
     FRAME3DD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -49,10 +49,10 @@ static void elastic_K(
 
 static void geometric_K(
 	double **k, vec3 *xyz, float *r,
-	double L, double Le, 
+	double L, double Le,
 	int n1, int n2, float
 	Ax, float Asy, float Asz, float Jx, float Iy, float Iz,
-	float E, float G, float p, double T, 
+	float E, float G, float p, double T,
 	int shear
 );
 
@@ -67,14 +67,14 @@ static void member_force(
 static void lumped_M(
 	double **m, vec3 *xyz,
 	double L, int n1, int n2,
-	float Ax, float Jx, float Iy, float Iz, float p, 
+	float Ax, float Jx, float Iy, float Iz, float p,
 	float d, float EMs
 );
 
 static void consistent_M(
 	double **m, vec3 *xyz, float *r, double L,
 	int n1, int n2,
-	float Ax, float Jx, float Iy, float Iz, float p, 
+	float Ax, float Jx, float Iy, float Iz, float p,
 	float d, float EMs
 );
 
@@ -120,8 +120,8 @@ void assemble_K(
 
 		if (geom)
 		 geometric_K( k, xyz, r, L[i], Le[i], N1[i], N2[i],
-		           Ax[i], Asy[i],Asz[i], 
-                           Jx[i], Iy[i], Iz[i], 
+		           Ax[i], Asy[i],Asz[i],
+                           Jx[i], Iy[i], Iz[i],
                            E[i],G[i], p[i], -Q[i][1], shear);
 
 		if (debug) {
@@ -201,17 +201,17 @@ void elastic_K(
 	for(i=1; i<=12; i++){
 	    for (j=i+1; j<=12; j++){
 			if( k[i][j] != k[j][i] ) {
-				if(fabs(k[i][j]/k[j][i]-1.0) > 1.0e-6 
-					&&(fabs(k[i][j]/k[i][i]) > 1e-6 
+				if(fabs(k[i][j]/k[j][i]-1.0) > 1.0e-6
+					&&(fabs(k[i][j]/k[i][i]) > 1e-6
 						|| fabs(k[j][i]/k[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"elastic_K: element stiffness matrix not symetric ...\n" ); 
-					fprintf(stderr," ... k[%d][%d] = %15.6e \n",i,j,k[i][j] ); 
-					fprintf(stderr," ... k[%d][%d] = %15.6e   ",j,i,k[j][i] ); 
-					fprintf(stderr," ... relative error = %e \n",  fabs(k[i][j]/k[j][i]-1.0) ); 
+					fprintf(stderr,"elastic_K: element stiffness matrix not symetric ...\n" );
+					fprintf(stderr," ... k[%d][%d] = %15.6e \n",i,j,k[i][j] );
+					fprintf(stderr," ... k[%d][%d] = %15.6e   ",j,i,k[j][i] );
+					fprintf(stderr," ... relative error = %e \n",  fabs(k[i][j]/k[j][i]-1.0) );
 					fprintf(stderr," ... element matrix saved in file 'kt'\n");
-					save_dmatrix ( "kt", k, 1,12, 1,12, 0, "w" ); 
+					save_dmatrix ( "kt", k, 1,12, 1,12, 0, "w" );
 				}
 
 				k[i][j] = k[j][i] = 0.5 * ( k[i][j] + k[j][i] );
@@ -240,7 +240,7 @@ void geometric_K(
 	int i, j;
 
 	coord_trans(
-		xyz, L, n1, n2, &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p 
+		xyz, L, n1, n2, &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p
 	);
 
 	kg = dmatrix(1,12,1,12);
@@ -266,7 +266,7 @@ void geometric_K(
 	kg[6][6]  = kg[12][12] = T*L*(2.0/15.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy;
 
         kg[1][7]  = kg[7][1]   = 0.0; // -T/L;
- 
+
 	kg[5][3]  = kg[3][5]   =  kg[11][3] = kg[3][11] = -T/10.0/Dsz;
 	kg[9][5]  = kg[5][9]   =  kg[11][9] = kg[9][11] =  T/10.0/Dsz;
 	kg[6][2]  = kg[2][6]   =  kg[12][2] = kg[2][12] =  T/10.0/Dsy;
@@ -286,22 +286,22 @@ void geometric_K(
 
 	atma(t1,t2,t3,t4,t5,t6,t7,t8,t9, kg, r[n1],r[n2]);	/* globalize */
 
-	/* check and enforce symmetry of geometric element stiffness matrix */ 
+	/* check and enforce symmetry of geometric element stiffness matrix */
 
 	for(i=1; i<=12; i++){
 	    for (j=i+1; j<=12; j++){
 			if( kg[i][j] != kg[j][i] ) {
-				if(fabs(kg[i][j]/kg[j][i]-1.0) > 1.0e-6 
-					&&(fabs(kg[i][j]/kg[i][i]) > 1e-6 
+				if(fabs(kg[i][j]/kg[j][i]-1.0) > 1.0e-6
+					&&(fabs(kg[i][j]/kg[i][i]) > 1e-6
 						|| fabs(kg[j][i]/kg[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"geometric_K element stiffness matrix not symetric ...\n" ); 
-					fprintf(stderr," ... kg[%d][%d] = %15.6e \n",i,j,kg[i][j] ); 
-					fprintf(stderr," ... kg[%d][%d] = %15.6e   ",j,i,kg[j][i] ); 
-					fprintf(stderr," ... relative error = %e \n",  fabs(kg[i][j]/kg[j][i]-1.0) ); 
+					fprintf(stderr,"geometric_K element stiffness matrix not symetric ...\n" );
+					fprintf(stderr," ... kg[%d][%d] = %15.6e \n",i,j,kg[i][j] );
+					fprintf(stderr," ... kg[%d][%d] = %15.6e   ",j,i,kg[j][i] );
+					fprintf(stderr," ... relative error = %e \n",  fabs(kg[i][j]/kg[j][i]-1.0) );
 					fprintf(stderr," ... element matrix saved in file 'kg'\n");
-					save_dmatrix ( "kg", kg, 1,12, 1,12, 0, "w" ); 
+					save_dmatrix ( "kg", kg, 1,12, 1,12, 0, "w" );
 				}
 
 				kg[i][j] = kg[j][i] = 0.5 * ( kg[i][j] + kg[j][i] );
@@ -331,11 +331,11 @@ int	r;
 {
 	int	i,j;
 
-	for (i=1; i<=12; i++)  if ( i != r) 
-		for (j=1; j<=12; j++) if ( j != r) 
+	for (i=1; i<=12; i++)  if ( i != r)
+		for (j=1; j<=12; j++) if ( j != r)
 			X[i][j]  =  X[i][j]  -  X[i][r] * X[r][j] / X[r][r];
-	
-	for (i=1; i<=12; i++) 
+
+	for (i=1; i<=12; i++)
 		X[r][i] = X[i][r] = 0.0;
 
 	return;
@@ -347,7 +347,7 @@ int	r;
 COMPUTE_REACTION_FORCES -  12oct12
 Compute  [K(r,q)] * {D(q)} + [K(r,r)] * {D(r)}
 The load vector modified for prescribed displacements Dp is returned as F
-Prescribed displacements are "mechanican loads" not "temperature loads"  
+Prescribed displacements are "mechanican loads" not "temperature loads"
 ------------------------------------------------------------------------------*/
 void compute_reaction_forces( double *F, double **K, double *D, int DoF, int *r)
 {
@@ -365,7 +365,7 @@ void compute_reaction_forces( double *F, double **K, double *D, int DoF, int *r)
 
 /*----------------------------------------------------------------------------
 SOLVE_SYSTEM  -  solve {F} =   [K]{D} via L D L' decomposition        27dec01
-Prescribed displacements are "mechanical loads" not "temperature loads"  
+Prescribed displacements are "mechanical loads" not "temperature loads"
 ----------------------------------------------------------------------------*/
 void solve_system(
 	double **K, double *D, double *F, int DoF, int *q, int *r,
@@ -395,7 +395,7 @@ void solve_system(
 		} while ( *ok );
 	        if ( verbose ) fprintf(stdout,"\n");
 	}
-	
+
 	free_dvector( diag, 1, DoF );
 }
 
@@ -406,7 +406,7 @@ EQUILIBRIUM_ERROR -  compute {dF} =   {F} - [K]{D}  and return ||dF||/||F||
 double equilibrium_error( double *dF, double *F, double **K, double *D, int DoF, int *q )
 {
 	double	ss_dF = 0.0,	//  sum of squares of dF
-		ss_F  = 0.0;	//  sum of squares of F	
+		ss_F  = 0.0;	//  sum of squares of F
 	int	i,j;
 
 	for (i=1; i<=DoF; i++) { // compute equilibrium error
@@ -415,7 +415,7 @@ double equilibrium_error( double *dF, double *F, double **K, double *D, int DoF,
 			if ( q[i] && K[i][j] != 0.0 && D[j] != 0.0 )
 				dF[i] -= K[i][j]*D[j];
 		}
-	}       
+	}
 
 	for (i=1; i<=DoF; i++) if (q[i]) ss_dF += ( dF[i] * dF[i] );
 	for (i=1; i<=DoF; i++) if (q[i]) ss_F  += ( F[i]  * F[i] );
@@ -449,7 +449,7 @@ void element_end_forces(
 		for(j=1; j<=12; j++)	Q[i][j] = s[j];
 
 		if ( fabs(axial_strain > 0.001) )
-		 fprintf(stderr," Warning! Frame element %2d has an average axial strain of %8.6f\n", i, axial_strain ); 
+		 fprintf(stderr," Warning! Frame element %2d has an average axial strain of %8.6f\n", i, axial_strain );
 
 	}
 
@@ -499,18 +499,18 @@ void member_force(
 
 
 	/* infinitessimal strain ... */
-	delta = (d7-d1)*t1 + (d8-d2)*t2 + (d9-d3)*t3; 
+	delta = (d7-d1)*t1 + (d8-d2)*t2 + (d9-d3)*t3;
 
 	/* finite strain ... (not consistent with 2nd order formulation) */
-/*  
- 	delta += ( pow(((d7-d1)*t4 + (d8-d2)*t5 + (d9-d3)*t6),2.0) + 
+/*
+ 	delta += ( pow(((d7-d1)*t4 + (d8-d2)*t5 + (d9-d3)*t6),2.0) +
  		   pow(((d7-d1)*t7 + (d8-d2)*t8 + (d9-d3)*t9),2.0) )/(2.0*L);
 */
 
 	/* true strain ... (not appropriate for structural materials) */
-/* 
-  	Ls =	pow((x2+d7-x1-d1),2.0) + 
-  		pow((y2+d8-y1-d2),2.0) + 
+/*
+  	Ls =	pow((x2+d7-x1-d1),2.0) +
+  		pow((y2+d8-y1-d2),2.0) +
   		pow((z2+d9-z1-d3),2.0);
   	Ls = sqrt(Ls) + Le - L;
 
@@ -527,69 +527,69 @@ void member_force(
 	else
 		s[1]  =  -(Ax*E/Le)*( (d7-d1)*t1 + (d8-d2)*t2 + (d9-d3)*t3 );
 
-	s[2]  = -( 12.*E*Iz/(Le*Le*Le*(1.+Ksy)) + 
+	s[2]  = -( 12.*E*Iz/(Le*Le*Le*(1.+Ksy)) +
 		   T/L*(1.2+2.0*Ksy+Ksy*Ksy)/Dsy ) *
 				( (d7-d1)*t4 + (d8-d2)*t5 + (d9-d3)*t6 )
 		+ (6.*E*Iz/(Le*Le*(1.+Ksy)) + T/10.0/Dsy) *
 				( (d4+d10)*t7 + (d5+d11)*t8 + (d6+d12)*t9 );
-	s[3]  = -(12.*E*Iy/(Le*Le*Le*(1.+Ksz)) + 
-		  T/L*(1.2+2.0*Ksz+Ksz*Ksz)/Dsz ) * 
+	s[3]  = -(12.*E*Iy/(Le*Le*Le*(1.+Ksz)) +
+		  T/L*(1.2+2.0*Ksz+Ksz*Ksz)/Dsz ) *
 				( (d7-d1)*t7  + (d8-d2)*t8  + (d9-d3)*t9 )
 		- ( 6.*E*Iy/(Le*Le*(1.+Ksz)) + T/10.0/Dsz ) *
 				( (d4+d10)*t4 + (d5+d11)*t5 + (d6+d12)*t6 );
 	s[4]  =   -(G*J/Le) * ( (d10-d4)*t1 + (d11-d5)*t2 + (d12-d6)*t3 );
-	s[5]  =   (6.*E*Iy/(Le*Le*(1.+Ksz)) + T/10.0/Dsz ) * 
+	s[5]  =   (6.*E*Iy/(Le*Le*(1.+Ksz)) + T/10.0/Dsz ) *
 				( (d7-d1)*t7 + (d8-d2)*t8 + (d9-d3)*t9 )
-		+ ( (4.+Ksz)*E*Iy/(Le*(1.+Ksz)) + 
+		+ ( (4.+Ksz)*E*Iy/(Le*(1.+Ksz)) +
 		    T*L*(2.0/15.0+Ksz/6.0+Ksz*Ksz/12.0)/Dsz ) *
 				(d4 *t4 + d5 *t5 + d6 *t6)
-		+ ((2.-Ksz)*E*Iy/(Le*(1.+Ksz)) -  
+		+ ((2.-Ksz)*E*Iy/(Le*(1.+Ksz)) -
 		    T*L*(1.0/30.0+Ksz/6.0+Ksz*Ksz/12.0)/Dsz ) *
 				(d10*t4 + d11*t5 + d12*t6);
 	s[6]  =  -( 6.*E*Iz/(Le*Le*(1.+Ksy)) + T/10.0/Dsy ) *
 				( (d7-d1)*t4 + (d8-d2)*t5 + (d9-d3)*t6 )
-		+ ((4.+Ksy)*E*Iz/(Le*(1.+Ksy)) + 
+		+ ((4.+Ksy)*E*Iz/(Le*(1.+Ksy)) +
 		    T*L*(2.0/15.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) *
 				( d4 *t7 + d5 *t8 + d6 *t9 )
-		+ ((2.-Ksy)*E*Iz/(Le*(1.+Ksy)) - 
-		    T*L*(1.0/30.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) * 
+		+ ((2.-Ksy)*E*Iz/(Le*(1.+Ksy)) -
+		    T*L*(1.0/30.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) *
 				( d10*t7 + d11*t8 + d12*t9 );
 	s[7]  = -s[1];
-	s[8]  = -s[2]; 
-	s[9]  = -s[3]; 
-	s[10] = -s[4]; 
+	s[8]  = -s[2];
+	s[9]  = -s[3];
+	s[10] = -s[4];
 
-	s[11] =   ( 6.*E*Iy/(Le*Le*(1.+Ksz)) + T/10.0/Dsz ) * 
+	s[11] =   ( 6.*E*Iy/(Le*Le*(1.+Ksz)) + T/10.0/Dsz ) *
 				( (d7-d1)*t7 + (d8-d2)*t8 + (d9-d3)*t9 )
-		+ ((4.+Ksz)*E*Iy/(Le*(1.+Ksz)) + 
-		    T*L*(2.0/15.0+Ksz/6.0+Ksz*Ksz/12.0)/Dsz ) * 
+		+ ((4.+Ksz)*E*Iy/(Le*(1.+Ksz)) +
+		    T*L*(2.0/15.0+Ksz/6.0+Ksz*Ksz/12.0)/Dsz ) *
 				( d10*t4 + d11*t5 + d12*t6 )
-		+ ((2.-Ksz)*E*Iy/(Le*(1.+Ksz)) - 
+		+ ((2.-Ksz)*E*Iy/(Le*(1.+Ksz)) -
 		    T*L*(1.0/30.0+Ksz/6.0+Ksz*Ksz/12.0)/Dsz ) *
 				( d4 *t4 + d5 *t5 + d6 *t6 );
 	s[12] =  -(6.*E*Iz/(Le*Le*(1.+Ksy)) + T/10.0/Dsy ) *
 				( (d7-d1)*t4 + (d8-d2)*t5 + (d9-d3)*t6 )
-		+ ((4.+Ksy)*E*Iz/(Le*(1.+Ksy)) + 
-		    T*L*(2.0/15.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) * 
+		+ ((4.+Ksy)*E*Iz/(Le*(1.+Ksy)) +
+		    T*L*(2.0/15.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) *
 				( d10*t7 + d11*t8 + d12*t9 )
-		+ ((2.-Ksy)*E*Iz/(Le*(1.+Ksy)) - 
-		    T*L*(1.0/30.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) * 
+		+ ((2.-Ksy)*E*Iz/(Le*(1.+Ksy)) -
+		    T*L*(1.0/30.0+Ksy/6.0+Ksy*Ksy/12.0)/Dsy ) *
 				( d4 *t7 + d5 *t8 + d6 *t9 );
 }
 
 
-/*----------------------------------------------------------------------------- 
+/*-----------------------------------------------------------------------------
 ADD_FEF -  add fixed end forces to reactions and internal element forces 18oct12
 ------------------------------------------------------------------------------*/
-void add_feF(	
+void add_feF(
 	vec3 *xyz,
 	double *L, int *N1, int *N2, float *p,
-	double **Q, double **f_t, double **f_m, int nE, int DoF, 
+	double **Q, double **f_t, double **f_m, int nE, int DoF,
 	double *F, int *r,
 	int verbose
 ){
 	double  t1, t2, t3, t4, t5, t6, t7, t8, t9,	/* 3D coord Xformn */
-		f1=0, f2=0, f3=0, f4=0,  f5=0,  f6=0, 
+		f1=0, f2=0, f3=0, f4=0,  f5=0,  f6=0,
 		f7=0, f8=0, f9=0, f10=0, f11=0, f12=0;
 	int	m, n1, n2, i, i1, i2; //, J, x;
 
@@ -626,9 +626,9 @@ void add_feF(
 		f7  += f_m[m][7];  f8  += f_m[m][8];  f9  += f_m[m][9];
 		f10 += f_m[m][10]; f11 += f_m[m][11]; f12 += f_m[m][12];
 
-		// add fixed end forces (-equivalent loads) to internal loads 
+		// add fixed end forces (-equivalent loads) to internal loads
 		// {Q} = [T]{F}
-		Q[m][1]  -= ( f1 *t1 + f2 *t2 + f3 *t3 );    
+		Q[m][1]  -= ( f1 *t1 + f2 *t2 + f3 *t3 );
 		Q[m][2]  -= ( f1 *t4 + f2 *t5 + f3 *t6 );
 		Q[m][3]  -= ( f1 *t7 + f2 *t8 + f3 *t9 );
 		Q[m][4]  -= ( f4 *t1 + f5 *t2 + f6 *t3 );
@@ -657,13 +657,15 @@ void assemble_M(
 	float *Ax, float *Jx, float *Iy, float *Iz, float *p,
 	float *d, float *EMs,
 	float *NMs, float *NMx, float *NMy, float *NMz,
+	float *NMxy, float *NMxz, float *NMyz,
+	float *rhox, float *rhoy, float *rhoz,
 	int lump, int debug
 ){
 	double  **m,	    /* element mass matrix in global coord */
 		**dmatrix();
 	int     **ind,	  /* member-structure DoF index table     */
 		**imatrix(),
-		res=0, 
+		res=0,
 		i, j, ii, jj, l, ll;
 	char	mass_fn[FILENMAX];
 
@@ -703,15 +705,77 @@ void assemble_M(
 		}
 	}
 
+	// double rhox = -2.13148489;
+	// double rhoy = 0.;
+	// double rhoz = 2.62719292;
+	double mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz;
+	double rx, ry, rz;
+
 	for ( j = 1; j <= nN; j++ ) {		// add extra node mass
 		i = 6*(j-1);
-		M[i+1][i+1] += NMs[j];
-		M[i+2][i+2] += NMs[j];
-		M[i+3][i+3] += NMs[j];
-		M[i+4][i+4] += NMx[j];
-		M[i+5][i+5] += NMy[j];
-		M[i+6][i+6] += NMz[j];
+		mass = NMs[j];
+		Ixx = NMx[j];
+		Iyy = NMy[j];
+		Izz = NMz[j];
+		Ixy = NMxy[j];
+		Ixz = NMxz[j];
+		Iyz = NMyz[j];
+		rx = rhox[j];
+		ry = rhoy[j];
+		rz = rhoz[j];
+
+		M[i+1][i+1] += mass;
+		M[i+1][i+2] += 0.0;
+		M[i+1][i+3] += 0.0;
+		M[i+1][i+4] += 0.0;
+		M[i+1][i+5] += mass*rz;
+		M[i+1][i+6] += -mass*ry;
+
+		M[i+2][i+1] += 0.0;
+		M[i+2][i+2] += mass;
+		M[i+2][i+3] += 0.0;
+		M[i+2][i+4] += -mass*rz;
+		M[i+2][i+5] += 0.0;
+		M[i+2][i+6] += mass*rx;
+
+		M[i+3][i+1] += 0.0;
+		M[i+3][i+2] += 0.0;
+		M[i+3][i+3] += mass;
+		M[i+3][i+4] += mass*ry;
+		M[i+3][i+5] += -mass*rx;
+		M[i+3][i+6] += 0.0;
+
+		M[i+4][i+1] += 0.0;
+		M[i+4][i+2] += -mass*rz;
+		M[i+4][i+3] += mass*ry;
+		M[i+4][i+4] += Ixx + mass*(ry*ry + rz*rz);
+		M[i+4][i+5] += Ixy - mass*(rx*ry);
+		M[i+4][i+6] += Ixz - mass*(rx*rz);
+
+		M[i+5][i+1] += mass*rz;
+		M[i+5][i+2] += 0.0;
+		M[i+5][i+3] += -mass*rx;
+		M[i+5][i+4] += Ixy - mass*(rx*ry);
+		M[i+5][i+5] += Iyy + mass*(rx*rx + rz*rz);
+		M[i+5][i+6] += Iyz - mass*(ry*rz);
+
+		M[i+6][i+1] += -mass*ry;
+		M[i+6][i+2] += mass*rx;
+		M[i+6][i+3] += 0.0;
+		M[i+6][i+4] += Ixz - mass*(rx*rz);
+		M[i+6][i+5] += Iyz - mass*(ry*rz);
+		M[i+6][i+6] += Izz + mass*(rx*rx + ry*ry);
 	}
+
+	// for ( j = 1; j <= nN; j++ ) {		// add extra node mass
+	// 	i = 6*(j-1);
+	// 	M[i+1][i+1] += NMs[j];
+	// 	M[i+2][i+2] += NMs[j];
+	// 	M[i+3][i+3] += NMs[j];
+	// 	M[i+4][i+4] += NMx[j];
+	// 	M[i+5][i+5] += NMy[j];
+	// 	M[i+6][i+6] += NMz[j];
+	// }
 
 	for (i=1; i<= DoF; i++) {
 		if ( M[i][i] <= 0.0 ) {
@@ -766,7 +830,7 @@ CONSISTENT_M  -  space frame consistent mass matrix in global coordnates 2oct97
 ------------------------------------------------------------------------------*/
 void consistent_M(
 	double **m, vec3 *xyz, float *r, double L,
-	int n1, int n2, float Ax, float J, float Iy, float Iz, float p, 
+	int n1, int n2, float Ax, float J, float Iy, float Iz, float p,
 	float d, float EMs
 ){
 	double	t1, t2, t3, t4, t5, t6, t7, t8, t9,     /* coord Xformn */
@@ -776,7 +840,7 @@ void consistent_M(
 	coord_trans ( xyz, L, n1, n2,
 				&t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p );
 
-	t  =  d*Ax*L;	
+	t  =  d*Ax*L;
 	ry =  d*Iy;
 	rz =  d*Iz;
 	po =  d*J*L;
@@ -796,7 +860,7 @@ void consistent_M(
 
 	m[8][6]  = m[6][8]   =  13.*t*L/420. - rz/10.;
 	m[9][5]  = m[5][9]   = -13.*t*L/420. + ry/10.;
-	m[10][4] = m[4][10]  =  po/6.; 
+	m[10][4] = m[4][10]  =  po/6.;
 	m[11][3] = m[3][11]  =  13.*t*L/420. - ry/10.;
 	m[12][2] = m[2][12]  = -13.*t*L/420. + rz/10.;
 
@@ -820,22 +884,22 @@ void consistent_M(
 	atma(t1,t2,t3,t4,t5,t6,t7,t8,t9, m, r[n1],r[n2]);	/* globalize */
 
 
-	/* check and enforce symmetry of consistent element mass matrix */ 
+	/* check and enforce symmetry of consistent element mass matrix */
 
 	for(i=1; i<=12; i++){
 	    for (j=i+1; j<=12; j++){
 			if( m[i][j] != m[j][i] ) {
-				if(fabs(m[i][j]/m[j][i]-1.0) > 1.0e-6 
-					&&(fabs(m[i][j]/m[i][i]) > 1e-6 
+				if(fabs(m[i][j]/m[j][i]-1.0) > 1.0e-6
+					&&(fabs(m[i][j]/m[i][i]) > 1e-6
 						|| fabs(m[j][i]/m[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"consistent_M: element mass matrix not symetric ...\n" ); 
-					fprintf(stderr," ... m[%d][%d] = %15.6e \n",i,j,m[i][j] ); 
-					fprintf(stderr," ... m[%d][%d] = %15.6e   ",j,i,m[j][i] ); 
-					fprintf(stderr," ... relative error = %e \n",  fabs(m[i][j]/m[j][i]-1.0) ); 
+					fprintf(stderr,"consistent_M: element mass matrix not symetric ...\n" );
+					fprintf(stderr," ... m[%d][%d] = %15.6e \n",i,j,m[i][j] );
+					fprintf(stderr," ... m[%d][%d] = %15.6e   ",j,i,m[j][i] );
+					fprintf(stderr," ... relative error = %e \n",  fabs(m[i][j]/m[j][i]-1.0) );
 					fprintf(stderr," ... element matrix saved in file 'mc'\n");
-					save_dmatrix ( "mc", m, 1,12, 1,12, 0, "w" ); 
+					save_dmatrix ( "mc", m, 1,12, 1,12, 0, "w" );
 				}
 
 				m[i][j] = m[j][i] = 0.5 * ( m[i][j] + m[j][i] );
@@ -857,7 +921,7 @@ void condense(
 	double **A, int N, int *c, int n, double **Ac, int verbose
 ){
 	double	**Arr, **Arc;
-	int	i,j,k, ri,rj,ci,cj, ok, 
+	int	i,j,k, ri,rj,ci,cj, ok,
 		*r;
 
 	r    = ivector(1,N-n);
@@ -909,7 +973,7 @@ void condense(
 }
 
 
-/*---------------------------------------------------------------------------- 
+/*----------------------------------------------------------------------------
 GUYAN  -   generalized Guyan reduction of mass and stiffness matrices    6jun07
            matches the response at a particular frequency, sqrt(L)/2/pi
            Guyan, Robert J., ``Reduction of Stiffness and Mass Matrices,''
@@ -918,13 +982,13 @@ GUYAN  -   generalized Guyan reduction of mass and stiffness matrices    6jun07
 void guyan(
 	double **M, double **K, int N,
 	int *c, int n,
-	double **Mc, double **Kc, double w2, 
+	double **Mc, double **Kc, double w2,
 	int verbose
 ){
 	double	**Drr, **Drc, **invDrrDrc, **T;
-	int	i,j,k, ri,rj,cj, ok, 
+	int	i,j,k, ri,rj,cj, ok,
 		*r;
-	
+
 	assert(M!=NULL);
 
 	r   = ivector(1,N-n);
@@ -952,7 +1016,7 @@ void guyan(
 		for (j=1; j<=N-n; j++) { /* use only upper triangle of K,M */
 			ri = r[i];
 			rj = r[j];
-			if ( ri <= rj )	
+			if ( ri <= rj )
 				Drr[j][i] = Drr[i][j] = K[ri][rj]-w2*M[ri][rj];
 			else	Drr[j][i] = Drr[i][j] = K[rj][ri]-w2*M[rj][ri];
 		}
@@ -969,12 +1033,12 @@ void guyan(
 
 	invAB(Drr, Drc, N-n, n, invDrrDrc, &ok, verbose); /* inv(Drr) * Drc */
 
-	/* coordinate transformation matrix	*/	
+	/* coordinate transformation matrix	*/
 	for (i=1; i<=n; i++) {
 		for (j=1; j<=n; j++)	T[c[i]][j] =  0.0;
 		T[c[i]][i] = 1.0;
-	}	
-	for (i=1; i<=N-n; i++) 
+	}
+	for (i=1; i<=N-n; i++)
 		for (j=1; j<=n; j++)	T[r[i]][j] = -invDrrDrc[i][j];
 
 	xtAx ( K, T, Kc, N, n );		/* Kc = T' * K * T	*/
@@ -989,7 +1053,7 @@ void guyan(
 }
 
 
-/*---------------------------------------------------------------------------- 
+/*----------------------------------------------------------------------------
 DYN_CONDEN - dynamic condensation of mass and stiffness matrices    8oct01
 	     matches the response at a set of frequencies
 WARNING: Kc and Mc may be ill-conditioned, and xyzsibly non-positive def.
@@ -1000,9 +1064,9 @@ void dyn_conden(
 	int verbose
 ){
 	double	**P, **invP,
-		traceM = 0, traceMc = 0, 
+		traceM = 0, traceMc = 0,
 		Aij;		/* temporary storage for matrix mult. */
-	int	i,j,k; 
+	int	i,j,k;
 
 	P    =  dmatrix(1,n,1,n);
 	invP =  dmatrix(1,n,1,n);
@@ -1029,7 +1093,7 @@ void dyn_conden(
 	for (i=1; i<=n; i++) { 		/* compute inv(P)' * W^2 * inv(P) */
 	    for (j=1; j<=n; j++) {
 		Aij = 0.0;
-	        for (k=1; k<=n; k++) 
+	        for (k=1; k<=n; k++)
 		    Aij += invP[k][i] * 4.0*PI*PI*f[m[k]]*f[m[k]] * invP[k][j];
 		Kc[i][j] = Aij;
 	    }
@@ -1051,7 +1115,7 @@ void dyn_conden(
 /*------------------------------------------------------------------------------
 DEALLOCATE  -  release allocated memory					9sep08
 ------------------------------------------------------------------------------*/
-void deallocate( 
+void deallocate(
 	int nN, int nE, int nL, int *nF, int *nU, int *nW, int *nP, int *nT,
 	int DoF, int nM,
 	vec3 *xyz, float *rj, double *L, double *Le,
@@ -1060,11 +1124,13 @@ void deallocate(
 	float *E, float *G, float *p,
 	float ***U, float ***W, float ***P, float ***T,
 	float **Dp,
-	double **F_mech, double **F_temp, 
+	double **F_mech, double **F_temp,
 	double ***feF_mech, double ***feF_temp, double **F, double *dF,
 	double **K, double **Q,
 	double *D, double *dD,
 	float *d, float *EMs, float *NMs, float *NMx, float *NMy, float *NMz,
+	float *NMxy, float *NMxz, float *NMyz,
+	float *rhox, float *rhoy, float *rhoz,
 	double **M, double *f, double **V,
 	int *c, int *m
 ){
@@ -1128,6 +1194,12 @@ void deallocate(
 	free_vector(NMx,1,nN);
 	free_vector(NMy,1,nN);
 	free_vector(NMz,1,nN);
+	free_vector(NMxy,1,nN);
+	free_vector(NMxz,1,nN);
+	free_vector(NMyz,1,nN);
+	free_vector(rhox,1,nN);
+	free_vector(rhoy,1,nN);
+	free_vector(rhoz,1,nN);
 
 // printf("..K\n"); /* debug */
 	free_ivector(c,1,DoF);
