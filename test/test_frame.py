@@ -55,11 +55,10 @@ class FrameTestEXA(unittest.TestCase):
         elements = ElementData(EL, N1, N2, Ax, Asy, Asz, Jx, Iy, Iz, E, G, roll, density)
 
         # parameters
-        shear = 0               # 1: include shear deformation
-        geom = 0                # 1: include geometric stiffness
-        exagg_static = 10.0     # exaggerate mesh deformations
+        shear = False               # 1: include shear deformation
+        geom = False                # 1: include geometric stiffness
         dx = 10.0               # x-axis increment for internal forces
-        other = OtherData(shear, geom, exagg_static, dx)
+        other = OtherData(shear, geom, dx)
 
 
         frame = Frame(nodes, reactions, elements, other)
@@ -506,11 +505,10 @@ class FrameTestEXB(unittest.TestCase):
             out[:, 11], out[:, 12])
 
         # parameters
-        shear = 1               # 1: include shear deformation
-        geom = 1                # 1: include geometric stiffness
-        exagg_static = 10.0     # exaggerate mesh deformations
+        shear = True               # 1: include shear deformation
+        geom = True                # 1: include geometric stiffness
         dx = 10.0               # x-axis increment for internal forces
-        other = OtherData(shear, geom, exagg_static, dx)
+        other = OtherData(shear, geom, dx)
 
 
         frame = Frame(nodes, reactions, elements, other)
@@ -562,9 +560,8 @@ class FrameTestEXB(unittest.TestCase):
         lump = 0               # 0: consistent mass ... 1: lumped mass matrix
         tol = 1e-9                # mode shape tolerance
         shift = 0.0             # shift value ... for unrestrained structures
-        exagg_modal = 10.0                            # exaggerate modal mesh deformations
 
-        dynamic = DynamicAnalysis(nM, Mmethod, lump, tol, shift, exagg_modal)
+        dynamic = DynamicAnalysis(nM, Mmethod, lump, tol, shift)
 
         N = np.array([1])
         EMs = np.array([0.1])

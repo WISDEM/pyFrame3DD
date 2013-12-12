@@ -327,7 +327,7 @@ NodeData = namedtuple('NodeData', ['node', 'x', 'y', 'z', 'r'])
 ReactionData = namedtuple('ReactionData', ['node', 'Kx', 'Ky', 'Kz', 'Ktx', 'Kty', 'Ktz', 'rigid'])
 ElementData = namedtuple('ElementData', ['element', 'N1', 'N2', 'Ax', 'Asy', 'Asz',
     'Jx', 'Iy', 'Iz', 'E', 'G', 'roll', 'density'])
-OtherData = namedtuple('OtherData', ['shear', 'geom', 'exagg_static', 'dx'])
+OtherData = namedtuple('OtherData', ['shear', 'geom', 'dx'])
 
 
 # outputs
@@ -396,7 +396,8 @@ class Frame(object):
             dp(self.eAsz), dp(self.eJx), dp(self.eIy), dp(self.eIz),
             dp(self.eE), dp(self.eG), dp(self.eroll), dp(self.edensity))
 
-        self.c_other = C_OtherElementData(other.shear, other.geom, other.exagg_static, other.dx)
+        exagg_static = 1.0  # not used
+        self.c_other = C_OtherElementData(other.shear, other.geom, exagg_static, other.dx)
 
 
         # create list for load cases
@@ -404,7 +405,7 @@ class Frame(object):
 
 
         # initialize with no dynamics
-        dynamic = DynamicAnalysis(nM=0, Mmethod=1, lump=0, tol=0.0, shift=0.0, exagg_modal=0.0)
+        dynamic = DynamicAnalysis(nM=0, Mmethod=1, lump=0, tol=0.0, shift=0.0)
         self.useDynamicAnalysis(dynamic)
 
 
@@ -709,10 +710,11 @@ class DynamicAnalysis(object):
     """docstring"""
 
 
-    def __init__(self, nM, Mmethod, lump, tol, shift, exagg_modal):
+    def __init__(self, nM, Mmethod, lump, tol, shift):
 
         self.nM = nM
 
+        exagg_modal = 1.0  # not used
         self.dynamicData = C_DynamicData(nM, Mmethod, lump, tol, shift, exagg_modal)
 
         i = np.array([], dtype=np.int32)
@@ -816,11 +818,10 @@ if __name__ == '__main__':
     elements = ElementData(EL, N1, N2, Ax, Asy, Asz, Jx, Iy, Iz, E, G, roll, density)
 
     # parameters
-    shear = 0               # 1: include shear deformation
-    geom = 0                # 1: include geometric stiffness
-    exagg_static = 10.0     # exaggerate mesh deformations
+    shear = False               # 1: include shear deformation
+    geom = False                # 1: include geometric stiffness
     dx = 10.0               # x-axis increment for internal forces
-    other = OtherData(shear, geom, exagg_static, dx)
+    other = OtherData(shear, geom, dx)
 
 
     frame = Frame(nodes, reactions, elements, other)
