@@ -60,6 +60,8 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
         *NMx,*NMy,*NMz, // inertia of a node in global coord
         *NMxy,*NMxz,*NMyz, // inertia of a node in global coord
         *rhox, *rhoy, *rhoz, // location of mass offset in global coord realtive to node
+        *EKx, *EKy, *EKz, // extra linear stiffness in global coord
+        *EKtx, *EKty, *EKtz, // extra rotational stiffness in global coord
         gX[_NL_],   // gravitational acceleration in global X
         gY[_NL_],   // gravitational acceleration in global Y
         gZ[_NL_],   // gravitational acceleration in global Z
@@ -158,9 +160,18 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 
     DoF = 6*nN;     /* total number of degrees of freedom   */
 
+    read_run_data ( other, &shear, &geom, &exagg_static, &dx); // read this first because want geom for check in read_reaction_data
+
     q   = ivector(1,DoF);   /* allocate memory for reaction data ... */
     r   = ivector(1,DoF);   /* allocate memory for reaction data ... */
-    read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose );
+    EKx =  vector(1,nN);    /* extra linear stiffness in global coord */
+    EKy =  vector(1,nN);    /* extra linear stiffness in global coord */
+    EKz =  vector(1,nN);    /* extra linear stiffness in global coord */
+    EKtx =  vector(1,nN);    /* extra rotational stiffness in global coord */
+    EKty =  vector(1,nN);    /* extra rotational stiffness in global coord */
+    EKtz =  vector(1,nN);    /* extra rotational stiffness in global coord */
+    read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose, geom,
+        EKx, EKy, EKz, EKtx, EKty, EKtz);
     if ( verbose )  fprintf(stdout," ... complete\n");
 
     nE = elements->nE;  /* number of frame elements */
@@ -197,7 +208,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 
     if ( verbose)   fprintf(stdout," ... complete\n");
 
-    read_run_data ( other, &shear, &geom, &exagg_static, &dx);
+
 
     if ( verbose ) {    /* display nL */
         fprintf(stdout," number of load cases ");
@@ -308,9 +319,10 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
         for (i=1; i<=nE; i++)   for (j=1;j<=12;j++) Q[i][j] = 0.0;
 
         /*  assemble stiffness matrix [K({D}^(i))], {D}^(0)={0} (i=0) */
-        assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+        assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
                     Ax, Asy, Asz, Jx,Iy,Iz, E, G, p,
-                    shear, geom, Q, debug );
+                    shear, geom, Q, debug,
+                    EKx, EKy, EKz, EKtx, EKty, EKtz );
 
 #ifdef MATRIX_DEBUG
         save_dmatrix ( "Ku", K, 1,DoF, 1,DoF, 0, "w" ); // unloaded stiffness matrix
@@ -333,9 +345,10 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
                 Ax, Asy,Asz, Jx,Iy,Iz, E,G, p, D, shear, geom );
 
              /* assemble temp.-stressed stiffness [K({D_t})]     */
-             assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+             assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
                         Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-                        shear,geom, Q, debug );
+                        shear,geom, Q, debug,
+                        EKx, EKy, EKz, EKtx, EKty, EKtz );
             }
         }
 
@@ -385,9 +398,10 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
             ++iter;
 
             /*  assemble stiffness matrix [K({D}^(i))]  */
-            assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+            assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
                 Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-                shear,geom, Q, debug );
+                shear,geom, Q, debug,
+                EKx, EKy, EKz, EKtx, EKty, EKtz );
 
             /*  compute equilibrium error, {dF}, at iteration i */
             /*  {dF}^(i) = {F} - [K({D}^(i))]*{D}^(i) */
@@ -589,7 +603,8 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
             K, Q, D, dD,
             d,EMs,NMs,NMx,NMy,NMz,
             NMxy, NMxz, NMyz, rhox, rhoy, rhoz,
-            M,f,V, c, m
+            M,f,V, c, m,
+            EKx, EKy, EKz, EKtx, EKty, EKtz
     );
 
     if ( verbose ) {

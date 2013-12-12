@@ -221,22 +221,31 @@ READ_REACTION_DATA - Read fixed node displacement boundary conditions
 Oct 31, 2013
 ------------------------------------------------------------------------------*/
 void read_reaction_data (Reactions *reactions, int DoF, int nN,
-    int *nR, int *q, int *r, int *sumR, int verbose){
+    int *nR, int *q, int *r, int *sumR, int verbose, int geom,
+    float *EKx, float *EKy, float *EKz,
+    float *EKtx, float *EKty, float *EKtz){
 
-    int i,j,l;
+    int i,j;
     char errMsg[MAXL];
-    int values[6];
 
     for (i=1; i<=DoF; i++)  r[i] = 0;
+    for (i=1; i<=nN; i++){
+        EKx[i] = 0.0;
+        EKy[i] = 0.0;
+        EKz[i] = 0.0;
+        EKtx[i] = 0.0;
+        EKty[i] = 0.0;
+        EKtz[i] = 0.0;
+    }
 
-    *nR = reactions->nR;
+    *nR = reactions->nK;
     if ( verbose ) {
-        fprintf(stdout," number of nodes with reactions ");
+        fprintf(stdout," number of nodes with reactions (or extra stiffness) ");
         dots(stdout,21);
         fprintf(stdout," nR =%4d ", *nR );
     }
     if ( *nR < 0 || *nR > DoF/6 ) {
-        fprintf(stderr," number of nodes with reactions ");
+        fprintf(stderr," number of nodes with reactions (or extras stiffness) ");
         dots(stderr,21);
         fprintf(stderr," nR = %3d ", *nR );
         sprintf(errMsg,"\n  error: valid ranges for nR is 0 ... %d \n", DoF/6 );
@@ -254,39 +263,51 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
             exit(81);
         }
 
-        values[5] = reactions->Rx[i-1];
-        values[4] = reactions->Ry[i-1];
-        values[3] = reactions->Rz[i-1];
-        values[2] = reactions->Rxx[i-1];
-        values[1] = reactions->Ryy[i-1];
-        values[0] = reactions->Rzz[i-1];
-
-        for (l=5; l >=0; l--) {
-
-            r[6*j-l] = values[l];
-
-            if ( r[6*j-l] != 0 && r[6*j-l] != 1 ) {
-                sprintf(errMsg,"\n  error in reaction data: Reaction data must be 0 or 1\n   Data for node %d, DoF %d is %d\n", j, 6-l, r[6*j-l] );
-                errorMsg(errMsg);
-                exit(82);
-            }
+        // save rigid locations (and extra stiffness if needed)
+        if (reactions->Kx[i-1] == reactions->rigid){
+            r[6*j-5] = 1;
+        } else{
+            EKx[j] = reactions->Kx[i-1];
+        }
+        if (reactions->Ky[i-1] == reactions->rigid){
+            r[6*j-4] = 1;
+        } else{
+            EKy[j] = reactions->Ky[i-1];
+        }
+        if (reactions->Kz[i-1] == reactions->rigid){
+            r[6*j-3] = 1;
+        } else{
+            EKz[j] = reactions->Kz[i-1];
+        }
+        if (reactions->Ktx[i-1] == reactions->rigid){
+            r[6*j-2] = 1;
+        } else{
+            EKtx[j] = reactions->Ktx[i-1];
+        }
+        if (reactions->Kty[i-1] == reactions->rigid){
+            r[6*j-1] = 1;
+        } else{
+            EKty[j] = reactions->Kty[i-1];
+        }
+        if (reactions->Ktz[i-1] == reactions->rigid){
+            r[6*j] = 1;
+        } else{
+            EKtz[j] = reactions->Ktz[i-1];
         }
 
-        *sumR = 0;
-        for (l=5; l >=0; l--)   *sumR += r[6*j-l];
-        if ( *sumR == 0 ) {
-            sprintf(errMsg,"\n  error: node %3d has no reactions\n   Remove node %3d from the list of reactions\n   and set nR to %3d \n",
-            j, j, *nR-1 );
-            errorMsg(errMsg);
-            exit(83);
-        }
     }
+
     *sumR=0;    for (i=1;i<=DoF;i++)    *sumR += r[i];
-    if ( *sumR < 4 ) {
-        sprintf(errMsg,"\n  Warning:  un-restrained structure   %d imposed reactions.\n  At least 4 reactions are required to support static loads.\n", *sumR );
+    if ( *sumR < 4 && geom) {
+        sprintf(errMsg,"\n  error:  geometric stiffness can not be used for unrestrained structure.  set geom=0 or added more reactions.\n");
         errorMsg(errMsg);
-        /*  exit(84); */
+        exit(84);
     }
+    // if ( *sumR < 4 ) {
+    //     sprintf(errMsg,"\n  Warning:  un-restrained structure   %d imposed reactions.\n  At least 4 reactions are required to support static loads.\n", *sumR );
+    //     errorMsg(errMsg);
+    //     /*  exit(84); */
+    // }
     if ( *sumR >= DoF ) {
         sprintf(errMsg,"\n  error in reaction data:  Fully restrained structure\n   %d imposed reactions >= %d degrees of freedom\n", *sumR, DoF );
         errorMsg(errMsg);

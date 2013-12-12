@@ -42,15 +42,15 @@ class C_Nodes(Structure):
 
 
 class C_Reactions(Structure):
-    _fields_ = [('nR', c_int),
+    _fields_ = [('nK', c_int),
                 ('N', c_int_p),
-                ('Rx', c_int_p),
-                ('Ry', c_int_p),
-                ('Rz', c_int_p),
-                ('Rxx', c_int_p),
-                ('Ryy', c_int_p),
-                ('Rzz', c_int_p)]
-
+                ('Kx', c_double_p),
+                ('Ky', c_double_p),
+                ('Kz', c_double_p),
+                ('Ktx', c_double_p),
+                ('Kty', c_double_p),
+                ('Ktz', c_double_p),
+                ('rigid', c_double)]
 
 
 class C_Elements(Structure):
@@ -324,7 +324,7 @@ class C_ModalResults(Structure):
 # inputs
 
 NodeData = namedtuple('NodeData', ['node', 'x', 'y', 'z', 'r'])
-ReactionData = namedtuple('ReactionData', ['node', 'Rx', 'Ry', 'Rz', 'Rxx', 'Ryy', 'Rzz'])
+ReactionData = namedtuple('ReactionData', ['node', 'Kx', 'Ky', 'Kz', 'Ktx', 'Kty', 'Ktz', 'rigid'])
 ElementData = namedtuple('ElementData', ['element', 'N1', 'N2', 'Ax', 'Asy', 'Asz',
     'Jx', 'Iy', 'Iz', 'E', 'G', 'roll', 'density'])
 OtherData = namedtuple('OtherData', ['shear', 'geom', 'exagg_static', 'dx'])
@@ -361,12 +361,12 @@ class Frame(object):
         self.nr = np.copy(nodes.r)
 
         self.rnode = reactions.node.astype(np.int32)
-        self.rRx = reactions.Rx.astype(np.int32)
-        self.rRy = reactions.Ry.astype(np.int32)
-        self.rRz = reactions.Rz.astype(np.int32)
-        self.rRxx = reactions.Rxx.astype(np.int32)
-        self.rRyy = reactions.Ryy.astype(np.int32)
-        self.rRzz = reactions.Rzz.astype(np.int32)
+        self.rKx = reactions.Kx.astype(np.float64)  # convert rather than copy to allow old syntax of integers
+        self.rKy = reactions.Ky.astype(np.float64)
+        self.rKz = reactions.Kz.astype(np.float64)
+        self.rKtx = reactions.Ktx.astype(np.float64)
+        self.rKty = reactions.Kty.astype(np.float64)
+        self.rKtz = reactions.Ktz.astype(np.float64)
 
         self.eelement = elements.element.astype(np.int32)
         self.eN1 = elements.N1.astype(np.int32)
@@ -388,8 +388,8 @@ class Frame(object):
             dp(self.ny), dp(self.nz), dp(self.nr))
 
         self.c_reactions = C_Reactions(len(self.rnode), ip(self.rnode),
-            ip(self.rRx), ip(self.rRy), ip(self.rRz),
-            ip(self.rRxx), ip(self.rRyy), ip(self.rRzz))
+            dp(self.rKx), dp(self.rKy), dp(self.rKz),
+            dp(self.rKtx), dp(self.rKty), dp(self.rKtz), reactions.rigid)
 
         self.c_elements = C_Elements(len(self.eelement), ip(self.eelement),
             ip(self.eN1), ip(self.eN2), dp(self.eAx), dp(self.eAsy),
@@ -790,13 +790,14 @@ if __name__ == '__main__':
 
     # reactions
     node = np.arange(1, 13)
-    Rx = np.array([1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
-    Ry = np.array([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
-    Rz = np.ones(12)
-    Rxx = np.ones(12)
-    Ryy = np.ones(12)
-    Rzz = np.zeros(12)
-    reactions = ReactionData(node, Rx, Ry, Rz, Rxx, Ryy, Rzz)
+    Kx = np.array([1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+    Ky = np.array([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
+    Kz = np.ones(12)
+    Ktx = np.ones(12)
+    Kty = np.ones(12)
+    Ktz = np.zeros(12)
+    rigid = 1
+    reactions = ReactionData(node, Kx, Ky, Kz, Ktx, Kty, Ktz, rigid)
 
     # elements
     EL = np.arange(1, 22)

@@ -84,13 +84,15 @@ ASSEMBLE_K  -  assemble global stiffness matrix from individual elements 23feb94
 ------------------------------------------------------------------------------*/
 void assemble_K(
 	double **K,
-	int DoF, int nE,
+	int DoF, int nE, int nN,
 	vec3 *xyz, float *r, double *L, double *Le,
 	int *N1, int *N2,
 	float *Ax, float *Asy, float *Asz,
 	float *Jx, float *Iy, float *Iz,
 	float *E, float *G, float *p,
-	int shear, int geom, double **Q, int debug
+	int shear, int geom, double **Q, int debug,
+	float *EKx, float *EKy, float *EKz,
+    float *EKtx, float *EKty, float *EKtz
 ){
 	double	**k;		/* element stiffness matrix in global coord */
 	int	**ind,		/* member-structure DoF index table	*/
@@ -137,6 +139,17 @@ void assemble_K(
 			}
 		}
 	}
+
+	for ( j = 1; j <= nN; j++ ) {		// add extra stiffness
+		i = 6*(j-1);
+		K[i+1][i+1] += EKx[j];
+		K[i+2][i+2] += EKy[j];
+		K[i+3][i+3] += EKz[j];
+		K[i+4][i+4] += EKtx[j];
+		K[i+5][i+5] += EKty[j];
+		K[i+6][i+6] += EKtz[j];
+	}
+
 	free_dmatrix ( k,1,12,1,12);
 	free_imatrix(ind,1,12,1,nE);
 	return;
@@ -372,7 +385,7 @@ void solve_system(
 	int *ok, int verbose, double *rms_resid
 ){
 	double	*diag;		/* diagonal vector of the L D L' decomp. */
-	int	i;
+	// int	i;
 
 	verbose = 0;		/* suppress verbose output		*/
 
@@ -469,7 +482,7 @@ void member_force(
 	double	t1, t2, t3, t4, t5, t6, t7, t8, t9, /* coord Xformn	*/
 		d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12,
 		x1, y1, z1, x2, y2, z2,	/* node coordinates	*/
-		Ls,			/* stretched length of element */
+		//Ls,			/* stretched length of element */
 		delta=0.0,		/* stretch in the frame element */
 		Ksy, Ksz, Dsy, Dsz,	/* shear deformation coeff's	*/
 		T = 0.0;		/* axial force for geometric stiffness */
@@ -705,9 +718,6 @@ void assemble_M(
 		}
 	}
 
-	// double rhox = -2.13148489;
-	// double rhoy = 0.;
-	// double rhoz = 2.62719292;
 	double mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz;
 	double rx, ry, rz;
 
@@ -1132,7 +1142,9 @@ void deallocate(
 	float *NMxy, float *NMxz, float *NMyz,
 	float *rhox, float *rhoy, float *rhoz,
 	double **M, double *f, double **V,
-	int *c, int *m
+	int *c, int *m,
+	float *EKx, float *EKy, float *EKz,
+    float *EKtx, float *EKty, float *EKtz
 ){
 
 	void	free();
@@ -1211,6 +1223,14 @@ void deallocate(
 		free_dvector(f,1,nM);
 		free_dmatrix(V,1,DoF,1,DoF);
 	}
+
+	free_vector(EKx,1,nN);
+	free_vector(EKy,1,nN);
+	free_vector(EKz,1,nN);
+	free_vector(EKtx,1,nN);
+	free_vector(EKty,1,nN);
+	free_vector(EKtz,1,nN);
+
 }
 
 /* itoa moved to frame3dd_io.c */

@@ -29,13 +29,14 @@ class FrameTestEXA(unittest.TestCase):
 
         # reactions
         node = np.arange(1, 13)
-        Rx = np.array([1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
-        Ry = np.array([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
-        Rz = np.ones(12)
-        Rxx = np.ones(12)
-        Ryy = np.ones(12)
-        Rzz = np.zeros(12)
-        reactions = ReactionData(node, Rx, Ry, Rz, Rxx, Ryy, Rzz)
+        Kx = np.array([1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+        Ky = np.array([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
+        Kz = np.ones(12)
+        Ktx = np.ones(12)
+        Kty = np.ones(12)
+        Ktz = np.zeros(12)
+        rigid = 1
+        reactions = ReactionData(node, Kx, Ky, Kz, Ktx, Kty, Ktz, rigid)
 
         # elements
         EL = np.arange(1, 22)
@@ -485,9 +486,10 @@ class FrameTestEXB(unittest.TestCase):
           5 1  1  1  1  1  1
         """)
         out = np.loadtxt(string, dtype=np.int)
+        rigid = 1
 
         reactions = ReactionData(out[:, 0], out[:, 1], out[:, 2], out[:, 3], out[:, 4],
-            out[:, 5], out[:, 6])
+            out[:, 5], out[:, 6], rigid)
 
         # elements
 

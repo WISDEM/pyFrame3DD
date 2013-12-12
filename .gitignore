@@ -1,4 +1,5 @@
 *.py[cod]
+frame3dd
 
 # C extensions
 *.so

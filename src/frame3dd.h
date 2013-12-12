@@ -39,6 +39,7 @@ void assemble_K(
 	double **K,		/**< stiffness matrix			*/
 	int DoF,		/**< number of degrees of freedom	*/
 	int nE,			/**< number of frame elements		*/
+	int nN,			/**< number of nodes		*/
 	vec3 *xyz,		/**< XYZ locations of every node	*/
 	float *r,		/**< rigid radius of every node	*/
 	double *L, double *Le,	/**< length of each frame element, effective */
@@ -50,7 +51,9 @@ void assemble_K(
 	int shear,		/**< 1: include shear deformation, 0: don't */
 	int geom,		/**< 1: include goemetric stiffness, 0: don't */
 	double **Q,		/**< frame element end forces		*/
-	int debug		/**< 1: write element stiffness matrices*/
+	int debug,		/**< 1: write element stiffness matrices*/
+	float *EKx, float *EKy, float *EKz,  // extra nodal stiffness
+    float *EKtx, float *EKty, float *EKtz
 );
 
 
@@ -217,7 +220,9 @@ void deallocate(
 	float *NMxy, float *NMxz, float *NMyz,
 	float *rhox, float *rhoy, float *rhoz,
 	double **M, double *f, double **V,
-	int *c, int *m
+	int *c, int *m,
+	float *EKx, float *EKy, float *EKz,
+	float *EKtx, float *EKty, float *EKtz
 );
 
 

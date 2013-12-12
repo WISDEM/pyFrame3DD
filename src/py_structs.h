@@ -20,9 +20,10 @@ typedef struct {
 
 typedef struct {
 
-    int nR;
+    int nK;
     int* N;
-    int *Rx, *Ry, *Rz, *Rxx, *Ryy, *Rzz;
+    double *Kx, *Ky, *Kz, *Ktx, *Kty, *Ktz;
+    double rigid;
 
 } Reactions;
 
