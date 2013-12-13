@@ -681,6 +681,8 @@ void assemble_M(
 		res=0,
 		i, j, ii, jj, l, ll;
 	char	mass_fn[FILENMAX];
+	double mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz;
+	double rx, ry, rz;
 
 	for (i=1; i<=DoF; i++)  for (j=1; j<=DoF; j++)  M[i][j] = 0.0;
 
@@ -718,8 +720,6 @@ void assemble_M(
 		}
 	}
 
-	double mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz;
-	double rx, ry, rz;
 
 	for ( j = 1; j <= nN; j++ ) {		// add extra node mass
 		i = 6*(j-1);
