@@ -11,8 +11,8 @@ import unittest
 import numpy as np
 from StringIO import StringIO
 
-from frame3dd import Frame, NodeData, ReactionData, ElementData, OtherData, \
-    StaticLoadCase, DynamicAnalysis
+from frame3dd import Frame, NodeData, ReactionData, ElementData, Options, \
+    StaticLoadCase
 
 
 class FrameTestEXA(unittest.TestCase):
@@ -58,10 +58,9 @@ class FrameTestEXA(unittest.TestCase):
         shear = False               # 1: include shear deformation
         geom = False                # 1: include geometric stiffness
         dx = 10.0               # x-axis increment for internal forces
-        other = OtherData(shear, geom, dx)
+        options = Options(shear, geom, dx)
 
-
-        frame = Frame(nodes, reactions, elements, other)
+        frame = Frame(nodes, reactions, elements, options)
 
 
 
@@ -508,10 +507,19 @@ class FrameTestEXB(unittest.TestCase):
         shear = True               # 1: include shear deformation
         geom = True                # 1: include geometric stiffness
         dx = 10.0               # x-axis increment for internal forces
-        other = OtherData(shear, geom, dx)
+        options = Options(shear, geom, dx)
 
 
-        frame = Frame(nodes, reactions, elements, other)
+        frame = Frame(nodes, reactions, elements, options)
+
+
+        # dynamics
+        nM = 6               # number of desired dynamic modes of vibration
+        Mmethod = 1                               # 1: subspace Jacobi     2: Stodola
+        lump = 0               # 0: consistent mass ... 1: lumped mass matrix
+        tol = 1e-9                # mode shape tolerance
+        shift = 0.0             # shift value ... for unrestrained structures
+        frame.enableDynamics(nM, Mmethod, lump, tol, shift)
 
 
 
@@ -552,17 +560,6 @@ class FrameTestEXB(unittest.TestCase):
         frame.addLoadCase(load)
 
 
-
-
-
-        nM = 6               # number of desired dynamic modes of vibration
-        Mmethod = 1                               # 1: subspace Jacobi     2: Stodola
-        lump = 0               # 0: consistent mass ... 1: lumped mass matrix
-        tol = 1e-9                # mode shape tolerance
-        shift = 0.0             # shift value ... for unrestrained structures
-
-        dynamic = DynamicAnalysis(nM, Mmethod, lump, tol, shift)
-
         N = np.array([1])
         EMs = np.array([0.1])
         EMx = np.array([0.0])
@@ -574,9 +571,9 @@ class FrameTestEXB(unittest.TestCase):
         rhox = np.array([0.0])
         rhoy = np.array([0.0])
         rhoz = np.array([0.0])
-        dynamic.changeExtraInertia(N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz)
+        addGravityLoad = False
+        frame.changeExtraNodeMass(N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz, addGravityLoad)
 
-        frame.useDynamicAnalysis(dynamic)
 
 
 

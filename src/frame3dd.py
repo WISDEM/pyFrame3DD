@@ -327,7 +327,7 @@ NodeData = namedtuple('NodeData', ['node', 'x', 'y', 'z', 'r'])
 ReactionData = namedtuple('ReactionData', ['node', 'Kx', 'Ky', 'Kz', 'Ktx', 'Kty', 'Ktz', 'rigid'])
 ElementData = namedtuple('ElementData', ['element', 'N1', 'N2', 'Ax', 'Asy', 'Asz',
     'Jx', 'Iy', 'Iz', 'E', 'G', 'roll', 'density'])
-OtherData = namedtuple('OtherData', ['shear', 'geom', 'dx'])
+Options = namedtuple('Options', ['shear', 'geom', 'dx'])
 
 
 # outputs
@@ -345,21 +345,24 @@ Modes = namedtuple('Modes', ['freq', 'xmpf', 'ympf', 'zmpf', 'node', 'xdsp', 'yd
 class Frame(object):
 
 
-    def __init__(self, nodes, reactions, elements, other):
+    def __init__(self, nodes, reactions, elements, options):
         """docstring"""
 
         self.nodes = nodes
         self.reactions = reactions
         self.elements = elements
-        self.other = other
+        self.options = options
 
         # convert to C int size (not longs) and copy to prevent releasing (b/c address space is shared by c)
+
+        # nodes
         self.nnode = nodes.node.astype(np.int32)
         self.nx = np.copy(nodes.x)
         self.ny = np.copy(nodes.y)
         self.nz = np.copy(nodes.z)
         self.nr = np.copy(nodes.r)
 
+        # reactions
         self.rnode = reactions.node.astype(np.int32)
         self.rKx = reactions.Kx.astype(np.float64)  # convert rather than copy to allow old syntax of integers
         self.rKy = reactions.Ky.astype(np.float64)
@@ -368,6 +371,7 @@ class Frame(object):
         self.rKty = reactions.Kty.astype(np.float64)
         self.rKtz = reactions.Ktz.astype(np.float64)
 
+        # elements
         self.eelement = elements.element.astype(np.int32)
         self.eN1 = elements.N1.astype(np.int32)
         self.eN2 = elements.N2.astype(np.int32)
@@ -396,17 +400,27 @@ class Frame(object):
             dp(self.eAsz), dp(self.eJx), dp(self.eIy), dp(self.eIz),
             dp(self.eE), dp(self.eG), dp(self.eroll), dp(self.edensity))
 
-        exagg_static = 1.0  # not used
-        self.c_other = C_OtherElementData(other.shear, other.geom, exagg_static, other.dx)
 
+        # options
+        exagg_static = 1.0  # not used
+        self.c_other = C_OtherElementData(options.shear, options.geom, exagg_static, options.dx)
+
+        # leave off dynamics by default
+        self.nM = 0              # number of desired dynamic modes of vibration (below only necessary if nM > 0)
+        self.Mmethod = 1         # 1: subspace Jacobi     2: Stodola
+        self.lump = 0            # 0: consistent mass ... 1: lumped mass matrix
+        self.tol = 1e-9          # mode shape tolerance
+        self.shift = 0.0         # shift value ... for unrestrained structures
 
         # create list for load cases
         self.loadCases = []
 
-
-        # initialize with no dynamics
-        dynamic = DynamicAnalysis(nM=0, Mmethod=1, lump=0, tol=0.0, shift=0.0)
-        self.useDynamicAnalysis(dynamic)
+        # initialize extra mass data
+        i = np.array([], dtype=np.int32)
+        d = np.array([])
+        self.changeExtraNodeMass(i, d, d, d, d, d, d, d, d, d, d, False)
+        self.changeExtraElementMass(i, d, False)
+        self.changeCondensationData(0, i, d, d, d, d, d, d, i)
 
 
         # load c module
@@ -429,10 +443,133 @@ class Frame(object):
         self.loadCases.append(loadCase)
 
 
+    def changeExtraNodeMass(self, node, mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz, rhox, rhoy, rhoz, addGravityLoad):
 
-    def useDynamicAnalysis(self, dynamic):
+        self.ENMnode = node.astype(np.int32)
+        self.ENMmass = np.copy(mass)
+        self.ENMIxx = np.copy(Ixx)
+        self.ENMIyy = np.copy(Iyy)
+        self.ENMIzz = np.copy(Izz)
+        self.ENMIxy = np.copy(Ixy)
+        self.ENMIxz = np.copy(Ixz)
+        self.ENMIyz = np.copy(Iyz)
+        self.ENMrhox = np.copy(rhox)
+        self.ENMrhoy = np.copy(rhoy)
+        self.ENMrhoz = np.copy(rhoz)
+        self.addGravityLoadForExtraNodeMass = addGravityLoad
 
-        self.dynamic = dynamic
+        self.c_extraInertia = C_ExtraInertia(len(self.ENMnode), ip(self.ENMnode),
+            dp(self.ENMmass), dp(self.ENMIxx), dp(self.ENMIyy), dp(self.ENMIzz),
+            dp(self.ENMIxy), dp(self.ENMIxz), dp(self.ENMIyz),
+            dp(self.ENMrhox), dp(self.ENMrhoy), dp(self.ENMrhoz))
+
+
+
+    def changeExtraElementMass(self, element, mass, addGravityLoad):
+
+        self.EEMelement = element.astype(np.int32)
+        self.EEMmass = np.copy(mass)
+        self.addGravityLoadForExtraElementMass = addGravityLoad
+
+        self.c_extraMass = C_ExtraMass(len(self.EEMelement), ip(self.EEMelement),
+            dp(self.EEMmass))
+
+
+    def changeCondensationData(self, Cmethod, N, cx, cy, cz, cxx, cyy, czz, m):
+        # I don't think this is actually used in Frame3DD anyway
+
+        self.NC = N.astype(np.int32)
+        self.cx = np.copy(cx)
+        self.cy = np.copy(cy)
+        self.cz = np.copy(cz)
+        self.cxx = np.copy(cxx)
+        self.cyy = np.copy(cyy)
+        self.czz = np.copy(czz)
+        self.mC = m.astype(np.int32)
+
+        self.c_condensation = C_Condensation(Cmethod, len(N), ip(self.NC), dp(self.cx), dp(self.cy), dp(self.cz),
+            dp(self.cxx), dp(self.cyy), dp(self.czz), ip(self.mC))
+
+
+    def enableDynamics(self, nM, Mmethod, lump, tol, shift):
+
+        self.nM = nM
+        self.Mmethod = Mmethod
+        self.lump = lump
+        self.tol = tol
+        self.shift = shift
+
+
+    def __addGravityToExtraMass(self):
+
+        if self.addGravityLoadForExtraNodeMass:
+
+            Nm = self.ENMnode
+            mass = self.ENMmass
+            x = self.ENMrhox
+            y = self.ENMrhoy
+            z = self.ENMrhoz
+
+            for lc in self.loadCases:
+
+                gx = lc.gx
+                gy = lc.gy
+                gz = lc.gz
+
+                self.PLN = np.concatenate([lc.NF, Nm])
+                self.PLFx = np.concatenate([lc.Fx, mass*gx])
+                self.PLFy = np.concatenate([lc.Fy, mass*gy])
+                self.PLFz = np.concatenate([lc.Fz, mass*gz])
+                self.PLMx = np.concatenate([lc.Mxx, mass*(y*gz - z*gy)])
+                self.PLMy = np.concatenate([lc.Myy, mass*(z*gx - x*gz)])
+                self.PLMz = np.concatenate([lc.Mzz, mass*(x*gy - y*gx)])
+
+                lc.pL = C_PointLoads(len(self.PLN), ip(self.PLN), dp(self.PLFx),
+                    dp(self.PLFy), dp(self.PLFz), dp(self.PLMx),
+                    dp(self.PLMy), dp(self.PLMz))
+
+
+        if self.addGravityLoadForExtraElementMass:
+
+            element = self.EEMelement
+            mass = self.EEMmass
+
+            # compute length of element
+            nE = len(self.elements.element)  # number of elements
+            x = self.nodes.x
+            y = self.nodes.y
+            z = self.nodes.z
+            N1 = self.elements.N1
+            N2 = self.elements.N2
+
+            L = np.zeros(nE)
+            for i in range(nE):
+
+                L[i] = math.sqrt(
+                    (x[N2[i]-1] - x[N1[i]-1])**2 +
+                    (y[N2[i]-1] - y[N1[i]-1])**2 +
+                    (z[N2[i]-1] - z[N1[i]-1])**2
+                )
+
+            LE = L[element]
+
+            # add to interior point load
+            for lc in self.loadCases:
+
+                gx = lc.gx
+                gy = lc.gy
+                gz = lc.gz
+
+                self.IPLE = np.concatenate([lc.ELE, element])
+                self.IPLPx = np.concatenate([lc.Px, mass*gx])
+                self.IPLPy = np.concatenate([lc.Py, mass*gy])
+                self.IPLPz = np.concatenate([lc.Pz, mass*gz])
+                self.IPLxE = np.concatenate([lc.xE, 0.5*LE])
+
+                lc.eL = C_ElementLoads(len(self.IPLE), ip(self.IPLE),
+                    dp(self.IPLPx), dp(self.IPLPy), dp(self.IPLPz),
+                    dp(self.IPLxE))
+
 
 
     def run(self):
@@ -440,12 +577,14 @@ class Frame(object):
         nCases = len(self.loadCases)  # number of load cases
         nN = len(self.nodes.node)  # number of nodes
         nE = len(self.elements.element)  # number of elements
-        nM = self.dynamic.nM  # number of modes
+        nM = self.nM  # number of modes
 
         if nCases == 0:
             print('error: must have at least 1 load case')
             return
 
+
+        self.__addGravityToExtraMass()
 
 
         # initialize output arrays
@@ -469,7 +608,7 @@ class Frame(object):
         z = self.nodes.z
         N1 = self.elements.N1
         N2 = self.elements.N2
-        dx = self.other.dx
+        dx = self.options.dx
 
         ifout = [0]*nE
         for i in range(nE):
@@ -559,12 +698,13 @@ class Frame(object):
             )
 
 
-        d = self.dynamic
-
+        # set dynamics data
+        exagg_modal = 1.0  # not used
+        c_dynamicData = C_DynamicData(self.nM, self.Mmethod, self.lump, self.tol, self.shift, exagg_modal)
 
         self._frame3dd.run(self.c_nodes, self.c_reactions, self.c_elements, self.c_other,
-            nCases, c_loadcases,
-            d.dynamicData, d.extraInertia, d.extraMass, d.condensation,
+            nCases, c_loadcases, c_dynamicData, self.c_extraInertia,
+            self.c_extraMass, self.c_condensation,
             c_disp, c_forces, c_reactions, c_internalForces, c_massResults, c_modalResults)
 
         # put mass values back in since tuple is read only
@@ -706,72 +846,72 @@ class StaticLoadCase(object):
 
 
 
-class DynamicAnalysis(object):
-    """docstring"""
+# class DynamicAnalysis(object):
+#     """docstring"""
 
 
-    def __init__(self, nM, Mmethod, lump, tol, shift):
+#     def __init__(self, nM, Mmethod, lump, tol, shift):
 
-        self.nM = nM
+#         self.nM = nM
 
-        exagg_modal = 1.0  # not used
-        self.dynamicData = C_DynamicData(nM, Mmethod, lump, tol, shift, exagg_modal)
+#         exagg_modal = 1.0  # not used
+#         self.dynamicData = C_DynamicData(nM, Mmethod, lump, tol, shift, exagg_modal)
 
-        i = np.array([], dtype=np.int32)
-        d = np.array([])
+#         i = np.array([], dtype=np.int32)
+#         d = np.array([])
 
-        self.changeExtraInertia(i, d, d, d, d, d, d, d, d, d, d)
+#         self.changeExtraInertia(i, d, d, d, d, d, d, d, d, d, d)
 
-        self.changeExtraMass(i, d)
+#         self.changeExtraMass(i, d)
 
-        self.changeCondensationData(0, i, d, d, d, d, d, d, i)
-
-
-
-    def changeExtraInertia(self, N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz):
-
-        self.NI = N.astype(np.int32)
-        self.EMs = np.copy(EMs)
-        self.EMx = np.copy(EMx)
-        self.EMy = np.copy(EMy)
-        self.EMz = np.copy(EMz)
-        self.EMxy = np.copy(EMxy)
-        self.EMxz = np.copy(EMxz)
-        self.EMyz = np.copy(EMyz)
-        self.rhox = np.copy(rhox)
-        self.rhoy = np.copy(rhoy)
-        self.rhoz = np.copy(rhoz)
-
-
-        self.extraInertia = C_ExtraInertia(len(N), ip(self.NI), dp(self.EMs),
-            dp(self.EMx), dp(self.EMy), dp(self.EMz), dp(self.EMxy), dp(self.EMxz), dp(self.EMyz),
-            dp(self.rhox), dp(self.rhoy), dp(self.rhoz))
+#         self.changeCondensationData(0, i, d, d, d, d, d, d, i)
 
 
 
-    def changeExtraMass(self, EL, EMs):
+#     def changeExtraInertia(self, N, EMs, EMx, EMy, EMz, EMxy, EMxz, EMyz, rhox, rhoy, rhoz):
 
-        self.ELM = EL.astype(np.int32)
-        self.EMsM = np.copy(EMs)
+#         self.NI = N.astype(np.int32)
+#         self.EMs = np.copy(EMs)
+#         self.EMx = np.copy(EMx)
+#         self.EMy = np.copy(EMy)
+#         self.EMz = np.copy(EMz)
+#         self.EMxy = np.copy(EMxy)
+#         self.EMxz = np.copy(EMxz)
+#         self.EMyz = np.copy(EMyz)
+#         self.rhox = np.copy(rhox)
+#         self.rhoy = np.copy(rhoy)
+#         self.rhoz = np.copy(rhoz)
 
-        self.extraMass = C_ExtraMass(len(EL), ip(self.ELM), dp(self.EMsM))
+
+#         self.extraInertia = C_ExtraInertia(len(N), ip(self.NI), dp(self.EMs),
+#             dp(self.EMx), dp(self.EMy), dp(self.EMz), dp(self.EMxy), dp(self.EMxz), dp(self.EMyz),
+#             dp(self.rhox), dp(self.rhoy), dp(self.rhoz))
+
+
+
+#     def changeExtraMass(self, EL, EMs):
+
+#         self.ELM = EL.astype(np.int32)
+#         self.EMsM = np.copy(EMs)
+
+#         self.extraMass = C_ExtraMass(len(EL), ip(self.ELM), dp(self.EMsM))
 
 
 
 
-    def changeCondensationData(self, Cmethod, N, cx, cy, cz, cxx, cyy, czz, m):
+#     def changeCondensationData(self, Cmethod, N, cx, cy, cz, cxx, cyy, czz, m):
 
-        self.NC = N.astype(np.int32)
-        self.cx = np.copy(cx)
-        self.cy = np.copy(cy)
-        self.cz = np.copy(cx)
-        self.cxx = np.copy(cxx)
-        self.cyy = np.copy(cyy)
-        self.czz = np.copy(czz)
-        self.mC = m.astype(np.int32)
+#         self.NC = N.astype(np.int32)
+#         self.cx = np.copy(cx)
+#         self.cy = np.copy(cy)
+#         self.cz = np.copy(cz)
+#         self.cxx = np.copy(cxx)
+#         self.cyy = np.copy(cyy)
+#         self.czz = np.copy(czz)
+#         self.mC = m.astype(np.int32)
 
-        self.condensation = C_Condensation(Cmethod, len(N), ip(self.NC), dp(self.cx), dp(self.cy), dp(self.cz),
-            dp(self.cxx), dp(self.cyy), dp(self.czz), ip(self.mC))
+#         self.condensation = C_Condensation(Cmethod, len(N), ip(self.NC), dp(self.cx), dp(self.cy), dp(self.cz),
+#             dp(self.cxx), dp(self.cyy), dp(self.czz), ip(self.mC))
 
 
 
@@ -821,10 +961,15 @@ if __name__ == '__main__':
     shear = False               # 1: include shear deformation
     geom = False                # 1: include geometric stiffness
     dx = 10.0               # x-axis increment for internal forces
-    other = OtherData(shear, geom, dx)
+    nM = 0              # number of desired dynamic modes of vibration
+    Mmethod = 1         # 1: subspace Jacobi     2: Stodola
+    lump = 0            # 0: consistent mass ... 1: lumped mass matrix
+    tol = 1e-9          # mode shape tolerance
+    shift = 0.0         # shift value ... for unrestrained structures
+    options = Options(shear, geom, dx, nM, Mmethod, lump, tol, shift)
 
 
-    frame = Frame(nodes, reactions, elements, other)
+    frame = Frame(nodes, reactions, elements, options)
 
 
 
