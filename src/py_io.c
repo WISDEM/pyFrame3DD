@@ -1191,13 +1191,14 @@ Oct 31, 2013
 ------------------------------------------------------------------------------*/
 void write_static_results (
         Displacements* displacements, Forces* forces, ReactionForces* reactionForces,
+        Reactions* reactions, int nR,
         int nN, int nE, int nL, int lc, int DoF,
         int *J1, int *J2,
         double *F, double *D, int *r, double **Q,
         double err, int ok){
 
     // double  disp;
-    int i,j,n;
+    int i,j,n,k;
     char errMsg[MAXL];
     double vals[6];
 
@@ -1244,9 +1245,9 @@ void write_static_results (
 
 
 
-    for (j=1; j<=nN; j++) {
-
-        reactionForces[lc-1].node[j-1] = j;
+    for (k=1; k<=nR; k++) {  // iteration through reactions
+        j = reactions->N[k-1];  // node number
+        reactionForces[lc-1].node[k-1] = j;
 
         for (i=5; i>=0; i--) {
             if (r[6*j-i]){
@@ -1256,13 +1257,34 @@ void write_static_results (
             }
         }
 
-        reactionForces[lc-1].Fx[j-1] = vals[5];
-        reactionForces[lc-1].Fy[j-1] = vals[4];
-        reactionForces[lc-1].Fz[j-1] = vals[3];
-        reactionForces[lc-1].Mxx[j-1] = vals[2];
-        reactionForces[lc-1].Myy[j-1] = vals[1];
-        reactionForces[lc-1].Mzz[j-1] = vals[0];
+        reactionForces[lc-1].Fx[k-1] = vals[5];
+        reactionForces[lc-1].Fy[k-1] = vals[4];
+        reactionForces[lc-1].Fz[k-1] = vals[3];
+        reactionForces[lc-1].Mxx[k-1] = vals[2];
+        reactionForces[lc-1].Myy[k-1] = vals[1];
+        reactionForces[lc-1].Mzz[k-1] = vals[0];
     }
+
+
+    // for (j=1; j<=nN; j++) {
+
+    //     reactionForces[lc-1].node[j-1] = j;
+
+    //     for (i=5; i>=0; i--) {
+    //         if (r[6*j-i]){
+    //             vals[i] = F[6*j-i];
+    //         } else{
+    //             vals[i] = 0.0;
+    //         }
+    //     }
+
+    //     reactionForces[lc-1].Fx[j-1] = vals[5];
+    //     reactionForces[lc-1].Fy[j-1] = vals[4];
+    //     reactionForces[lc-1].Fz[j-1] = vals[3];
+    //     reactionForces[lc-1].Mxx[j-1] = vals[2];
+    //     reactionForces[lc-1].Myy[j-1] = vals[1];
+    //     reactionForces[lc-1].Mzz[j-1] = vals[0];
+    // }
 
     return;
 }

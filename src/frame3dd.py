@@ -577,6 +577,7 @@ class Frame(object):
         nCases = len(self.loadCases)  # number of load cases
         nN = len(self.nodes.node)  # number of nodes
         nE = len(self.elements.element)  # number of elements
+        nR = len(self.reactions.node)  # number of reactions
         nM = self.nM  # number of modes
 
         if nCases == 0:
@@ -598,9 +599,9 @@ class Frame(object):
             np.zeros((nCases, 2*nE)), np.zeros((nCases, 2*nE)), np.zeros((nCases, 2*nE)),
             np.zeros((nCases, 2*nE)), np.zeros((nCases, 2*nE)), np.zeros((nCases, 2*nE))
         )
-        rout = NodeReactions(np.zeros((nCases, nN), dtype=np.int32),
-            np.zeros((nCases, nN)), np.zeros((nCases, nN)), np.zeros((nCases, nN)),
-            np.zeros((nCases, nN)), np.zeros((nCases, nN)), np.zeros((nCases, nN))
+        rout = NodeReactions(np.zeros((nCases, nR), dtype=np.int32),
+            np.zeros((nCases, nR)), np.zeros((nCases, nR)), np.zeros((nCases, nR)),
+            np.zeros((nCases, nR)), np.zeros((nCases, nR)), np.zeros((nCases, nR))
         )
 
         x = self.nodes.x

@@ -165,6 +165,7 @@ void read_condensation_data(
 */
 void write_static_results(
     Displacements* displacements, Forces* forces, ReactionForces* reactionForces, //structs
+    Reactions* reactions, int nR,
     int nN, int nE, int nL, int lc, int DoF,
     int *N1, int *N2,
     double *F, double *D, int *r, double **Q,
