@@ -504,29 +504,63 @@ class Frame(object):
 
         if self.addGravityLoadForExtraNodeMass:
 
-            Nm = self.ENMnode
-            mass = self.ENMmass
-            x = self.ENMrhox
-            y = self.ENMrhoy
-            z = self.ENMrhoz
+            # need to save all in memory
+            nLC = len(self.loadCases)
+            self.PLN = [0]*nLC
+            self.PLFx = [0]*nLC
+            self.PLFy = [0]*nLC
+            self.PLFz = [0]*nLC
+            self.PLMx = [0]*nLC
+            self.PLMy = [0]*nLC
+            self.PLMz = [0]*nLC
 
-            for lc in self.loadCases:
+            for icase, lc in enumerate(self.loadCases):
 
                 gx = lc.gx
                 gy = lc.gy
                 gz = lc.gz
 
-                self.PLN = np.concatenate([lc.NF, Nm])
-                self.PLFx = np.concatenate([lc.Fx, mass*gx])
-                self.PLFy = np.concatenate([lc.Fy, mass*gy])
-                self.PLFz = np.concatenate([lc.Fz, mass*gz])
-                self.PLMx = np.concatenate([lc.Mxx, mass*(y*gz - z*gy)])
-                self.PLMy = np.concatenate([lc.Myy, mass*(z*gx - x*gz)])
-                self.PLMz = np.concatenate([lc.Mzz, mass*(x*gy - y*gx)])
+                # copy data over for this case
+                self.PLN[icase] = np.copy(lc.NF)
+                self.PLFx[icase] = np.copy(lc.Fx)
+                self.PLFy[icase] = np.copy(lc.Fy)
+                self.PLFz[icase] = np.copy(lc.Fz)
+                self.PLMx[icase] = np.copy(lc.Mxx)
+                self.PLMy[icase] = np.copy(lc.Myy)
+                self.PLMz[icase] = np.copy(lc.Mzz)
 
-                lc.pL = C_PointLoads(len(self.PLN), ip(self.PLN), dp(self.PLFx),
-                    dp(self.PLFy), dp(self.PLFz), dp(self.PLMx),
-                    dp(self.PLMy), dp(self.PLMz))
+                for iextra in range(len(self.ENMnode)):
+                    Nm = self.ENMnode[iextra]
+                    mass = self.ENMmass[iextra]
+                    x = self.ENMrhox[iextra]
+                    y = self.ENMrhoy[iextra]
+                    z = self.ENMrhoz[iextra]
+
+                    # check if a point load already exists for this node
+                    if Nm in self.PLN[icase]:
+                        idx = np.where(self.PLN[icase]==Nm)[0]
+
+                        # if so just add it
+                        self.PLFx[icase][idx] += mass*gx
+                        self.PLFy[icase][idx] += mass*gy
+                        self.PLFz[icase][idx] += mass*gz
+                        self.PLMx[icase][idx] += mass*(y*gz - z*gy)
+                        self.PLMy[icase][idx] += mass*(z*gx - x*gz)
+                        self.PLMz[icase][idx] += mass*(x*gy - y*gx)
+
+                    else:
+                        # otherwise append to end
+                        self.PLN[icase] = np.concatenate([self.PLN[icase], [Nm]])
+                        self.PLFx[icase] = np.concatenate([self.PLFx[icase], [mass*gx]])
+                        self.PLFy[icase] = np.concatenate([self.PLFy[icase], [mass*gy]])
+                        self.PLFz[icase] = np.concatenate([self.PLFz[icase], [mass*gz]])
+                        self.PLMx[icase] = np.concatenate([self.PLMx[icase], [mass*(y*gz - z*gy)]])
+                        self.PLMy[icase] = np.concatenate([self.PLMy[icase], [mass*(z*gx - x*gz)]])
+                        self.PLMz[icase] = np.concatenate([self.PLMz[icase], [mass*(x*gy - y*gx)]])
+
+                lc.pL = C_PointLoads(len(self.PLN[icase]), ip(self.PLN[icase]), dp(self.PLFx[icase]),
+                    dp(self.PLFy[icase]), dp(self.PLFz[icase]), dp(self.PLMx[icase]),
+                    dp(self.PLMy[icase]), dp(self.PLMz[icase]))
 
 
         if self.addGravityLoadForExtraElementMass:
@@ -551,24 +585,59 @@ class Frame(object):
                     (z[N2[i]-1] - z[N1[i]-1])**2
                 )
 
-            LE = L[element]
+            # LE = L[element]
 
             # add to interior point load
-            for lc in self.loadCases:
+
+            # save all data in memory
+            nLC = len(self.loadCases)
+            self.IPLE = [0]*nLC
+            self.IPLPx = [0]*nLC
+            self.IPLPy = [0]*nLC
+            self.IPLPz = [0]*nLC
+            self.IPLxE = [0]*nLC
+
+
+            for icase, lc in enumerate(self.loadCases):
 
                 gx = lc.gx
                 gy = lc.gy
                 gz = lc.gz
 
-                self.IPLE = np.concatenate([lc.ELE, element])
-                self.IPLPx = np.concatenate([lc.Px, mass*gx])
-                self.IPLPy = np.concatenate([lc.Py, mass*gy])
-                self.IPLPz = np.concatenate([lc.Pz, mass*gz])
-                self.IPLxE = np.concatenate([lc.xE, 0.5*LE])
+                # iterate through additional mass
+                for iextra in range(len(self.EEMelement)):
 
-                lc.eL = C_ElementLoads(len(self.IPLE), ip(self.IPLE),
-                    dp(self.IPLPx), dp(self.IPLPy), dp(self.IPLPz),
-                    dp(self.IPLxE))
+                    element = self.EEMelement[iextra]
+                    mass = self.EEMmass[iextra]
+                    LE = L[element]
+
+                    # check whether an element load already exists for this element
+                    if element in self.IPLE[icase]:
+                        idx = np.where(self.IPLE[icase]==element)[0]
+
+                        # if so we just add the weight loads
+                        self.IPLPx[icase][idx] += mass*gx
+                        self.IPLPy[icase][idx] += mass*gy
+                        self.IPLPz[icase][idx] += mass*gz
+                        # TODO: assumes xE does not change
+
+                    else:
+                        # otherwise append to the end
+                        self.IPLE[icase] = np.concatenate([self.IPLE[icase], [element]])
+                        self.IPLPx[icase] = np.concatenate([self.IPLPx[icase], [mass*gx]])
+                        self.IPLPy[icase] = np.concatenate([self.IPLPx[icase], [mass*gy]])
+                        self.IPLPz[icase] = np.concatenate([self.IPLPx[icase], [mass*gz]])
+                        self.IPLxE[icase] = np.concatenate([self.IPLxE[icase], 0.5*LE])
+
+                # self.IPLE = np.concatenate([lc.ELE, element])
+                # self.IPLPx = np.concatenate([lc.Px, mass*gx])
+                # self.IPLPy = np.concatenate([lc.Py, mass*gy])
+                # self.IPLPz = np.concatenate([lc.Pz, mass*gz])
+                # self.IPLxE = np.concatenate([lc.xE, 0.5*LE])
+
+                lc.eL = C_ElementLoads(len(self.IPLE[icase]), ip(self.IPLE[icase]),
+                    dp(self.IPLPx[icase]), dp(self.IPLPy[icase]), dp(self.IPLPz[icase]),
+                    dp(self.IPLxE[icase]))
 
 
 

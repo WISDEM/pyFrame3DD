@@ -9,8 +9,8 @@ Copyright (c) NREL. All rights reserved.
 
 import numpy as np
 
-from frame3dd import Frame, NodeData, ReactionData, ElementData, OtherData, \
-    StaticLoadCase, DynamicAnalysis
+from frame3dd import Frame, NodeData, ReactionData, ElementData, Options, \
+    StaticLoadCase
 
 
 # ------- node data ----------------
@@ -35,7 +35,7 @@ Rxx = np.ones(4)
 Ryy = np.ones(4)
 Rzz = np.ones(4)
 
-reactions = ReactionData(node, Rx, Ry, Rz, Rxx, Ryy, Rzz)
+reactions = ReactionData(node, Rx, Ry, Rz, Rxx, Ryy, Rzz, rigid=1)
 
 # -----------------------------------
 
@@ -64,10 +64,9 @@ elements = ElementData(element, N1, N2, Ax, Asy, Asz, Jx, Iy, Iz, E, G, roll, de
 
 shear = 1               # 1: include shear deformation
 geom = 1                # 1: include geometric stiffness
-exagg_static = 10.0     # exaggerate mesh deformations
 dx = 10.0               # x-axis increment for internal forces
 
-other = OtherData(shear, geom, exagg_static, dx)
+other = Options(shear, geom, dx)
 
 # -----------------------------------
 
@@ -186,9 +185,8 @@ Mmethod = 1         # 1: subspace Jacobi     2: Stodola
 lump = 0            # 0: consistent mass ... 1: lumped mass matrix
 tol = 1e-9          # mode shape tolerance
 shift = 0.0         # shift value ... for unrestrained structures
-exagg_modal = 10.0  # exaggerate modal mesh deformations
 
-dynamic = DynamicAnalysis(nM, Mmethod, lump, tol, shift, exagg_modal)
+frame.enableDynamics(nM, Mmethod, lump, tol, shift)
 
 # extra node inertia data
 N = np.array([1])
@@ -197,16 +195,16 @@ EMx = np.array([0.0])
 EMy = np.array([0.0])
 EMz = np.array([0.0])
 
-dynamic.changeExtraInertia(N, EMs, EMx, EMy, EMz)
+# frame.changeExtraInertia(N, EMs, EMx, EMy, EMz)
+frame.changeExtraNodeMass(N, EMs, EMx, EMy, EMz, [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], True)
 
 # extra frame element mass data ...
 # dynamic.changeExtraMass(EL, EMs)
 
 # set dynamic analysis
-frame.useDynamicAnalysis(dynamic)
+# frame.useDynamicAnalysis(dynamic)
 
 # ------------------------------------
-
 
 # run the analysis
 displacements, forces, reactions, internalForces, mass, modal = frame.run()
@@ -214,7 +212,7 @@ displacements, forces, reactions, internalForces, mass, modal = frame.run()
 nC = len(frame.loadCases)  # number of load cases
 nN = len(nodes.node)  # number of nodes
 nE = len(elements.element)  # number of elements
-nM = dynamic.nM  # number of modes
+# nM = dynamic.nM  # number of modes
 
 # node displacements
 
