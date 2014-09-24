@@ -3,14 +3,6 @@
 
 Python bindings to [Frame3DD](http://frame3dd.sourceforge.net)
 
-## Install
-
-    $ python setup.py install
-
-## Unit Tests
-
-    $ python test/test_frame.py
-
 ## Documentation
 
 Browse the [documentation for Frame3DD](http://svn.code.sourceforge.net/p/frame3dd/code/trunk/doc/Frame3DD-manual.html).  This is a Python wrapper to that code with the following modifications:
@@ -21,6 +13,18 @@ Browse the [documentation for Frame3DD](http://svn.code.sourceforge.net/p/frame3
 
 There is example code that shows usage contained in ``examples/exB.py``.  This follows example (B) Pyramid Frame contained on the [Frame3DD home page](http://frame3dd.sourceforge.net).
 
+## Install
+
+    $ python setup.py install
+
+## Unit Tests
+
+    $ python test/test_frame.py
+
+For software issues please use <https://github.com/WISDEM/pyFrame3DD/issues>.  For functionality and theory related questions and comments please use the NWTC forum for [Systems Engineering Software Questions](https://wind.nrel.gov/forum/wind/viewtopic.php?f=34&t=1002).
+
+
 ## License
 
 Frame3DD uses the GNU GPL so this code must also be under the same license.
+
