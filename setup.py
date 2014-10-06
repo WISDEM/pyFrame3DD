@@ -9,7 +9,7 @@ import os
 
 
 if os.name == 'nt':  # Windows.
-    extra_compile_args = ['/TC', '/D', 'ANSI']
+#    extra_compile_args = ['/TC', '/D', 'ANSI'] # for msvs (we use mingw (gcc) now by default)
 else:
     extra_compile_args = ''
 
