@@ -17,7 +17,7 @@
 #define NR_END 1
 #define FREE_ARG char*
 
-void nrerror(char error_text[])
+void NRerror(char error_text[])
 /* Numerical Recipes standard error handler */
 {
 	fprintf(stderr,"Numerical Recipes run-time error...\n");
@@ -32,7 +32,7 @@ float *vector(long nl, long nh)
 	float *v;
 
 	v=(float *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(float)));
-	if (!v) nrerror("allocation failure in vector()");
+	if (!v) NRerror("allocation failure in vector()");
 	return v-nl+NR_END;
 }
 
@@ -42,7 +42,7 @@ int *ivector(long nl, long nh)
 	int *v;
 
 	v=(int *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(int)));
-	if (!v) nrerror("allocation failure in ivector()");
+	if (!v) NRerror("allocation failure in ivector()");
 	return v-nl+NR_END;
 }
 
@@ -52,7 +52,7 @@ unsigned char *cvector(long nl, long nh)
 	unsigned char *v;
 
 	v=(unsigned char *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(unsigned char)));
-	if (!v) nrerror("allocation failure in cvector()");
+	if (!v) NRerror("allocation failure in cvector()");
 	return v-nl+NR_END;
 }
 
@@ -62,7 +62,7 @@ unsigned long *lvector(long nl, long nh)
 	unsigned long *v;
 
 	v=(unsigned long *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(long)));
-	if (!v) nrerror("allocation failure in lvector()");
+	if (!v) NRerror("allocation failure in lvector()");
 	return v-nl+NR_END;
 }
 
@@ -72,7 +72,7 @@ double *dvector(long nl, long nh)
 	double *v;
 
 	v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
-	if (!v) nrerror("allocation failure in dvector()");
+	if (!v) NRerror("allocation failure in dvector()");
 	return v-nl+NR_END;
 }
 
@@ -84,13 +84,13 @@ float **matrix(long nrl, long nrh, long ncl, long nch)
 
 	/* allocate pointers to rows */
 	m=(float **) malloc((size_t)((nrow+NR_END)*sizeof(float*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(float *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(float)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -108,13 +108,13 @@ double **dmatrix(long nrl, long nrh, long ncl, long nch)
 
 	/* allocate pointers to rows */
 	m=(double **) malloc((size_t)((nrow+NR_END)*sizeof(double*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(double *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(double)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -132,14 +132,14 @@ int **imatrix(long nrl, long nrh, long ncl, long nch)
 
 	/* allocate pointers to rows */
 	m=(int **) malloc((size_t)((nrow+NR_END)*sizeof(int*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(int *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(int)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -149,16 +149,16 @@ int **imatrix(long nrl, long nrh, long ncl, long nch)
 	return m;
 }
 
-float **submatrix(float **a, long oldrl, long oldrh, long oldcl, long oldch,
+float **subMatrix(float **a, long oldrl, long oldrh, long oldcl, long oldch,
 	long newrl, long newcl)
-/* point a submatrix [newrl..][newcl..] to a[oldrl..oldrh][oldcl..oldch] */
+/* point a subMatrix [newrl..][newcl..] to a[oldrl..oldrh][oldcl..oldch] */
 {
 	long i,j,nrow=oldrh-oldrl+1,ncol=oldcl-newcl;
 	float **m;
 
 	/* allocate array of pointers to rows */
 	m=(float **) malloc((size_t) ((nrow+NR_END)*sizeof(float*)));
-	if (!m) nrerror("allocation failure in submatrix()");
+	if (!m) NRerror("allocation failure in subMatrix()");
 	m += NR_END;
 	m -= newrl;
 
@@ -180,7 +180,7 @@ and ncol=nch-ncl+1. The routine should be called with the address
 
 	/* allocate pointers to rows */
 	m=(float **) malloc((size_t) ((nrow+NR_END)*sizeof(float*)));
-	if (!m) nrerror("allocation failure in convert_matrix()");
+	if (!m) NRerror("allocation failure in convert_matrix()");
 	m += NR_END;
 	m -= nrl;
 
@@ -199,19 +199,19 @@ float ***f3tensor(long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 
 	/* allocate pointers to pointers to rows */
 	t=(float ***) malloc((size_t)((nrow+NR_END)*sizeof(float**)));
-	if (!t) nrerror("allocation failure 1 in f3tensor()");
+	if (!t) NRerror("allocation failure 1 in f3tensor()");
 	t += NR_END;
 	t -= nrl;
 
 	/* allocate pointers to rows and set pointers to them */
 	t[nrl]=(float **) malloc((size_t)((nrow*ncol+NR_END)*sizeof(float*)));
-	if (!t[nrl]) nrerror("allocation failure 2 in f3tensor()");
+	if (!t[nrl]) NRerror("allocation failure 2 in f3tensor()");
 	t[nrl] += NR_END;
 	t[nrl] -= ncl;
 
 	/* allocate rows and set pointers to them */
 	t[nrl][ncl]=(float *) malloc((size_t)((nrow*ncol*ndep+NR_END)*sizeof(float)));
-	if (!t[nrl][ncl]) nrerror("allocation failure 3 in f3tensor()");
+	if (!t[nrl][ncl]) NRerror("allocation failure 3 in f3tensor()");
 	t[nrl][ncl] += NR_END;
 	t[nrl][ncl] -= ndl;
 
@@ -277,8 +277,8 @@ void free_imatrix(int **m, long nrl, long nrh, long ncl, long nch)
 	free((FREE_ARG) (m+nrl-NR_END));
 }
 
-void free_submatrix(float **b, long nrl, long nrh, long ncl, long nch)
-/* free a submatrix allocated by submatrix() */
+void free_subMatrix(float **b, long nrl, long nrh, long ncl, long nch)
+/* free a subMatrix allocated by subMatrix() */
 {
 	free((FREE_ARG) (b+nrl-NR_END));
 }
@@ -303,7 +303,7 @@ fcomplex *Cvector(int nl, int nh)
 	fcomplex *v;
 
 	v=(fcomplex *)malloc((unsigned) (nh-nl+1)*sizeof(fcomplex));
-	if (!v) nrerror("allocation failure in Cvector()");
+	if (!v) NRerror("allocation failure in Cvector()");
 	return v-nl;
 }
 
@@ -315,11 +315,11 @@ fcomplex **Cmatrix(int nrl, int nrh, int ncl, int nch)
 	fcomplex **m;
 
 	m=(fcomplex **)malloc((unsigned) (nrh-nrl+1)*sizeof(fcomplex*));
-	if (!m) nrerror("allocation failure 1 in Cmatrix()");
+	if (!m) NRerror("allocation failure 1 in Cmatrix()");
 	m -= nrl;
 	for (i=nrl;i<=nrh;i++) {
 		m[i]=(fcomplex *)malloc((unsigned)(nch-ncl+1)*sizeof(fcomplex));
-		if (!m[i]) nrerror("allocation failure 2 in Cmatrix()");
+		if (!m[i]) NRerror("allocation failure 2 in Cmatrix()");
 		m[i] -= ncl;
 	}
 	return m;
@@ -333,16 +333,16 @@ float ***D3matrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 	float   ***m;
 
 	m=(float ***) malloc((unsigned) (nrh-nrl+1)*sizeof(float*));
-	if (!m) nrerror("alloc failure 1 in 3Dmatrix()");
+	if (!m) NRerror("alloc failure 1 in 3Dmatrix()");
 	m -= nrl;
 	for (i=nrl;i<=nrh;i++) {
 		m[i]=(float **) malloc((unsigned) (nch-ncl+1)*sizeof(float*));
-		if (!m[i]) nrerror("alloc failure 2 in 3Dmatrix()");
+		if (!m[i]) NRerror("alloc failure 2 in 3Dmatrix()");
 		m[i] -= ncl;
 		for (j=ncl;j<=nch;j++) {
 			m[i][j]=(float *)
 				malloc((unsigned) (nzh-nzl+1)*sizeof(float));
-			if (!m[i][j]) nrerror("alloc failure 3 in 3Dmatrix()");
+			if (!m[i][j]) NRerror("alloc failure 3 in 3Dmatrix()");
 			m[i][j] -= nzl;
 		}
 	}
@@ -356,16 +356,16 @@ double ***D3dmatrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 	double   ***m;
 
 	m=(double ***) malloc((unsigned) (nrh-nrl+1)*sizeof(double*));
-	if (!m) nrerror("alloc failure 1 in 3Ddmatrix()");
+	if (!m) NRerror("alloc failure 1 in 3Ddmatrix()");
 	m -= nrl;
 	for (i=nrl;i<=nrh;i++) {
 		m[i]=(double **) malloc((unsigned) (nch-ncl+1)*sizeof(double*));
-		if (!m[i]) nrerror("alloc failure 2 in 3Dmatrix()");
+		if (!m[i]) NRerror("alloc failure 2 in 3Dmatrix()");
 		m[i] -= ncl;
 		for (j=ncl;j<=nch;j++) {
 			m[i][j]=(double *)
 				malloc((unsigned) (nzh-nzl+1)*sizeof(double));
-			if (!m[i][j]) nrerror("alloc failure 3 in 3Ddmatrix()");
+			if (!m[i][j]) NRerror("alloc failure 3 in 3Ddmatrix()");
 			m[i][j] -= nzl;
 		}
 	}
@@ -419,7 +419,7 @@ void free_D3dmatrix(double ***m, int nrl, int nrh, int ncl, int nch, int nzl, in
 #define NR_END 1
 #define FREE_ARG char*
 
-void nrerror(error_text)
+void NRerror(error_text)
 char error_text[];
 /* Numerical Recipes standard error handler */
 {
@@ -438,7 +438,7 @@ long nh,nl;
 	float *v;
 
 	v=(float *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(float)));
-	if (!v) nrerror("allocation failure in vector()");
+	if (!v) NRerror("allocation failure in vector()");
 	return v-nl+NR_END;
 }
 
@@ -449,7 +449,7 @@ long nh,nl;
 	int *v;
 
 	v=(int *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(int)));
-	if (!v) nrerror("allocation failure in ivector()");
+	if (!v) NRerror("allocation failure in ivector()");
 	return v-nl+NR_END;
 }
 
@@ -460,7 +460,7 @@ long nh,nl;
 	unsigned char *v;
 
 	v=(unsigned char *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(unsigned char)));
-	if (!v) nrerror("allocation failure in cvector()");
+	if (!v) NRerror("allocation failure in cvector()");
 	return v-nl+NR_END;
 }
 
@@ -471,7 +471,7 @@ long nh,nl;
 	unsigned long *v;
 
 	v=(unsigned long *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(long)));
-	if (!v) nrerror("allocation failure in lvector()");
+	if (!v) NRerror("allocation failure in lvector()");
 	return v-nl+NR_END;
 }
 
@@ -482,7 +482,7 @@ long nh,nl;
 	double *v;
 
 	v=(double *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(double)));
-	if (!v) nrerror("allocation failure in dvector()");
+	if (!v) NRerror("allocation failure in dvector()");
 	return v-nl+NR_END;
 }
 
@@ -495,13 +495,13 @@ long nch,ncl,nrh,nrl;
 
 	/* allocate pointers to rows */
 	m=(float **) malloc((unsigned int)((nrow+NR_END)*sizeof(float*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(float *) malloc((unsigned int)((nrow*ncol+NR_END)*sizeof(float)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -520,13 +520,13 @@ long nch,ncl,nrh,nrl;
 
 	/* allocate pointers to rows */
 	m=(double **) malloc((unsigned int)((nrow+NR_END)*sizeof(double*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(double *) malloc((unsigned int)((nrow*ncol+NR_END)*sizeof(double)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -545,14 +545,14 @@ long nch,ncl,nrh,nrl;
 
 	/* allocate pointers to rows */
 	m=(int **) malloc((unsigned int)((nrow+NR_END)*sizeof(int*)));
-	if (!m) nrerror("allocation failure 1 in matrix()");
+	if (!m) NRerror("allocation failure 1 in matrix()");
 	m += NR_END;
 	m -= nrl;
 
 
 	/* allocate rows and set pointers to them */
 	m[nrl]=(int *) malloc((unsigned int)((nrow*ncol+NR_END)*sizeof(int)));
-	if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+	if (!m[nrl]) NRerror("allocation failure 2 in matrix()");
 	m[nrl] += NR_END;
 	m[nrl] -= ncl;
 
@@ -562,17 +562,17 @@ long nch,ncl,nrh,nrl;
 	return m;
 }
 
-float **submatrix(a,oldrl,oldrh,oldcl,oldch,newrl,newcl)
+float **subMatrix(a,oldrl,oldrh,oldcl,oldch,newrl,newcl)
 float **a;
 long newcl,newrl,oldch,oldcl,oldrh,oldrl;
-/* point a submatrix [newrl..][newcl..] to a[oldrl..oldrh][oldcl..oldch] */
+/* point a subMatrix [newrl..][newcl..] to a[oldrl..oldrh][oldcl..oldch] */
 {
 	long i,j,nrow=oldrh-oldrl+1,ncol=oldcl-newcl;
 	float **m;
 
 	/* allocate array of pointers to rows */
 	m=(float **) malloc((unsigned int) ((nrow+NR_END)*sizeof(float*)));
-	if (!m) nrerror("allocation failure in submatrix()");
+	if (!m) NRerror("allocation failure in subMatrix()");
 	m += NR_END;
 	m -= newrl;
 
@@ -596,7 +596,7 @@ and ncol=nch-ncl+1. The routine should be called with the address
 
 	/* allocate pointers to rows */
 	m=(float **) malloc((unsigned int) ((nrow+NR_END)*sizeof(float*)));
-	if (!m)	nrerror("allocation failure in convert_matrix()");
+	if (!m)	NRerror("allocation failure in convert_matrix()");
 	m += NR_END;
 	m -= nrl;
 
@@ -616,19 +616,19 @@ long nch,ncl,ndh,ndl,nrh,nrl;
 
 	/* allocate pointers to pointers to rows */
 	t=(float ***) malloc((unsigned int)((nrow+NR_END)*sizeof(float**)));
-	if (!t) nrerror("allocation failure 1 in f3tensor()");
+	if (!t) NRerror("allocation failure 1 in f3tensor()");
 	t += NR_END;
 	t -= nrl;
 
 	/* allocate pointers to rows and set pointers to them */
 	t[nrl]=(float **) malloc((unsigned int)((nrow*ncol+NR_END)*sizeof(float*)));
-	if (!t[nrl]) nrerror("allocation failure 2 in f3tensor()");
+	if (!t[nrl]) NRerror("allocation failure 2 in f3tensor()");
 	t[nrl] += NR_END;
 	t[nrl] -= ncl;
 
 	/* allocate rows and set pointers to them */
 	t[nrl][ncl]=(float *) malloc((unsigned int)((nrow*ncol*ndep+NR_END)*sizeof(float)));
-	if (!t[nrl][ncl]) nrerror("allocation failure 3 in f3tensor()");
+	if (!t[nrl][ncl]) NRerror("allocation failure 3 in f3tensor()");
 	t[nrl][ncl] += NR_END;
 	t[nrl][ncl] -= ndl;
 
@@ -710,10 +710,10 @@ long nch,ncl,nrh,nrl;
 	free((FREE_ARG) (m+nrl-NR_END));
 }
 
-void free_submatrix(b,nrl,nrh,ncl,nch)
+void free_subMatrix(b,nrl,nrh,ncl,nch)
 float **b;
 long nch,ncl,nrh,nrl;
-/* free a submatrix allocated by submatrix() */
+/* free a subMatrix allocated by subMatrix() */
 {
 	free((FREE_ARG) (b+nrl-NR_END));
 }
@@ -738,9 +738,9 @@ long nch,ncl,ndh,ndl,nrh,nrl;
 
 #endif /* ANSI */
 
-/*---------------------------------------------------------------------------
-SHOW_VECTOR  -  display a vector of dimension [1..n]
-----------------------------------------------------------------------------*/
+/*
+ * SHOW_VECTOR  -  display a vector of dimension [1..n]
+ */
 void show_vector ( float *A, int n )
 {
 	int     j;
@@ -753,24 +753,25 @@ void show_vector ( float *A, int n )
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SHOW_DVECTOR  -  display a vector of dimension [1..n]
-----------------------------------------------------------------------------*/
+/*
+ * SHOW_DVECTOR  -  display a vector of dimension [1..n]
+ */
 void show_dvector ( double *A, int n )
 {
 	int     j;
 
 	for (j=1; j <= n; j++) {
-		if (A[j] != 0)	fprintf(stdout,"%14.6e", A[j] );
-		else		fprintf(stdout,"   0       ");
+		if ( fabs(A[j]) >= 1.e-99)
+			fprintf(stdout,"%14.6e", A[j] );
+		else	fprintf(stdout,"   0       ");
 	}
 	fprintf(stdout," ]';\n\n");
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SHOW_IVECTOR  -  display a vector of integers of dimension [1..n]
-----------------------------------------------------------------------------*/
+/*
+ * SHOW_IVECTOR  -  display a vector of integers of dimension [1..n]
+ */
 void show_ivector ( int *A, int n )
 {
 	int     j;
@@ -784,9 +785,9 @@ void show_ivector ( int *A, int n )
 }
 
 
-/*---------------------------------------------------------------------------
-SHOW_MATRIX  -  display a matrix of dimension [1..m][1..n]
-----------------------------------------------------------------------------*/
+/*
+ * SHOW_MATRIX  -  display a matrix of dimension [1..m][1..n]
+ */
 void show_matrix ( float **A, int m, int n )
 {
 	int     i,j;
@@ -802,9 +803,9 @@ void show_matrix ( float **A, int m, int n )
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SHOW_DMATRIX  - display a matrix of dimension [1..m][1..n] 
-----------------------------------------------------------------------------*/
+/*
+ * SHOW_DMATRIX  - display a matrix of dimension [1..m][1..n] 
+ */
 void show_dmatrix ( double **A, int m, int n )
 {
 	int     i,j;
@@ -821,9 +822,9 @@ void show_dmatrix ( double **A, int m, int n )
 }
 
 
-/*---------------------------------------------------------------------------
-SAVE_VECTOR  -  save a vector of dimension [1..n] to the named file 
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_VECTOR  -  save a vector of dimension [1..n] to the named file 
+ */
 void save_vector( char filename[], float *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
@@ -849,9 +850,9 @@ void save_vector( char filename[], float *V, int nl, int nh, const char *mode )
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_DVECTOR  -  save a vector of dimension [1..n] to the named file 
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_DVECTOR  -  save a vector of dimension [1..n] to the named file 
+ */
 void save_dvector( char filename[], double *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
@@ -877,9 +878,9 @@ void save_dvector( char filename[], double *V, int nl, int nh, const char *mode 
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_IVECTOR  -  save an integer vector of dimension [1..n] to the named file 
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_IVECTOR  -  save an integer vector of dimension [1..n] to the named file 
+ */
 void save_ivector( char filename[], int *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
@@ -905,15 +906,18 @@ void save_ivector( char filename[], int *V, int nl, int nh, const char *mode )
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_MATRIX  -  save a matrix of dimension [ml..mh][nl..nh] to the named file
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_MATRIX  -  save a matrix of dimension [ml..mh][nl..nh] to the named file
+ */
 void save_matrix ( char filename[], float **A, int ml, int mh, int nl, int nh, int transpose, const char *mode )
 {
 	FILE    *fp_m;
-	int     i,j;
+	int     i,j, rows, cols;
 	void	exit();
 	time_t	now;
+
+	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
+	if ( transpose ) cols = mh-ml+1; else cols = nh-nl+1;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {
 		printf (" error: cannot open file: %s \n", filename );
@@ -922,8 +926,8 @@ void save_matrix ( char filename[], float **A, int ml, int mh, int nl, int nh, i
         (void) time(&now);
 	fprintf(fp_m,"%% filename: %s - %s", filename, ctime(&now));
 	fprintf(fp_m,"%% type: matrix \n");
-	fprintf(fp_m,"%% rows: %d\n", mh+1-ml );
-	fprintf(fp_m,"%% columns: %d\n", nh+1-nl );
+	fprintf(fp_m,"%% rows: %d\n", rows );
+	fprintf(fp_m,"%% columns: %d\n", cols );
 	if ( transpose ) {
 	    for (j=nl; j <= nh; j++) {
 		for (i=ml; i <= mh; i++) {
@@ -945,15 +949,18 @@ void save_matrix ( char filename[], float **A, int ml, int mh, int nl, int nh, i
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_DMATRIX  - save a matrix of dimension [ml..mh][nl..nh] to the named file
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_DMATRIX  - save a matrix of dimension [ml..mh][nl..nh] to the named file
+ */
 void save_dmatrix ( char filename[], double **A, int ml, int mh, int nl, int nh, int transpose, const char *mode )
 {
 	FILE    *fp_m;
-	int     i,j;
+	int     i,j, rows, cols;
 	void	exit();
 	time_t	now;
+
+	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
+	if ( transpose ) cols = mh-ml+1; else cols = nh-nl+1;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {
 		printf (" error: cannot open file: %s \n", filename );
@@ -962,8 +969,8 @@ void save_dmatrix ( char filename[], double **A, int ml, int mh, int nl, int nh,
         (void) time(&now);
 	fprintf(fp_m,"%% filename: %s - %s", filename, ctime(&now));
 	fprintf(fp_m,"%% type: matrix \n");
-	fprintf(fp_m,"%% rows: %d\n", mh-ml+1 );
-	fprintf(fp_m,"%% columns: %d\n", nh-nl+1 );
+	fprintf(fp_m,"%% rows: %d\n", rows );
+	fprintf(fp_m,"%% columns: %d\n", cols );
 	if ( transpose ) {
 	    for (j=nl; j <= nh; j++) {
 		for (i=ml; i <= mh; i++) {
@@ -985,11 +992,11 @@ void save_dmatrix ( char filename[], double **A, int ml, int mh, int nl, int nh,
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_UT_MATRIX  - 						     23apr01 
- save a symmetric matrix of dimension [1..n][1..n] to the named file 
- use only upper-triangular part
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_UT_MATRIX  - 						     23apr01 
+ * save a symmetric matrix of dimension [1..n][1..n] to the named file 
+ *  use only upper-triangular part
+ */
 void save_ut_matrix ( char filename[], float **A, int n, const char *mode )
 {
 	FILE    *fp_m;
@@ -1022,11 +1029,11 @@ void save_ut_matrix ( char filename[], float **A, int n, const char *mode )
 	return;
 }
 
-/*---------------------------------------------------------------------------
-SAVE_UT_DMATRIX  - 						23apr01
-  save a symetric matrix of dimension [1..n][1..n] to the named file 
-  use only upper-triangular part
-----------------------------------------------------------------------------*/
+/*
+ * SAVE_UT_DMATRIX  - 						23apr01
+ * save a symetric matrix of dimension [1..n][1..n] to the named file 
+ * use only upper-triangular part
+ */
 void save_ut_dmatrix ( char filename[], double **A, int n, const char *mode )
 {
 	FILE    *fp_m;

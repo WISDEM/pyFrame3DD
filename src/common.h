@@ -5,7 +5,7 @@
  ---------------------------------------------------------------------------
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
- Copyright (C) 1992-2010  Henri P. Gavin
+ Copyright (C) 1992-2014  Henri P. Gavin
 
     FRAME3DD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,11 +33,11 @@
 #define FILENMAX 128
 
 #ifndef VERSION
-# define VERSION "20100105"
+#define VERSION "20140514+"
 #endif
 
 #ifndef PI
-# define PI 3.14159265358979323846
+#define PI 3.14159265358979323846264338327950288419716939937510
 #endif
 
 // Zvert=1: Z axis is vertical... rotate about Y-axis, then rotate about Z-axis

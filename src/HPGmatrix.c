@@ -41,6 +41,10 @@
 
 #define SWAP(a,b) {temp=(a);(a)=(b);(b)=temp;}
 
+#define sind(x) (sin(fmod((x),360) * M_PI / 180))
+#define cosd(x) (cos(fmod((x),360) * M_PI / 180))
+
+
 /* 
  * GAUSSJ
  * Linear equation solution by Gauss-Jordan elimination, [A][X]=[B] above. A[1..n][1..n]
@@ -77,7 +81,7 @@ void gaussj(float **A, int n, float **B, int m)
 							irow=j;
 							icol=k;
 						}
-					} else if (ipiv[k] > 1) nrerror("gaussj: Singular Matrix-1");
+					} else if (ipiv[k] > 1) NRerror("gaussj: Singular Matrix-1");
 				}
 		++(ipiv[icol]);
 
@@ -99,7 +103,7 @@ void gaussj(float **A, int n, float **B, int m)
 
 /* We are now ready to divide the pivot row by the by the pivot element, located at irow,icol */
 
-		if (A[icol][icol] == 0.0) nrerror("gaussj: Singular Matrix-2");
+		if (A[icol][icol] == 0.0) NRerror("gaussj: Singular Matrix-2");
 		pivinv=1.0/A[icol][icol];
 		A[icol][icol]=1.0;
 		for (l=1;l<=n;l++) A[icol][l] *= pivinv;
@@ -198,23 +202,23 @@ void lu_dcmp (
 }
 
 
-/*----------------------------------------------------------------------------- 
-LDL_DCMP  -  Solves [A]{x} = {b} simply and efficiently by performing an 
-  L D L' - decomposition of [A].  No pivoting is performed.  
-  [A] is a symmetric diagonally-dominant matrix of dimension [1..n][1..n]. 
-  {b} is a r.h.s. vector of dimension [1..n].
-  {b} is updated using L D L' and then back-substitution is done to obtain {x}. 
-  {b} is returned unchanged.  ldl_dcmp(A,n,d,x,x,1,1,&pd) is valid.  
-      The lower triangle of [A] is replaced by the lower triangle L of the 
-      L D L' reduction.  The diagonal of D is returned in the vector {d}
-
- usage: double **A, *d, *b, *x;
-	int   n, reduce, solve, pd;
-	ldl_dcmp ( A, n, d, b, x, reduce, solve, &pd );
-
- H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  9 Oct 2001
- Bathe, Finite Element Procecures in Engineering Analysis, Prentice Hall, 1982
------------------------------------------------------------------------------*/
+/*
+ * LDL_DCMP  -  Solves [A]{x} = {b} simply and efficiently by performing an 
+ * L D L' - decomposition of [A].  No pivoting is performed.  
+ * [A] is a symmetric diagonally-dominant matrix of dimension [1..n][1..n]. 
+ * {b} is a r.h.s. vector of dimension [1..n].
+ * {b} is updated using L D L' and then back-substitution is done to obtain {x}
+ * {b} is returned unchanged.  ldl_dcmp(A,n,d,x,x,1,1,&pd) is valid.  
+ *     The lower triangle of [A] is replaced by the lower triangle L of the 
+ *     L D L' reduction.  The diagonal of D is returned in the vector {d}
+ *
+ * usage: double **A, *d, *b, *x;
+ *	int   n, reduce, solve, pd;
+ *	ldl_dcmp ( A, n, d, b, x, reduce, solve, &pd );
+ *
+ * H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  9 Oct 2001
+ * Bathe, Finite Element Procecures in Engineering Analysis, Prentice Hall, 1982
+ */
 void ldl_dcmp (
 	double **A,	// the system matrix, and L of the L D L' decomp.
 	int n,		// the dimension of the matrix	
@@ -274,20 +278,20 @@ void ldl_dcmp (
 }
 
 
-/*----------------------------------------------------------------------------
-LDL_MPROVE  -  Improves a solution vector x[1..n] of the linear set of equations
- [A]{x} = {b}.  The matrix A[1..n][1..n], and the vectors b[1..n] and x[1..n]
- are input, as is the dimension n.   The matrix [A] is the L D L'
- decomposition of the original system matrix, as returned by ldl_dcmp().
- Also input is the diagonal vector, {d} of [D] of the L D L' decompositon.
- On output, only {x} is modified to an improved set of values.
-
- usage: double **A, *d, *b, *x, rms_resid;
-	int   n, ok;
-	ldl_mprove ( A, n, d, b, x, &rms_resid, &ok );
-
- H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  4 May 2001
------------------------------------------------------------------------------*/
+/*
+ * LDL_MPROVE  Improves a solution vector x[1..n] of the linear set of equations
+ * [A]{x} = {b}.  The matrix A[1..n][1..n], and the vectors b[1..n] and x[1..n]
+ * are input, as is the dimension n.   The matrix [A] is the L D L'
+ * decomposition of the original system matrix, as returned by ldl_dcmp().
+ * Also input is the diagonal vector, {d} of [D] of the L D L' decompositon.
+ * On output, only {x} is modified to an improved set of values.
+ *
+ * usage: double **A, *d, *b, *x, rms_resid;
+ * 	int   n, ok;
+ * 	ldl_mprove ( A, n, d, b, x, &rms_resid, &ok );
+ * 
+ * H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  4 May 2001
+ */
 void ldl_mprove(
 	double **A, int n, double *d, double *b, double *x, 
 	double *rms_resid, int *ok
@@ -332,36 +336,40 @@ void ldl_mprove(
 }
 
 
-/*----------------------------------------------------------------------------- 
-LDL_DCMP_PM  -  Solves partitioned matrix equations
-
-             [A_qq]{x_q} + [A_qr]{x_r} = {b_q}
-             [A_rq]{x_q} + [A_rr]{x_r} = {b_r}
-             where {b_q} and {x_r} are known and {x_q} and {b_r} are unknown
-
-  via L D L' - decomposition of [A].  No pivoting is performed.  
-  [A] is a symmetric diagonally-dominant matrix of dimension [1..n][1..n]. 
-  {b} is a r.h.s. vector of dimension [1..n].
-  {b} is updated using L D L' and then back-substitution is done to obtain {x}. 
-  {b} is returned unchanged.  ldl_dcmp(A,n,d,x,x,1,1,&pd) is valid.  
-  {q} is a vector of the indexes of known values {b_q}
-  {r} is a vector of the indexes of known values {x_r}
-      The lower triangle of [A_qq] is replaced by the lower triangle L of its 
-      L D L' reduction.  The diagonal of D is returned in the vector {d}
-
- usage: double **A, *d, *b, *x;
-	int   n, reduce, solve, pd;
-	ldl_dcmp ( A, n, d, b, x, reduce, solve, &pd );
-
- H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  9 Oct 2001
- Bathe, Finite Element Procecures in Engineering Analysis, Prentice Hall, 1982
------------------------------------------------------------------------------*/
+/*
+ * LDL_DCMP_PM  -  Solves partitioned matrix equations
+ *
+ *           [A_qq]{x_q} + [A_qr]{x_r} = {b_q}
+ *           [A_rq]{x_q} + [A_rr]{x_r} = {b_r}+{c_r}
+ *           where {b_q}, {b_r}, and {x_r} are known and 
+ *           where {x_q} and {c_r} are unknown
+ * 
+ * via L D L' - decomposition of [A_qq].  No pivoting is performed.  
+ * [A] is a symmetric diagonally-dominant matrix of dimension [1..n][1..n]. 
+ * {b} is a r.h.s. vector of dimension [1..n].
+ * {b} is updated using L D L' and then back-substitution is done to obtain {x}
+ * {b_q} and {b_r}  are returned unchanged. 
+ * {c_r} is returned as a vector of [1..n] with {c_q}=0.
+ * {q} is a vector of the indexes of known values {b_q}
+ * {r} is a vector of the indexes of known values {x_r}
+ *     The lower triangle of [A_qq] is replaced by the lower triangle L of its 
+ *     L D L' reduction.  The diagonal of D is returned in the vector {d}
+ *
+ * usage: double **A, *d, *b, *x;
+ *	int   n, reduce, solve, pd;
+ *	ldl_dcmp_pm ( A, n, d, b, x, c, q, r, reduce, solve, &pd );
+ *
+ * H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu
+ * Bathe, Finite Element Procecures in Engineering Analysis, Prentice Hall, 1982
+ * 2014-05-14 
+ */
 void ldl_dcmp_pm (
 	double **A,	/**< the system matrix, and L of the L D L' decomp.*/
 	int n,		/**< the dimension of the matrix		*/
 	double *d,	/**< diagonal of D in the  L D L' - decomp'n    */
 	double *b,	/**< the right hand side vector			*/
-	double *x,	/**< the solution vector			*/
+	double *x,	/**< part of the solution vector		*/
+	double *c,	/**< the part of the solution vector in the rhs */
 	int *q,		/**< q[j]=1 if  b[j] is known; q[j]=0 otherwise	*/
 	int *r,		/**< r[j]=1 if  x[j] is known; r[j]=0 otherwise	*/
 	int reduce,	/**< 1: do a forward reduction of A; 0: don't   */
@@ -429,13 +437,13 @@ void ldl_dcmp_pm (
 				if ( q[j] )
 					x[j] -= A[i][j]*x[i];
 	
-	    /* finally, evaluate b_r	*/
+	    /* finally, evaluate c_r	*/
 
 	    for (i=1; i<=n; i++) {
+		c[i] = 0.0;
 		if ( r[i] ) {
-			b[i] = 0;
-			for (j=1; j<=n; j++)
-				b[i] += A[i][j]*x[j];
+			c[i] = -b[i]; // changed from 0.0 to -b[i]; 2014-05-14
+			for (j=1; j<=n; j++)	c[i] += A[i][j]*x[j];
 		}
 	    }
 				
@@ -444,85 +452,104 @@ void ldl_dcmp_pm (
 }
 
 
-/*----------------------------------------------------------------------------
-LDL_MPROVE_PM 
- Improves a solution vector x[1..n] of the partitioned set of linear equations
-             [A_qq]{x_q} + [A_qr]{x_r} = {b_q}
-             [A_rq]{x_q} + [A_rr]{x_r} = {b_r}
-             where {b_q} and {x_r} are known and {x_q} and {b_r} are unknown
- [A]{x} = {b}.  The matrix A[1..n][1..n], and the vectors b[1..n] and x[1..n]
- are input, as is the dimension n.   The matrix [A] is the L D L'
- decomposition of the original system matrix, as returned by ldl_dcmp().
- Also input is the diagonal vector, {d} of [D] of the L D L' decompositon.
- On output, only {x} is modified to an improved set of values.
-
- usage: double **A, *d, *b, *x, rms_resid;
-	int   n, ok, *q, *r;
-	ldl_mprove_pm ( A, n, d, b, x, q, r, &rms_resid, &ok );
-
- H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  4 May 2001
------------------------------------------------------------------------------*/
+/*
+ * LDL_MPROVE_PM 
+ * Improves a solution vector x[1..n] of the partitioned set of linear equations
+ *           [A_qq]{x_q} + [A_qr]{x_r} = {b_q}
+ *           [A_rq]{x_q} + [A_rr]{x_r} = {b_r}+{c_r}
+ *           where {b_q}, {b_r}, and {x_r} are known and 
+ *           where {x_q} and {c_r} are unknown
+ * by reducing the residual r_q
+ *           A_qq r_q = {b_q} - [A_qq]{x_q+r_q} + [A_qr]{x_r} 
+ * The matrix A[1..n][1..n], and the vectors b[1..n] and x[1..n]
+ * are input, as is the dimension n.   The matrix [A_qq] is the L D L'
+ * decomposition of the original system matrix, as returned by ldl_dcmp_pm().
+ * Also input is the diagonal vector, {d} of [D] of the L D L' decompositon.
+ * On output, only {x} and {c} are modified to an improved set of values.
+ * The partial right-hand-side vectors, {b_q} and {b_r}, are returned unchanged.
+ * Further, the calculations in ldl_mprove_pm do not involve b_r.  
+ * 
+ * usage: double **A, *d, *b, *x, rms_resid;
+ * 	int   n, ok, *q, *r;
+ *	ldl_mprove_pm ( A, n, d, b, x, q, r, &rms_resid, &ok );
+ *
+ * H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu 
+ * 2001-05-01, 2014-05-14 
+ */
 void ldl_mprove_pm (
-	double **A, int n, double *d, double *b, double *x, 
-	int *q, int *r,
-	double *rms_resid, int *ok
+	double **A,	/**< the system matrix, and L of the L D L' decomp.*/
+	int n,		/**< the dimension of the matrix		*/
+	double *d,	/**< diagonal of D in the  L D L' - decomp'n    */
+	double *b,	/**< the right hand side vector			*/
+	double *x,	/**< part of the solution vector		*/
+	double *c,	/**< the part of the solution vector in the rhs */
+	int *q,		/**< q[j]=1 if  b[j] is known; q[j]=0 otherwise	*/
+	int *r,		/**< r[j]=1 if  x[j] is known; r[j]=0 otherwise	*/
+	double *rms_resid, /**< root-mean-square of residual error	*/
+	int *ok		/**< 1: >10% reduction in rms_resid; 0: not	*/
 ){
-	double  sdp;		/* accumulate the r.h.s. in double precision */
-	double   *resid,	/* the residual error		  	*/
-		rms_resid_new=0.0, /* the RMS error of the mprvd solution */
-		*dvector();	/* allocate memory for a vector	of doubles */
+	double  sdp;		// accumulate the r.h.s. in double precision
+	double  *dx,		// the residual error
+		*dc,		// update to partial r.h.s. vector, c
+		rms_resid_new=0.0, // the RMS error of the mprvd solution
+		*dvector();	// allocate memory for a vector	of doubles
 	int	j,i, pd;
 	void	ldl_dcmp(),
 		free_dvector();
 
-	resid = dvector(1,n);
+	dx  = dvector(1,n);
+	dc  = dvector(1,n);
 
-	for (i=1;i<=n;i++)	resid[i] = 0.0;
+	for (i=1;i<=n;i++)	dx[i] = 0.0;
 
 	// calculate the r.h.s. of ...
-	//  [A_qq]{r_q} = {b_q} - [A_qr]*{x_r} - [A_qq]{x_q+r_q}      
+	//  [A_qq]{dx_q} = {b_q} - [A_qq]*{x_q} - [A_qr]*{x_r}      
+	//  {dx_r} is left unchanged at 0.0;
 	for (i=1;i<=n;i++) {	
 	    if ( q[i] ) {
 		sdp = b[i];	
-		for (j=1;j<=n;j++) if ( r[j] ) sdp -= A[i][j] * x[j];
-		for (j=1;j<=n;j++) {	/* A in upper triangle only     */
-			if ( q[j] ) {
+		for (j=1;j<=n;j++) {
+			if ( q[j] ) {	// A_qq in upper triangle only
 				if ( i <= j )   sdp -= A[i][j] * x[j];
 				else		sdp -= A[j][i] * x[j];
 			}
 		}
-		resid[i] = sdp;
-	    } // else resid[i] = 0.0; // x[i];
+		for (j=1;j<=n;j++) if ( r[j] )	sdp -= A[i][j] * x[j];
+		dx[i] = sdp;
+	    } // else dx[i] = 0.0; // x[i];
 	}
 
-	/* solve for the residual error term	*/
-	ldl_dcmp_pm ( A, n, d, resid, resid, q,r, 0, 1, &pd );
+	// solve for the residual error term, A is already factored
+	ldl_dcmp_pm ( A, n, d, dx, dx, dc, q,r, 0, 1, &pd );
 
-	for (i=1;i<=n;i++) if ( q[i] )	rms_resid_new += resid[i]*resid[i];
+	for (i=1;i<=n;i++) if ( q[i] )	rms_resid_new += dx[i]*dx[i];
 
 	rms_resid_new = sqrt ( rms_resid_new / (double) n );
 
 	*ok = 0;
-	if ( rms_resid_new / *rms_resid < 0.90 ) {	/* good improvement */
-				/* subtract the error from the old solution */
-		for (i=1;i<=n;i++) if ( q[i] )	x[i] += resid[i];
-		*rms_resid = rms_resid_new;
-		*ok = 1;	/* the solution has improved		*/
+	if ( rms_resid_new / *rms_resid < 0.90 ) { /*  enough improvement    */
+		for (i=1;i<=n;i++) {	/*  update the solution 2014-05-14   */
+		    	if ( q[i] )	x[i] += dx[i];
+			if ( r[i] )	c[i] += dc[i];
+		}
+		*rms_resid = rms_resid_new;	/* return the new residual   */
+		*ok = 1;			/* the solution has improved */
 	}
 
-	free_dvector(resid,1,n);
+	free_dvector(dx,1,n);
+	free_dvector(dc,1,n);
 	return;
 }
 
 
-/*----------------------------------------------------------------------------
-PSB_UPDATE
- Update secant stiffness matrix via the Powell-Symmetric-Broyden update eqn.
-
-        B = B - (f*d' + d*f') / (d' * d) + f'*d * d*d' / (d' * d)^2 ;
-
- H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  24 Oct 2012
------------------------------------------------------------------------------*/
+/*
+ * PSB_UPDATE
+ * Update secant stiffness matrix via the Powell-Symmetric-Broyden update eqn.
+ *
+ *       B = B - (f*d' + d*f') / (d' * d) + f'*d * d*d' / (d' * d)^2 ;
+ *
+ * H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  24 Oct 2012
+ */
 void PSB_update ( 
 	double **B,	/**< secant stiffness matrix            */
 	double *f,	/**< out-of-balance force vector        */
@@ -544,12 +571,12 @@ void PSB_update (
 }
 
 
-/*----------------------------------------------------------------------------
-PSEUDO_INV - calculate the pseudo-inverse of A ,
-	     Ai = inv ( A'*A + beta * trace(A'*A) * I ) * A' 
-	     beta is a regularization factor, which should be small (1e-10)
-	     A is m by n      Ai is m by n			      8oct01
------------------------------------------------------------------------------*/
+/*
+ * PSEUDO_INV - calculate the pseudo-inverse of A ,
+ * 	     Ai = inv ( A'*A + beta * trace(A'*A) * I ) * A' 
+ *	     beta is a regularization factor, which should be small (1e-10)
+ *	     A is m by n      Ai is m by n			      8oct01
+ */
 void pseudo_inv(
 	double **A, double **Ai, int n, int m, double beta, int verbose
 ){
@@ -628,10 +655,10 @@ void pseudo_inv(
 }
 
 
-/* ----------------------------------------------------------------------------
+/* 
  * PRODABj -  matrix-matrix multiplication for symmetric A	      27apr01
  *		 u = A * B(:,j)
- * --------------------------------------------------------------------------*/
+ */
 void prodABj ( double **A, double **B, double *u, int n, int j )
 {
 	int     i, k;
@@ -648,9 +675,9 @@ void prodABj ( double **A, double **B, double *u, int n, int j )
 }
 
 
-/* ----------------------------------------------------------------------------
+/* 
  * prodAB - matrix-matrix multiplication      C = A * B			27apr01
- * --------------------------------------------------------------------------*/
+ */
 void prodAB ( double **A, double **B, double **C, int I, int J, int K )
 {
 	int     i, j, k;
@@ -667,10 +694,10 @@ void prodAB ( double **A, double **B, double **C, int I, int J, int K )
 }
 
 
-/* ---------------------------------------------------------------------------
-INVAB  -  calculate product inv(A) * B  
-	 A is n by n      B is n by m				    6jun07
-----------------------------------------------------------------------------*/
+/*
+ * INVAB  -  calculate product inv(A) * B  
+ *	 A is n by n      B is n by m				    6jun07
+ */
 void invAB( double **A, double **B, int n, int m, double **AiB, int *ok, int verbose)
 {
 	double  *diag, *b, *x, error;
@@ -710,10 +737,10 @@ void invAB( double **A, double **B, int n, int m, double **AiB, int *ok, int ver
 }
 
 
-/* ---------------------------------------------------------------------------
+/*
  * XTinvAY  -  calculate quadratic form with inverse matrix   X' * inv(A) * Y   
  *	   A is n by n    X is n by m     Y is n by m		    15sep01
- * --------------------------------------------------------------------------*/
+ */
 void xtinvAy(
 	double **X, double **A, double **Y, int n, int m, double **Ac, int verbose
 ){
@@ -753,10 +780,29 @@ void xtinvAy(
 }
 
 
-/*-----------------------------------------------------------------------------
+/*  COORD_XFRM - coordinate transform of a matrix of column 2-vectors
+ * 
+ * Rr  = [ cosd(theta) -sind(theta) ; sind(theta) cosd(theta) ]*[ Rx ; Ry ];
+ */
+void coord_xfrm ( float **Rr, float **R, float theta, int n )
+{
+	float	R1, R2;
+	int	i;
+
+	for ( i = 1; i<=n; i++ ) {
+		R1 =  cosd(theta)*R[1][i] - sind(theta)*R[2][i];
+		R2 =  sind(theta)*R[1][i] + cosd(theta)*R[2][i];
+		Rr[1][i] = R1;
+		Rr[2][i] = R2;
+	}
+	return;
+}
+
+
+/*
  * xtAx - carry out matrix-matrix-matrix multiplication for symmetric A  7nov02
  *	 C = X' A X     C is J by J      X is N by J     A is N by N      
- * ---------------------------------------------------------------------------*/
+ */ 
 void xtAx(double **A, double **X, double **C, int N, int J)
 {
 
@@ -791,9 +837,9 @@ void xtAx(double **A, double **X, double **C, int N, int J)
 }
 
 
-/* ----------------------------------------------------------------------------
+/* 
  * xtAy - carry out vector-matrix-vector multiplication for symmetric A  7apr94
- * ------------------------------------------------------------------------- */
+ */
 double xtAy(double *x, double **A, double *y, int n, double *d)
 {
 
@@ -812,11 +858,11 @@ double xtAy(double *x, double **A, double *y, int n, double *d)
 }
 
 
-/* ---------------------------------------------------------------------------
+/*
  * invAXinvA -  calculate quadratic form with inverse matrix 
  *	   replace X with inv(A) * X * inv(A) 
  *	   A is n by n and symmetric   X is n by n and symmetric    15sep01
- * -------------------------------------------------------------------------*/
+ */ 
 void invAXinvA ( double **A, double **X, int n, int verbose )
 {
 	double  *diag, *b, *x, **Ai, **XAi, Aij, error;
@@ -884,12 +930,12 @@ void invAXinvA ( double **A, double **X, int n, int verbose )
 }
 
 
-/* ---------------------------------------------------------------------------
+/* 
  *  RELATIVE_NORM -  compute the relative 2-norm between two vectors       26dec01 
  *       compute the relative 2-norm between two vectors N and D
  *	       return  ( sqrt(sum(N[i]*N[i]) / sqrt(D[i]*D[i]) )
  *
- * ------------------------------------------------------------------------- */
+ */
 double relative_norm( double *N, double *D, int n )
 {
 	double  nN = 0.0, nD = 0.0;
@@ -902,14 +948,15 @@ double relative_norm( double *N, double *D, int n )
 }
 
 
-/*  Legendre 
- *  compute matrices of the Legendre polynomials and its first two derivitives
+/*
+ *  Legendre 
+ *  compute matrix of the Legendre polynomials and its first two derivitives
  */
 void Legendre( int order, float *t, int n, float **P, float **Pp, float **Ppp )
 {
 	int k,p;
 
-// save_vector( "t.dat", t, 1,n, "w" );
+// save_vector( n, t, "t.dat");
 
 	for (p=1; p <= n; p++) {
 

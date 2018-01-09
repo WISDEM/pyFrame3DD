@@ -5,7 +5,7 @@
  ---------------------------------------------------------------------------
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
- Copyright (C) 1992-2010  Henri P. Gavin
+ Copyright (C) 1992-2014  Henri P. Gavin
 
  FRAME3DD is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -141,6 +141,7 @@ void read_run_data (
 	char infcpath[],/**< file name for internal force data		*/
 	double *exagg_static,/**< factor for static displ. exaggeration	*/
 	double exagg_flag, /**< static exagg. command-line over-ride	*/
+	float *scale,	/**< zoom scale for 3D plotting in gnuplot      */
 	float *dx,	/**< frame element increment for internal forces*/
 	int *anlyz,	/**< 1: perform elastic analysis, 0: don't	*/
 	int anlyz_flag,	/**< command-line over-ride			*/
@@ -194,14 +195,14 @@ void read_and_assemble_loads(
 	double **Q,		/**< frame element end forces, every beam */
 	double **F_temp, 	/**< thermal loads			*/
 	double **F_mech, 	/**< mechanical loads			*/
-	double **Fo,	 	/**< thermal loads + mechanical loads	*/
+	double *Fo,	 	/**< thermal loads + mechanical loads	*/
 	float ***U,		/**< uniformally distributed loads	*/
 	float ***W,		/**< trapezoidally distributed loads	*/
 	float ***P,		/**< concentrated point loads		*/
 	float ***T,	 	/**< temperature loads			*/
 	float **Dp,		/**< prescribed displacements at rctns	*/
-	double ***feF_mech,	/**< fixed end forces for mechanical loads */
-	double ***feF_temp,	/**< fixed end forces for temperature loads */
+	double ***eqF_mech,	/**< equiv. end forces for mech. loads	*/
+	double ***eqF_temp,	/**< equiv. end forces for temp. loads	*/
 	int verbose		/**< 1: copious output to screen, 0: none */
 );
 
@@ -240,9 +241,9 @@ void read_mass_data(
 );
 
 
-/**
-	read matrix condensation information
-*/
+/*
+ * READ_CONDENSATION_DATA - read matrix condensation information
+ */
 void read_condensation_data(
 	FILE *fp,	/**< input data file pointer			*/
 	int nN, int nM, 	/**< number of nodes, number of modes	*/
@@ -256,9 +257,9 @@ void read_condensation_data(
 );
 
 
-/**
-	write input data to a file
-*/
+/*
+ * WRITE_INPUT DATA - write input data to a file
+ */
 void write_input_data(
 	FILE *fp,	/**< input data file pointer			*/
 	char *title, int nN, int nE,  int nL,
@@ -277,49 +278,95 @@ void write_input_data(
 );
 
 
-/**
-	save node displacements and member end forces in a text file	9sep08
-*/
+/*
+ * WRITE_STATIC_RESULTS
+ * save node displacements, reactions, and element end forces in a text file
+ * 9sep08, 2014-05-15
+ */
 void write_static_results(
 	FILE *fp,
 	int nN, int nE, int nL, int lc, int DoF,
 	int *N1, int *N2,
-	double *F, double *D, int *r, double **Q,
+	double *F, double *D, double *R, int *r, double **Q,
 	double err, int ok, int axial_sign
 );
 
 
-/**
-	save node displacements and member end forces in a .CSV file   31dec08
+/* 
+ * CSV_filename - return the file name for the .CSV file and 
+ * whether the file should be written or appended (wa)
+ * 1 Nov 2015
 */
+void CSV_filename( char CSV_file[], char wa[], char OUT_file[], int lc );
+
+
+/*
+ * WRITE_STATIC_CSV
+ * save node displacements, reactions, and  element end forces in a .CSV file   
+ * 31dec08, 2015-05-15
+ */
 void write_static_csv(
 	char *OUT_file, char *title,
 	int nN, int nE, int nL, int lc, int DoF,
 	int *N1, int *N2,
-	double *F, double *D, int *r, double **Q,
+	double *F, double *D, double *R, int *r, double **Q,
 	double err, int ok
 );
 
 
-/**
-	save node displacements and member end forces in an m-file	9sep08
-*/
+
+/*
+ * WRITE_STATIC_MFILE
+ * save node displacements, reactions, and element end forces in an m-file
+ * 9sep08, 2015-05-15
+ */
 void write_static_mfile(
 	char *OUT_file, char *title,
 	int nN, int nE, int nL, int lc, int DoF,
 	int *N1, int *N2,
-	double *F, double *D, int *r, double **Q,
+	double *F, double *D, double *R, int *r, double **Q,
 	double err, int ok
 );
 
 
-/** 
-	calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
-	calculate frame element local displacements, Rx, Dx, Dy, Dz
-	write internal forces and local displacements to an output data file
-	4jan10
-*/
+/*
+ * PEAK_INTERNAL_FORCES
+ *	calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
+ *	calculate frame element local displacements, Rx, Dx, Dy, Dz
+ *	return the peak (maximum absolute) values
+ *	18 jun 2013
+ */
+void peak_internal_forces (
+        int lc,         // load case number
+        int nL,         // total number of load cases
+        vec3 *xyz,      // node locations
+        double **Q, int nN, int nE, double *L, int *N1, int *N2,
+        float *Ax,float *Asy,float *Asz,float *Jx,float *Iy,float *Iz,
+        float *E, float *G, float *p,
+        float *d, float gX, float gY, float gZ,
+        int nU, float **U, int nW, float **W, int nP, float **P,
+        double *D, int shear,
+	float dx,	// x-axis increment along frame element
+
+        // vectors of peak forces, moments, displacements and slopes 
+	// for each frame element, for load case "lc" 
+        double **pkNx, double **pkVy, double **pkVz,
+        double **pkTx, double **pkMy, double **pkMz,
+        double **pkDx, double **pkDy, double **pkDz,
+        double **pkRx, double **pkSy, double **pkSz
+);
+
+
+/* 
+ * WRITE_INTERNAL_FORCES
+ *	calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
+ *	calculate frame element local displacements, Rx, Dx, Dy, Dz
+ *	write internal forces and local displacements to an output data file
+ *	4jan10
+ */
 void write_internal_forces(
+	char *OUT_file, /**< output data filename                       */
+	FILE *fp,	/**< pointer to output data file		*/
 	char infcpath[],/**< interior force data file			*/
 	int lc,		/**< load case number				*/
 	int nL,		/**< number of static load cases		*/
@@ -351,9 +398,10 @@ void write_internal_forces(
 );
 
 
-/**
-	save modal frequencies and mode shapes			16aug01
-*/
+/*
+ * WRITE_MODAL_RESULTS
+ *	save modal frequencies and mode shapes			16aug01
+ */
 void write_modal_results(
 	FILE *fp,
 	int nN, int nE, int nI, int DoF,
@@ -364,24 +412,26 @@ void write_modal_results(
 );
 
 
-/**
-	create mesh data of deformed and undeformed mesh, use gnuplot	22feb99
-	useful gnuplot options: set noxtics noytics noztics noborder view nokey
-*/
+/*
+ * STATIC_MESH
+ *	create mesh data of deformed and undeformed mesh, use gnuplot	22feb99
+ *	useful gnuplot options: set noxtics noytics noztics noborder view nokey
+ */
 void static_mesh(
 	char OUT_file[],
 	char infcpath[], char meshpath[], char plotpath[],
 	char *title, int nN, int nE, int nL, int lc, int DoF,
 	vec3 *xyz, double *L,
 	int *N1, int *N2, float *p, double *D,
-	double exagg_static, int D3_flag, int anlyz, float dx
+	double exagg_static, int D3_flag, int anlyz, float dx, float scale
 );
 
 
-/**
-	create mesh data of the mode-shape meshes, use gnuplot	19oct98
-	useful gnuplot options: set noxtics noytics noztics noborder view nokey
-*/
+/*
+ * MODAL_MESH
+ *	create mesh data of the mode-shape meshes, use gnuplot	19oct98
+ *	useful gnuplot options: set noxtics noytics noztics noborder view nokey
+ */
 void modal_mesh(
 	char OUT_file[], char meshpath[], char modepath[],
 	char plotpath[], char *title,
@@ -393,12 +443,13 @@ void modal_mesh(
 );
 
 
-/**
-	create mesh data of animated mode-shape meshes, use gnuplot	16dec98
-	useful gnuplot options: set noxtics noytics noztics noborder view nokey
-	mpeg movie example:   % convert mesh_file-03-f-*.ps mode-03.mpeg
-	... requires ImageMagick and mpeg2vidcodec packages
-*/
+/*
+ * ANIMATE
+ *	create mesh data of animated mode-shape meshes, use gnuplot	16dec98
+ *	useful gnuplot options: set noxtics noytics noztics noborder view nokey
+ *	mpeg movie example:   % convert mesh_file-03-f-*.ps mode-03.mpeg
+ *	... requires ImageMagick and mpeg2vidcodec packages
+ */
 void animate(
 	char OUT_file[], char meshpath[], char modepath[], char plotpath[],
 	char *title,
@@ -406,16 +457,17 @@ void animate(
 	int nN, int nE, int DoF, int nM,
 	vec3 *xyz, double *L, float *p,
 	int *N1, int *N2, double *f, double **V,
-	double exagg_modal, int D3_flag, float pan
+	double exagg_modal, int D3_flag, float pan, float scale
 );
 
 
-/**
-	computes cubic deflection functions from end deflections
-	and end rotations.  Saves deflected shapes to a file.
-	These bent shapes are exact for mode-shapes, and for frames
-	loaded at their nodes.
-*/
+/*
+ * CUBIC_BENT_BEAM
+ *	computes cubic deflection functions from end deflections
+ *	and end rotations.  Saves deflected shapes to a file.
+ *	These bent shapes are exact for mode-shapes, and for frames
+ *	loaded at their nodes.
+ */
 void cubic_bent_beam(
 	FILE *fpm,	/**< deformed mesh data file pointer	*/
 	int n1, int n2,	/**< node 1 and node 2 of the frame element */
@@ -427,11 +479,12 @@ void cubic_bent_beam(
 );
 
 
-/**
-	reads internal frame element forces and deflections
-	from the internal force and deflection data file.  
-	Saves deflected shapes to a file.  These bent shapes are exact. 
-*/
+/*
+ * FORCE_BENT_BEAM
+ * 	reads internal frame element forces and deflections
+ * 	from the internal force and deflection data file.  
+ *	Saves deflected shapes to a file.  These bent shapes are exact. 
+ */
 void force_bent_beam(
 	FILE *fpm,	/**< deformed mesh data file pointer	*/
 	FILE *fpif,	/**< internal force data file pointer	*/
@@ -445,55 +498,66 @@ void force_bent_beam(
 	double exagg	/**< mesh exaggeration factor		*/
 );
 
-/**
-	display *scanf errors from output from *scanf function
-*/
+
+/*
+ * SFERR - display *scanf errors from output from *scanf function
+ */
 void sferr( char *s );
 
-/**
-	return the file extension, including the period (.)
-                return 1 if the extension is ".csv"
-                return 2 if the extension is ".fmm"
-                return 0 otherwise
 
-*/
+/*
+ * GET_FILE_EXT
+ *	return the file extension, including the period (.)
+ *        return 1 if the extension is ".csv"
+ *        return 2 if the extension is ".fmm"
+ *        return 0 otherwise
+ */
 int get_file_ext( char *filename, char *ext );
 
-/**
-	Return location for temporary 'clean' file
 
-	@param fname name of the file, excluding directory.
-	@param fullpath (returned) full path to temporary file.
-	@param len available length for string being returned.
-*/
+/*
+ * TEMP_FILE_LOCATION
+ *	Return location for temporary 'clean' file
+ *
+ *	@param fname name of the file, excluding directory.
+ *	@param fullpath (returned) full path to temporary file.
+ *	@param len available length for string being returned.
+ */
 void temp_file_location(const char *fname, char fullpath[], const int len);
 
-/**
-	Return path to an output file.
-	
-	If the fname starts with a path separator ('\' on Windows, else '/') then
-	it is assumed to be an absolute path, and will be returned unchanged.
 
-	If the fname doesn't start with a path separator, it is assumed to be a
-	relative path. It will be appended to the contents of FRAME3DD_OUTDIR if
-	that path is defined.
-
-	If FRAME3DD_OUTDIR is not defined, it will be appended to the contents of
-	the parameter default_outdir. If the parameter default_outdir is given a
-	NULL value, then it will be replaced by the appropriate temp file location
-	(see temp_file_location and temp_dir in frame3dd_io.c).
-
-	@param fname name of the file, excluding directory.
-	@param fullpath (returned) full path to temporary file.
-	@param len available length for string being returned.
-	@param default_outdir default output directory in case where no env var.
-*/
+/*
+ * OUTPUT_PATH
+ *	Return path to an output file.
+ *
+ *	If the fname starts with a path separator ('\' on Windows, else '/') then
+ *	it is assumed to be an absolute path, and will be returned unchanged.
+ *
+ *	If the fname doesn't start with a path separator, it is assumed to be a
+ *	relative path. It will be appended to the contents of FRAME3DD_OUTDIR if
+ *	that path is defined.
+ *
+ *	If FRAME3DD_OUTDIR is not defined, it will be appended to the contents of
+ *	the parameter default_outdir. If the parameter default_outdir is given a
+ *	NULL value, then it will be replaced by the appropriate temp file location
+ *	(see temp_file_location and temp_dir in frame3dd_io.c).
+ *
+ *	@param fname name of the file, excluding directory.
+ *	@param fullpath (returned) full path to temporary file.
+ *	@param len available length for string being returned.
+ *	@param default_outdir default output directory in case where no env var.
+ */
 void output_path(const char *fname, char fullpath[], const int len, const char *default_outdir);
 
-/** print a set of dots (periods) */
+
+/*
+ * DOTS - print a set of dots (periods)
+ */
 void dots ( FILE *fp, int n );
 
 
-/** EVALUATE -  displays a randomly-generated evaluation message.  */ 
+/*
+ *  EVALUATE -  displays a randomly-generated evaluation message. 
+ */ 
 void evaluate (  float error, float rms_resid, float tol, int geom );
 

@@ -67,9 +67,7 @@ void read_reaction_data(
     int *r,     /**< r[i]=1: DoF i is fixed, r[i]=0: DoF i is free */
     int *sumR,  /**< sum of vector R                */
     int verbose, /**< 1: copious screen output; 0: none      */
-    int geom,
-    float *EKx, float *EKy, float *EKz,  /* extra stiffness */
-    float *EKtx, float *EKty, float *EKtz
+    int geom
 );
 
 
@@ -104,7 +102,7 @@ void read_and_assemble_loads(
     double **Q,     /**< frame element end forces, every beam */
     double **F_temp,    /**< thermal loads          */
     double **F_mech,    /**< mechanical loads           */
-    double **Fo,        /**< thermal loads + mechanical loads   */
+    double *Fo,        /**< thermal loads + mechanical loads   */
     float ***U,     /**< uniformally distributed loads  */
     float ***W,     /**< trapezoidally distributed loads    */
     float ***P,     /**< concentrated point loads       */
@@ -126,8 +124,6 @@ void read_mass_data(
     int *nX,    /**< number of elements with extra mass     */
     float *d, float *EMs, /**< density, extra frame element mass    */
     float *NMs, float *NMx, float *NMy, float *NMz, /**< node inertia*/
-    float *NMxy, float *NMxz, float *NMyz,
-    float *rhox, float *rhoy, float *rhoz,
     double *L,  /**< length of each frame element       */
     float *Ax,  /**< cross section area of each frame element   */
     double *total_mass, /**< total mass of structure and extra mass */

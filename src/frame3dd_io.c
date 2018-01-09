@@ -5,7 +5,7 @@
  ---------------------------------------------------------------------------
  http://frame3dd.sourceforge.net/
  ---------------------------------------------------------------------------
- Copyright (C) 1992-2010  Henri P. Gavin
+ Copyright (C) 1992-2015  Henri P. Gavin
 
  FRAME3DD is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -50,14 +50,14 @@ static void getline_no_comment(
 );
 
 
-/*------------------------------------------------------------------------------
-PARSE_OPTIONS -  parse command line options
-command line options over-ride values in the input data file
-04 Mar 2009, 22 Sep 2009
-------------------------------------------------------------------------------*/
+/*
+ * PARSE_OPTIONS -  parse command line options		
+ * command line options over-ride values in the input data file	 	
+ * 04 Mar 2009, 22 Sep 2009
+ */
 void parse_options (
-	int argc, char *argv[],
-	char IN_file[], char OUT_file[],
+	int argc, char *argv[], 
+	char IN_file[], char OUT_file[], 
 	int *shear_flag,
 	int *geom_flag,
 	int *anlyz_flag,
@@ -65,7 +65,7 @@ void parse_options (
 	int *D3_flag,
 	int *lump_flag,
 	int *modal_flag,
-	double *tol_flag,
+	double *tol_flag, 
 	double *shift_flag,
 	float *pan_flag,
 	int *write_matrix,
@@ -84,7 +84,8 @@ void parse_options (
 	*shear_flag = *geom_flag  = *anlyz_flag = *lump_flag = *modal_flag = -1;
 	*exagg_flag = *tol_flag = *shift_flag = -1.0;
 	*D3_flag = 0;
-	*pan_flag = *condense_flag = 0.0;
+	*pan_flag = -1.0;
+	*condense_flag = -1;
 	*write_matrix = 0;
 	*axial_sign = 1;
 	*debug = 0; *verbose = 1;
@@ -116,7 +117,7 @@ void parse_options (
 	 }
 	}
 
-	// remaining unused flags ... b j k n u y
+	// remaining unused flags ... b j k n u y 
 
 	while ((option=getopt(argc,argv, "i:o:acdhqvwxzs:e:f:g:l:m:p:r:t:")) != -1){
 		switch ( option ) {
@@ -212,8 +213,8 @@ void parse_options (
 				break;
 			case 'p':		/* pan rate	*/
 				*pan_flag = atof(optarg);
-				if (*pan_flag == 0.0) {
-				 errorMsg("\n frame3dd command-line error: argument to -p option should be a number.\n");
+				if (*pan_flag < 0.0) {
+				 errorMsg("\n frame3dd command-line error: argument to -p option should be a positive number.\n");
 				 exit(9);
 				}
 				break;
@@ -247,10 +248,10 @@ void parse_options (
 }
 
 
-/*------------------------------------------------------------------------------
-DISPLAY_HELP -  display help information to stderr
-04 Mar 2009, 22 Sep 2009
-------------------------------------------------------------------------------*/
+/*
+ * DISPLAY_HELP -  display help information to stderr	
+ * 04 Mar 2009, 22 Sep 2009
+ */
 void display_help()
 {
  textColor('g','x','x','x');
@@ -296,10 +297,10 @@ void display_help()
 }
 
 
-/*------------------------------------------------------------------------------
-DISPLAY_USAGE -  display usage information to stderr
-04 Mar 2009
-------------------------------------------------------------------------------*/
+/*
+ * DISPLAY_USAGE -  display usage information to stderr	
+ * 04 Mar 2009
+ */
 void display_usage()
 {
  fprintf(stderr,"\n Frame3DD version: %s\n", VERSION);
@@ -313,10 +314,10 @@ void display_usage()
 
 }
 
-/*------------------------------------------------------------------------------
-DISPLAY_VERSION_HELP -  display version, website, and brief help info. to stderr
-04 Mar 2009
-------------------------------------------------------------------------------*/
+/*
+ * DISPLAY_VERSION_HELP -  display version, website, and brief help info. to stderr
+ * 04 Mar 2009
+ */
 void display_version()
 {
  fprintf(stderr,"\n Frame3DD version: %s\n", VERSION);
@@ -329,18 +330,18 @@ void display_version()
 }
 
 
-/*------------------------------------------------------------------------------
-DISPLAY_VERSION_ABOUT-  display version and website to stderr for
-running as a background process
-22 Sep 2009
-Contributed by Barry Sanford, barry.sanford@trimjoist.com
-------------------------------------------------------------------------------*/
+/*
+ * DISPLAY_VERSION_ABOUT-  display version and website to stderr for 
+ * running as a background process 
+ * 22 Sep 2009
+ * Contributed by Barry Sanford, barry.sanford@trimjoist.com
+ */
 void display_version_about()
 {
  fprintf(stderr," Frame3DD version: %s\n", VERSION);
  fprintf(stderr," Analysis of 2D and 3D structural frames with elastic and geometric stiffness\n");
  fprintf(stderr," http://frame3dd.sourceforge.net\n");
- fprintf(stderr," GPL Copyright (C) 1992-2010, Henri P. Gavin \n");
+ fprintf(stderr," GPL Copyright (C) 1992-2015, Henri P. Gavin \n");
  fprintf(stderr," Frame3DD is distributed in the hope that it will be useful");
  fprintf(stderr," but with no warranty.\n");
  fprintf(stderr," For details see the GNU Public Licence:");
@@ -348,10 +349,10 @@ void display_version_about()
 }
 
 
-/*------------------------------------------------------------------------------
-READ_NODE_DATA  -  read node location data
-04 Jan 2009
-------------------------------------------------------------------------------*/
+/*
+ * READ_NODE_DATA  -  read node location data		
+ * 04 Jan 2009
+ */
 void read_node_data( FILE *fp, int nN, vec3 *xyz, float *r )
 {
 	int	i, j,
@@ -375,10 +376,10 @@ void read_node_data( FILE *fp, int nN, vec3 *xyz, float *r )
 }
 
 
-/*------------------------------------------------------------------------------
-READ_FRAME_ELEMENT_DATA  -  read frame element property data
-04 Jan 2009
-------------------------------------------------------------------------------*/
+/*
+ * READ_FRAME_ELEMENT_DATA  -  read frame element property data		
+ * 04 Jan 2009
+ */
 void read_frame_element_data (
 	FILE *fp,
 	int nN, int nE, vec3 *xyz, float *r,
@@ -509,12 +510,12 @@ void read_frame_element_data (
 }
 
 
-/*------------------------------------------------------------------------------
-READ_RUN_DATA  -  read information for analysis
-29 Dec 2008
-------------------------------------------------------------------------------*/
+/*
+ * READ_RUN_DATA  -  read information for analysis
+ * 29 Dec 2008
+ */
 void read_run_data (
-	FILE	*fp,
+	FILE	*fp, 
 	char	*OUT_file,	/* output data file name */
 	int	*shear,
 	int	shear_flag,
@@ -525,6 +526,7 @@ void read_run_data (
 	char	*infcpath,
 	double	*exagg_static,
 	double	exagg_flag,
+	float   *scale,
 	float	*dx,
 	int	*anlyz,
 	int	anlyz_flag,
@@ -535,7 +537,7 @@ void read_run_data (
 	char	mesh_file[96] = "EMPTY_MESH";
 	int	sfrv=0;		/* *scanf return value */
 
-	strcpy(base_file,OUT_file);
+	strcpy(base_file,OUT_file);	
 	while ( base_file[len++] != '\0' )
 		/* the length of the base_file */ ;
 	full_len = len;
@@ -551,7 +553,7 @@ void read_run_data (
 	strcat(infcpath,".if");
 
 	while ( base_file[len] != '/' && base_file[len] != '\\' && len > 0 )
-		len--;	/* find the last '/' or '\' in base_file */
+		len--;	/* find the last '/' or '\' in base_file */ 
 	i = 0;
 	while ( base_file[len] != '\0' )
 		mesh_file[i++] = base_file[len++];
@@ -567,8 +569,8 @@ void read_run_data (
 		fprintf(stderr,"MESHPATH  = %s \n", meshpath);
 	}
 
-	sfrv=fscanf( fp, "%d %d %lf %f", shear, geom,  exagg_static, dx );
-	if (sfrv != 4) sferr("shear, geom, exagg_static, or dx variables");
+	sfrv=fscanf( fp, "%d %d %lf %f %f", shear,geom, exagg_static,scale,dx );
+	if (sfrv != 5) sferr("shear, geom, exagg_static, scale, or dx variables");
 
 	if (*shear != 0 && *shear != 1) {
 	    errorMsg(" Rember to specify shear deformations with a 0 or a 1 \n after the frame element property info.\n");
@@ -589,7 +591,7 @@ void read_run_data (
 	    errorMsg(" Remember to specify a frame element increment greater than zero.\n");
 	    exit(74);
 	}
-
+	
 
 	/* over-ride values from input data file with command-line options */
 	if ( shear_flag != -1   )	*shear = shear_flag;
@@ -602,9 +604,9 @@ void read_run_data (
 }
 
 
-/*-----------------------------------------------------------------------------
-FRAME3DD_GETLINE -  get line into a character string. from K&R        03feb94
------------------------------------------------------------------------------*/
+/*
+ * FRAME3DD_GETLINE -  get line into a character string. from K&R        03feb94
+ */
 int frame3dd_getline (
 FILE	*fp,
 char    *s,
@@ -628,11 +630,11 @@ static const char sep = '\\';
 static const char sep = '/';
 #endif
 
-/*----------------------------------------------------------------------------
-TEMP_DIR
-return platform-specific temp file location --
-John Pye, Feb 2009
-----------------------------------------------------------------------------*/
+/*
+ * TEMP_DIR
+ * return platform-specific temp file location -- 
+ * John Pye, Feb 2009
+ */
 static const char *temp_dir(){
 #if defined(WIN32) || defined(DJGPP)
 	char *tmp;
@@ -644,7 +646,7 @@ static const char *temp_dir(){
 "write its temporary files.  Set one of these variable, then re-run Frame3DD."
 "The Frame3DD on-line documentation provides help on this issue.");
 		exit(15);
-	}
+	} 
 #else
 	const char *tmp = "/tmp";	/* Linux, Unix, OS X	*/
 #endif
@@ -652,19 +654,19 @@ static const char *temp_dir(){
 }
 
 
-/*------------------------------------------------------------------------------
-OUTPUT_PATH
-return path for output files using either current directory, or FRAME3DD_OUTDIR
-if specified. --
-John Pye, Feb 2009.
-------------------------------------------------------------------------------*/
+/*
+ * OUTPUT_PATH
+ * return path for output files using either current directory, or FRAME3DD_OUTDIR
+ * if specified. -- 
+ * John Pye, Feb 2009.
+ */
 void output_path(const char *fname, char fullpath[], const int len, const char *default_outdir) {
 	int res;
 	assert(fname!=NULL);
 
 	/*			deprecated code, January 15 2010 ...
 	if ( fname[0]==sep ) {	in Win32 absolute path starts with C:\ not \ ??
-		// absolute output path specified
+		// absolute output path specified 
 //		res = snprintf(fullpath,len,"%s",fname);
 		res = sprintf(fullpath,"%s",fname);
 	} else {
@@ -694,17 +696,18 @@ void output_path(const char *fname, char fullpath[], const int len, const char *
 }
 
 
-/*-----------------------------------------------------------------------------
-PARSE_INPUT                                                             7may03
- strip comments from the input file, and write a stripped input file
------------------------------------------------------------------------------*/
+/*
+ * PARSE_INPUT                                                            
+ * strip comments from the input file, and write a stripped input file
+ * 07 May 2003
+ */
 void parse_input(FILE *fp, const char *tpath){
 	FILE	*fpc;		/* stripped input file pointer	*/
 	char	line[256];
 	char	errMsg[MAXL];
 
 	if ((fpc = fopen (tpath, "w")) == NULL) {
-		sprintf (errMsg,"ERROR: cannot open file '%s'\n", tpath );
+		sprintf (errMsg,"\n  error: cannot open parsed input data file: '%s' \n", tpath );
 		errorMsg(errMsg);
 		exit(12);
 	}
@@ -719,13 +722,15 @@ void parse_input(FILE *fp, const char *tpath){
 }
 
 
-/*-----------------------------------------------------------------------------
-GETLINE_NO_COMMENT
- get a line into a character string. from K&R
- get the line only up to one of the following characters:  \n  %  #  ;  ?
- ignore all comma (,) characters, ignore all double quote (") characters
-09 Feb 2009
------------------------------------------------------------------------------*/
+/*
+ * GETLINE_NO_COMMENT                                                
+ * get a line into a character string. from K&R
+ * get the line only up to one of the following characters:  \n  %  #  ? 
+ * ignore all comma (,) characters
+ * ignore all double quote (") characters
+ * ignore all semi-colon (;) characters
+ * 09 Feb 2009
+ */
 void getline_no_comment (
 	FILE *fp,   /**< pointer to the file from which to read */
 	char *s,    /**< pointer to the string to which to write */
@@ -733,9 +738,9 @@ void getline_no_comment (
 ){
 	int     c=0, i=0;
 
-	while (--lim > 0 && (c=getc(fp)) != EOF && c != '\n' && c != '%' &&
-		c != '#' && c != ';' && c != '?' ) {
-		if (c != ',' && c != '"' )
+	while (--lim > 0 && (c=getc(fp)) != EOF && 
+		c != '\n' && c != '%' && c != '#' && c != '?' ) {
+		if (c != ',' && c != '"' && c != ';')
 			s[i++] = c;
 		else
 			s[i++] = ' ';
@@ -752,10 +757,10 @@ void getline_no_comment (
 }
 
 
-/*------------------------------------------------------------------------------
-READ_REACTION_DATA - Read fixed node displacement boundary conditions
-29 Dec 2009
-------------------------------------------------------------------------------*/
+/*
+ * READ_REACTION_DATA - Read fixed node displacement boundary conditions
+ * 29 Dec 2009
+ */
 void read_reaction_data (
 	FILE *fp, int DoF, int nN, int *nR, int *q, int *r, int *sumR, int verbose
 ){
@@ -827,11 +832,15 @@ void read_reaction_data (
 }
 
 
-/*------------------------------------------------------------------------------
-READ_AND_ASSEMBLE_LOADS  -
-read load information data, assemble un-restrained load vectors
-09 Sep 2008
-------------------------------------------------------------------------------*/
+/*
+ * READ_AND_ASSEMBLE_LOADS  
+ * Read load information data, assemble load vectors in global coordinates
+ * Returns vector of equivalent loadal forces F_temp and F_mech and 
+ * a matrix of equivalent element end forces eqF_temp and eqF_mech from 
+ * distributed internal and temperature loadings.  
+ * eqF_temp and eqF_mech are computed for the global coordinate system 
+ * 2008-09-09, 2015-05-15
+ */
 void read_and_assemble_loads (
 		FILE *fp,
 		int nN, int nE, int nL, int DoF,
@@ -841,24 +850,26 @@ void read_and_assemble_loads (
 		float *Ax, float *Asy, float *Asz,
 		float *Iy, float *Iz, float *E, float *G,
 		float *p,
-		float *d, float *gX, float *gY, float *gZ,
+		float *d, float *gX, float *gY, float *gZ, 
 		int *r,
 		int shear,
 		int *nF, int *nU, int *nW, int *nP, int *nT, int *nD,
 		double **Q,
-		double **F_temp, double **F_mech, double **Fo,
+		double **F_temp, double **F_mech, double *Fo, 
 		float ***U, float ***W, float ***P, float ***T, float **Dp,
-		double ***feF_mech, double ***feF_temp,
+		double ***eqF_mech, // equivalent mech loads, global coord 
+		double ***eqF_temp, // equivalent temp loads, global coord 
 		int verbose
 ){
 	float	hy, hz;			/* section dimensions in local coords */
 
 	float	x1,x2, w1,w2;
-	double	Ln, R1o, R2o, f01, f02;
+	double	Ln, R1o, R2o, f01, f02; 
 
-	double	Nx1, Vy1, Vz1, Mx1=0.0, My1=0.0, Mz1=0.0, /* fixed end forces */
-		Nx2, Vy2, Vz2, Mx2=0.0, My2=0.0, Mz2=0.0,
-		Ksy, Ksz, 		/* shear deformatn coefficients	*/
+	/* equivalent element end forces from distributed and thermal loads */
+	double	Nx1, Vy1, Vz1, Mx1=0.0, My1=0.0, Mz1=0.0,
+		Nx2, Vy2, Vz2, Mx2=0.0, My2=0.0, Mz2=0.0;
+	double	Ksy, Ksz, 		/* shear deformatn coefficients	*/
 		a, b,			/* point load locations */
 		t1, t2, t3, t4, t5, t6, t7, t8, t9;	/* 3D coord Xfrm coeffs */
 	int	i,j,l, lc, n, n1, n2;
@@ -866,13 +877,15 @@ void read_and_assemble_loads (
 
 	char	errMsg[MAXL];
 
+	/* initialize load data vectors and matrices to zero */
+	for (j=1; j<=DoF; j++)	Fo[j] = 0.0;
 	for (j=1; j<=DoF; j++)
 		for (lc=1; lc <= nL; lc++)
-			Fo[lc][j] = F_temp[lc][j] = F_mech[lc][j] = 0.0;
+			F_temp[lc][j] = F_mech[lc][j] = 0.0;
 	for (i=1; i<=12; i++)
 		for (n=1; n<=nE; n++)
 			for (lc=1; lc <= nL; lc++)
-				feF_mech[lc][n][i] = feF_temp[lc][n][i] = 0.0;
+				eqF_mech[lc][n][i] = eqF_temp[lc][n][i] = 0.0;
 
 	for (i=1; i<=DoF; i++)	for (lc=1; lc<=nL; lc++) Dp[lc][i] = 0.0;
 
@@ -889,7 +902,7 @@ void read_and_assemble_loads (
 		fprintf(stdout,"\n");
 	  }
 
-	  /* gravity loads applied uniformly to all frame elements	*/
+	  /* gravity loads applied uniformly to all frame elements ------- */
 	  sfrv=fscanf(fp,"%f %f %f", &gX[lc], &gY[lc], &gZ[lc] );
 	  if (sfrv != 3) sferr("gX gY gZ values in load data");
 
@@ -900,40 +913,40 @@ void read_and_assemble_loads (
 		coord_trans ( xyz, L[n], n1, n2,
 			&t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
-		feF_mech[lc][n][1]  = d[n]*Ax[n]*L[n]*gX[lc] / 2.0;
-		feF_mech[lc][n][2]  = d[n]*Ax[n]*L[n]*gY[lc] / 2.0;
-		feF_mech[lc][n][3]  = d[n]*Ax[n]*L[n]*gZ[lc] / 2.0;
+		eqF_mech[lc][n][1]  = d[n]*Ax[n]*L[n]*gX[lc] / 2.0;
+		eqF_mech[lc][n][2]  = d[n]*Ax[n]*L[n]*gY[lc] / 2.0;
+		eqF_mech[lc][n][3]  = d[n]*Ax[n]*L[n]*gZ[lc] / 2.0;
 
-		feF_mech[lc][n][4]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][4]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( (-t4*t8+t5*t7)*gY[lc] + (-t4*t9+t6*t7)*gZ[lc] );
-		feF_mech[lc][n][5]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][5]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( (-t5*t7+t4*t8)*gX[lc] + (-t5*t9+t6*t8)*gZ[lc] );
-		feF_mech[lc][n][6]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][6]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( (-t6*t7+t4*t9)*gX[lc] + (-t6*t8+t5*t9)*gY[lc] );
 
-		feF_mech[lc][n][7]  = d[n]*Ax[n]*L[n]*gX[lc] / 2.0;
-		feF_mech[lc][n][8]  = d[n]*Ax[n]*L[n]*gY[lc] / 2.0;
-		feF_mech[lc][n][9]  = d[n]*Ax[n]*L[n]*gZ[lc] / 2.0;
+		eqF_mech[lc][n][7]  = d[n]*Ax[n]*L[n]*gX[lc] / 2.0;
+		eqF_mech[lc][n][8]  = d[n]*Ax[n]*L[n]*gY[lc] / 2.0;
+		eqF_mech[lc][n][9]  = d[n]*Ax[n]*L[n]*gZ[lc] / 2.0;
 
-		feF_mech[lc][n][10] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][10] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( ( t4*t8-t5*t7)*gY[lc] + ( t4*t9-t6*t7)*gZ[lc] );
-		feF_mech[lc][n][11] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][11] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( ( t5*t7-t4*t8)*gX[lc] + ( t5*t9-t6*t8)*gZ[lc] );
-		feF_mech[lc][n][12] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
+		eqF_mech[lc][n][12] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
 			( ( t6*t7-t4*t9)*gX[lc] + ( t6*t8-t5*t9)*gY[lc] );
 
-		/* debugging ... check feF data
+		/* debugging ... check eqF data
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
-			if (feF_mech[lc][n][l] != 0)
-			   printf(" feF %d = %9.2e ", l, feF_mech[lc][n][l] );
+			if (eqF_mech[lc][n][l] != 0)
+			   printf(" eqF %d = %9.2e ", l, eqF_mech[lc][n][l] );
 		}
 		printf("\n");
 		*/
 	  }					/* end gravity loads */
 
-
-	  sfrv=fscanf(fp,"%d", &nF[lc] );	/* node point loads	*/
+	  /* node point loads -------------------------------------------- */
+	  sfrv=fscanf(fp,"%d", &nF[lc] );
 	  if (sfrv != 1) sferr("nF value in load data");
 	  if ( verbose ) {
 		fprintf(stdout,"  number of loaded nodes ");
@@ -957,7 +970,8 @@ void read_and_assemble_loads (
 		    fprintf(stderr,"\n   Warning: All node loads applied at node %d  are zero\n", j );
 	  }					/* end node point loads  */
 
-	  sfrv=fscanf(fp,"%d", &nU[lc] );	/* uniformly distributed loads */
+	  /* uniformly distributed loads --------------------------------- */
+	  sfrv=fscanf(fp,"%d", &nU[lc] );
 	  if (sfrv != 1) sferr("nU value in uniform load data");
 	  if ( verbose ) {
 		fprintf(stdout,"  number of uniformly distributed loads ");
@@ -976,7 +990,7 @@ void read_and_assemble_loads (
 	  	if (sfrv != 1) sferr("frame element number in uniform load data");
 		if ( n < 1 || n > nE ) {
 		    sprintf(errMsg,"\n  error in uniform distributed loads: element number %d is out of range\n",n);
-		    errorMsg(errMsg);
+		    errorMsg(errMsg); 
 		    exit(132);
 		}
 		U[lc][i][1] = (double) n;
@@ -996,9 +1010,9 @@ void read_and_assemble_loads (
 		Mz1 =  U[lc][i][3]*Le[n]*Le[n] / 12.0;	Mz2 = -Mz1;
 
 		/* debugging ... check end force values
-		printf("n=%d Vy=%9.2e Vz=%9.2e My=%9.2e Mz=%9.2e\n",
-						n, Vy1,Vz1, My1,Mz1 );
-		*/
+		 * printf("n=%d Vy=%9.2e Vz=%9.2e My=%9.2e Mz=%9.2e\n",
+		 *				n, Vy1,Vz1, My1,Mz1 );
+		 */
 
 		n1 = J1[n];	n2 = J2[n];
 
@@ -1012,31 +1026,32 @@ void read_and_assemble_loads (
 		*/
 
 		/* {F} = [T]'{Q} */
-		feF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-		feF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-		feF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-		feF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-		feF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-		feF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+		eqF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+		eqF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+		eqF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+		eqF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+		eqF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+		eqF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-		feF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-		feF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-		feF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-		feF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-		feF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-		feF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+		eqF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+		eqF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+		eqF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+		eqF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+		eqF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+		eqF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 
-		/* debugging ... check feF values
+		/* debugging ... check eqF values
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
-			if (feF_mech[lc][n][l] != 0)
-			   printf(" feF %d = %9.2e ", l, feF_mech[lc][n][l] );
+			if (eqF_mech[lc][n][l] != 0)
+			   printf(" eqF %d = %9.2e ", l, eqF_mech[lc][n][l] );
 		}
 		printf("\n");
-		*/
+		*/ 
 	  }				/* end uniformly distributed loads */
 
-	  sfrv=fscanf(fp,"%d", &nW[lc] ); /* trapezoidally distributed loads */
+	  /* trapezoidally distributed loads ----------------------------- */
+	  sfrv=fscanf(fp,"%d", &nW[lc] );
 	  if (sfrv != 1) sferr("nW value in load data");
 	  if ( verbose ) {
 		fprintf(stdout,"  number of trapezoidally distributed loads ");
@@ -1079,7 +1094,7 @@ void read_and_assemble_loads (
 		  exit(142);
 		}
 		if ( W[lc][i][ 2] > W[lc][i][3] ) {
-		  sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n",
+		  sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n", 
 		  lc, n, i , W[lc][i][2], W[lc][i][3] );
 		  errorMsg(errMsg);
 		  exit(143);
@@ -1142,9 +1157,9 @@ void read_and_assemble_loads (
 		x1 =  W[lc][i][6];  x2 = W[lc][i][7];
 		w1 =  W[lc][i][8]; w2 =  W[lc][i][9];
 
-		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
+		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 + 
 			 3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
-		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
+		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 - 
 			(2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
 
 		f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
@@ -1169,7 +1184,7 @@ void read_and_assemble_loads (
 		x1 =  W[lc][i][10]; x2 =  W[lc][i][11];
 		w1 =  W[lc][i][12]; w2 =  W[lc][i][13];
 
-		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
+		R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 + 
 			 3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
 		R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
 			(2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
@@ -1209,33 +1224,34 @@ void read_and_assemble_loads (
 		*/
 
 		/* {F} = [T]'{Q} */
-		feF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-		feF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-		feF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-		feF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-		feF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-		feF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+		eqF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+		eqF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+		eqF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+		eqF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+		eqF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+		eqF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-		feF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-		feF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-		feF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-		feF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-		feF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-		feF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+		eqF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+		eqF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+		eqF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+		eqF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+		eqF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+		eqF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 
-		/* debugging ... check feF data
+		/* debugging ... check eqF data
 		for (l=1;l<=13;l++) printf(" %9.2e ", W[lc][i][l] );
-		printf("\n");
+		printf("\n"); 
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
-			if (feF_mech[lc][n][l] != 0)
-			   printf(" feF %d = %9.3f ", l, feF_mech[lc][n][l] );
+			if (eqF_mech[lc][n][l] != 0)
+			   printf(" eqF %d = %9.3f ", l, eqF_mech[lc][n][l] );
 		}
 		printf("\n");
 		*/
 	  }			/* end trapezoidally distributed loads */
 
-	  sfrv=fscanf(fp,"%d", &nP[lc] );	/* element point loads	*/
+	  /* internal element point loads -------------------------------- */
+	  sfrv=fscanf(fp,"%d", &nP[lc] );
 	  if (sfrv != 1) sferr("nP value load data");
 	  if ( verbose ) {
 	  	fprintf(stdout,"  number of concentrated frame element point loads ");
@@ -1258,7 +1274,7 @@ void read_and_assemble_loads (
 		    exit(151);
 		}
 		P[lc][i][1] = (double) n;
-		for (l=2; l<=5; l++) {
+		for (l=2; l<=5; l++) { 
 			sfrv=fscanf(fp,"%f", &P[lc][i][l] );
 			if (sfrv != 1) sferr("value in point load data");
 		}
@@ -1309,22 +1325,23 @@ void read_and_assemble_loads (
 			&t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
 		/* {F} = [T]'{Q} */
-		feF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-		feF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-		feF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-		feF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-		feF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-		feF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+		eqF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+		eqF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+		eqF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+		eqF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+		eqF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+		eqF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-		feF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-		feF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-		feF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-		feF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-		feF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-		feF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+		eqF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+		eqF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+		eqF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+		eqF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+		eqF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+		eqF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 	  }					/* end element point loads */
 
-	  sfrv=fscanf(fp,"%d", &nT[lc] );	/* thermal loads	*/
+	  /* thermal loads ----------------------------------------------- */
+	  sfrv=fscanf(fp,"%d", &nT[lc] );
 	  if (sfrv != 1) sferr("nT value in load data");
 	  if ( verbose ) {
 	  	fprintf(stdout,"  number of temperature changes ");
@@ -1361,7 +1378,7 @@ void read_and_assemble_loads (
 		    exit(162);
 		}
 
-		Nx2 = (a/4.0)*( T[lc][i][5]+T[lc][i][6]+T[lc][i][7]+T[lc][i][8])*E[n]*Ax[n];
+		Nx2 = a*(1.0/4.0)*( T[lc][i][5]+T[lc][i][6]+T[lc][i][7]+T[lc][i][8])*E[n]*Ax[n];
 		Nx1 = -Nx2;
 		Vy1 = Vy2 = Vz1 = Vz2 = 0.0;
 		Mx1 = Mx2 = 0.0;
@@ -1376,41 +1393,44 @@ void read_and_assemble_loads (
 			&t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
 		/* {F} = [T]'{Q} */
-		feF_temp[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-		feF_temp[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-		feF_temp[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-		feF_temp[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-		feF_temp[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-		feF_temp[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+		eqF_temp[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+		eqF_temp[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+		eqF_temp[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+		eqF_temp[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+		eqF_temp[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+		eqF_temp[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-		feF_temp[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-		feF_temp[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-		feF_temp[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-		feF_temp[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-		feF_temp[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-		feF_temp[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+		eqF_temp[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+		eqF_temp[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+		eqF_temp[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+		eqF_temp[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+		eqF_temp[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+		eqF_temp[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 	  }				/* end thermal loads	*/
 
-	  /* debugging ...  check feF's prior to asembly
-	  for (n=1; n<=nE; n++) {
+	  /* debugging ...  check eqF's prior to asembly 
+	  for (n=1; n<=nE; n++) {	
 		printf("n=%d ", n);
 		for (l=1;l<=12;l++) {
-			if (feF_mech[lc][n][l] != 0)
-			   printf(" feF %d = %9.2e ", l, feF_mech[lc][n][l] );
+			if (eqF_mech[lc][n][l] != 0)
+			   printf(" eqF %d = %9.2e ", l, eqF_mech[lc][n][l] );
 		}
-		printf("\n");
+		printf("\n"); 
 	  }
 	  */
 
+	  // assemble all element equivalent loads into 
+	  // separate load vectors for mechanical and thermal loading
 	  for (n=1; n<=nE; n++) {
 	     n1 = J1[n];	n2 = J2[n];
-	     for (i=1; i<= 6; i++) F_mech[lc][6*n1- 6+i] += feF_mech[lc][n][i];
-	     for (i=7; i<=12; i++) F_mech[lc][6*n2-12+i] += feF_mech[lc][n][i];
-	     for (i=1; i<= 6; i++) F_temp[lc][6*n1- 6+i] += feF_temp[lc][n][i];
-	     for (i=7; i<=12; i++) F_temp[lc][6*n2-12+i] += feF_temp[lc][n][i];
+	     for (i=1; i<= 6; i++) F_mech[lc][6*n1- 6+i] += eqF_mech[lc][n][i];
+	     for (i=7; i<=12; i++) F_mech[lc][6*n2-12+i] += eqF_mech[lc][n][i];
+	     for (i=1; i<= 6; i++) F_temp[lc][6*n1- 6+i] += eqF_temp[lc][n][i];
+	     for (i=7; i<=12; i++) F_temp[lc][6*n2-12+i] += eqF_temp[lc][n][i];
 	  }
 
-	  sfrv=fscanf(fp,"%d", &nD[lc] ); /* read prescribed displacements */
+	  /* prescribed displacements ------------------------------------ */
+	  sfrv=fscanf(fp,"%d", &nD[lc] );
 	  if (sfrv != 1) sferr("nD value in load data");
 	  if ( verbose ) {
 	  	fprintf(stdout,"  number of prescribed displacements ");
@@ -1437,21 +1457,21 @@ void read_and_assemble_loads (
 }
 
 
-/*------------------------------------------------------------------------------
-READ_MASS_DATA  -  read element densities and extra inertial mass data	16aug01
-------------------------------------------------------------------------------*/
+/*
+ * READ_MASS_DATA  -  read element densities and extra inertial mass data	16aug01 
+ */
 void read_mass_data (
 		FILE *fp,
-		char *OUT_file,
-		int nN, int nE, int *nI, int *nX,
+		char *OUT_file, 
+		int nN, int nE, int *nI, int *nX, 
 		float *d, float *EMs,
 		float *NMs, float *NMx, float *NMy, float *NMz,
 		double *L, float *Ax,
 		double *total_mass, double *struct_mass,
-		int *nM, int *Mmethod, int modal_flag,
-		int *lump, int lump_flag,
+		int *nM, int *Mmethod, int modal_flag, 
+		int *lump, int lump_flag, 
 		double *tol, double tol_flag, double *shift, double shift_flag,
-		double *exagg_modal,
+		double *exagg_modal, 
 		char modepath[],
 		int anim[], float *pan, float pan_flag,
 		int verbose, int debug
@@ -1496,7 +1516,7 @@ void read_mass_data (
 	FILE	*mf;				// mass data file
 	mf = fopen("MassData.txt","w");		// open mass data file
 	if ((mf = fopen ("MassData.txt", "w")) == NULL) {
-	  errorMsg("\n  error: cannot open file 'MassData.txt'\n");
+	  errorMsg("\n  error: cannot open mass data debug file: 'MassData.txt' \n");
 	  exit(29);
 	}
 	fprintf(mf,"%% structural mass data \n");
@@ -1554,8 +1574,8 @@ void read_mass_data (
 		sfrv=fscanf(fp, "%d", &b );
 		if (sfrv != 1) sferr("element number in extra element mass data");
 		if ( b < 1 || b > nE ) {
-			sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
-			b, *nX );
+			sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n", 
+			b, *nX ); 
 			errorMsg(errMsg);
 	    		exit(87);
 		}
@@ -1601,19 +1621,23 @@ void read_mass_data (
 		dots(stdout,21);	fprintf(stdout," nA = %3d\n",nA);
 	}
 	if (nA > 20)
-	  fprintf(stderr," nA = %d, only 20 or fewer modes may be animated\n", nA );
+	  fprintf(stderr," nA = %d, only 100 or fewer modes may be animated\n", nA );
 	for ( m = 0; m < 20; m++ )	anim[m] = 0;
-	for ( m = 0; m < nA; m++ ) {
+	for ( m = 1; m <= nA; m++ ) {
 		sfrv=fscanf ( fp, "%d", &anim[m] );
 		if (sfrv != 1) sferr("mode number in mode animation data");
 	}
 
 	sfrv=fscanf ( fp, "%f", pan );
 	if (sfrv != 1) sferr("pan value in mode animation data");
-	if ( pan_flag != -0.0 )	*pan = pan_flag;
+	if ( pan_flag != -1.0 )	*pan = pan_flag;
 
+	if ( verbose ) {
+		fprintf(stdout," pan rate ");
+		dots(stdout,43); fprintf(stdout," %8.3f\n", *pan);
+	}
 
-	strcpy(base_file,OUT_file);
+	strcpy(base_file,OUT_file);	
 	while ( base_file[len++] != '\0' )
 		/* the length of the base_file */ ;
 	full_len = len;
@@ -1624,7 +1648,7 @@ void read_mass_data (
 	base_file[++len] = '\0';	/* end base_file at the last '.' */
 
 	while ( base_file[len] != '/' && base_file[len] != '\\' && len > 0 )
-		len--;	/* find the last '/' or '\' in base_file */
+		len--;	/* find the last '/' or '\' in base_file */ 
 	i = 0;
 	while ( base_file[len] != '\0' )
 		mode_file[i++] = base_file[len++];
@@ -1636,9 +1660,9 @@ void read_mass_data (
 }
 
 
-/*------------------------------------------------------------------------------
-READ_CONDENSE   -  read matrix condensation information 	        30aug01
-------------------------------------------------------------------------------*/
+/* 
+ * READ_CONDENSE   -  read matrix condensation information 	        30aug01
+ */
 void read_condensation_data (
 		FILE *fp,
 		int nN, int nM,
@@ -1653,12 +1677,16 @@ void read_condensation_data (
 
 	if ( (sfrv=fscanf ( fp, "%d", Cmethod )) != 1 )   {
 		*Cmethod = *nC = *Cdof = 0;
+		if ( verbose )
+			fprintf(stdout," missing matrix condensation data \n");
 		return;
 	}
 
 	if ( condense_flag != -1 )	*Cmethod = condense_flag;
 
 	if ( *Cmethod <= 0 )  {
+		if ( verbose )
+			fprintf(stdout," Cmethod = %d : no matrix condensation \n", *Cmethod );
 		*Cmethod = *nC = *Cdof = 0;
 		return;
 	}
@@ -1674,6 +1702,8 @@ void read_condensation_data (
 
 	if ( (sfrv=fscanf ( fp, "%d", nC )) != 1 )  {
 		*Cmethod = *nC = *Cdof = 0;
+		if ( verbose )
+			fprintf(stdout," missing matrix condensation data \n");
 		return;
 	}
 
@@ -1683,7 +1713,7 @@ void read_condensation_data (
 	}
 
 	if ( (*nC) > nN ) {
-	  sprintf(errMsg,"\n  error in matrix condensation data: \n error: nC > nN ... nC=%d; nN=%d;\n The number of nodes with condensed DoF's may not exceed the total number of nodes.\n",
+	  sprintf(errMsg,"\n  error in matrix condensation data: \n error: nC > nN ... nC=%d; nN=%d;\n The number of nodes with condensed DoF's may not exceed the total number of nodes.\n", 
 	  *nC, nN );
 	  errorMsg(errMsg);
 	  exit(90);
@@ -1717,9 +1747,13 @@ void read_condensation_data (
 
 	for (i=1; i<= *Cdof; i++) {
 	 sfrv=fscanf( fp, "%d", &m[i] );
-	 if (sfrv != 1) sferr("mode number in condensation data");
+	 if (sfrv != 1 && *Cmethod == 3) {
+		sferr("mode number in condensation data");
+		sprintf(errMsg,"condensed mode %d = %d", i, m[i] );
+		errorMsg(errMsg);
+	 }
 	 if ( (m[i] < 0 || m[i] > nM) && *Cmethod == 3 ) {
-	  sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n",
+	  sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n", 
 	  i, m[i], nM );
 	  errorMsg(errMsg);
 	  exit(92);
@@ -1731,9 +1765,9 @@ void read_condensation_data (
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_INPUT_DATA  -  save input data					07nov02
-------------------------------------------------------------------------------*/
+/* 
+ * WRITE_INPUT_DATA  -  save input data					07nov02
+ */
 void write_input_data (
 	FILE *fp,
 	char *title, int nN, int nE, int nL,
@@ -1742,8 +1776,8 @@ void write_input_data (
 	vec3 *xyz, float *r,
 	int *J1, int *J2,
 	float *Ax, float *Asy, float *Asz, float *Jx, float *Iy, float *Iz,
-	float *E, float *G, float *p, float *d,
-	float *gX, float *gY, float *gZ,
+	float *E, float *G, float *p, float *d, 
+	float *gX, float *gY, float *gZ, 
 	double **Ft, double **Fm, float **Dp,
 	int *R,
 	float ***U, float ***W, float ***P, float ***T,
@@ -1757,7 +1791,7 @@ void write_input_data (
 	for (i=1; i<=80; i++)	fprintf(fp,"_");
   	fprintf(fp,"\nFrame3DD version: %s ", VERSION );
 	fprintf(fp,"              http://frame3dd.sf.net/\n");
-	fprintf(fp,"GPL Copyright (C) 1992-2010, Henri P. Gavin \n");
+	fprintf(fp,"GPL Copyright (C) 1992-2015, Henri P. Gavin \n");
 	fprintf(fp,"Frame3DD is distributed in the hope that it will be useful");
 	fprintf(fp," but with no warranty.\n");
 	fprintf(fp,"For details see the GNU Public Licence:");
@@ -1777,9 +1811,9 @@ void write_input_data (
 
 	for (i=1; i<=80; i++)	fprintf(fp,"_");	fprintf(fp,"\n");
 
-	fprintf(fp,"%5d NODES          ", nN );
+	fprintf(fp,"%5d NODES          ", nN ); 
 	fprintf(fp,"%5d FIXED NODES    ", nR );
-	fprintf(fp,"%5d FRAME ELEMENTS ", nE );
+	fprintf(fp,"%5d FRAME ELEMENTS ", nE ); 
 	fprintf(fp,"%3d LOAD CASES   \n", nL );
 
 	for (i=1; i<=80; i++)	fprintf(fp,"_"); fprintf(fp,"\n");
@@ -1921,15 +1955,15 @@ void write_input_data (
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_STATIC_RESULTS -  save node displacements and frame element end forces
-09 Sep 2008
-------------------------------------------------------------------------------*/
+/*
+ * WRITE_STATIC_RESULTS -  save node displacements and frame element end forces
+ * 09 Sep 2008 , 2015-05-15
+ */
 void write_static_results (
 		FILE *fp,
 		int nN, int nE, int nL, int lc, int DoF,
 		int *J1, int *J2,
-		double *F, double *D, int *r, double **Q,
+		double *F, double *D, double *R, int *r, double **Q,
 		double err, int ok, int axial_sign
 ){
 	double	disp;
@@ -2002,9 +2036,8 @@ void write_static_results (
 		     r[i+4] || r[i+5] || r[i+6] ) {
 			fprintf(fp, " %5d", j);
 			for (i=5; i>=0; i--) {
-				if ( !r[6*j-i] || fabs(F[6*j-i]) < 0.0001 )
-					fprintf (fp, "       0.0  ");
-				else    fprintf (fp, " %11.3f", F[6*j-i] );
+			    if ( r[6*j-i] ) fprintf (fp, " %11.3f", R[6*j-i] );
+			    else		fprintf (fp, "       0.0  ");
 			}
 			fprintf(fp, "\n");
 		}
@@ -2015,27 +2048,14 @@ void write_static_results (
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_STATIC_CSV -  save node displacements and frame element end forces
-31 Dec 2008
-------------------------------------------------------------------------------*/
-void write_static_csv (
-		char *OUT_file,
-		char *title,
-		int nN, int nE, int nL, int lc, int DoF,
-		int *J1, int *J2,
-		double *F, double *D, int *R, double **Q,
-		double err, int ok
-){
-
-	FILE	*fpcsv;
-	int	i,j,n;
-	char	*wa;
-	char	CSV_file[FILENMAX];
-	time_t  now;		/* modern time variable type	*/
-	char	errMsg[MAXL];
-
-	(void) time(&now);
+/*
+ * CSV_filename - return the file name for the .CSV file and 
+ * whether the file should be written or appended (wa)
+ * 1 Nov 2015
+ */
+void CSV_filename( char CSV_file[], char wa[], char OUT_file[], int lc )
+{
+	int i,j;
 
 	i=0;
 	j=0;
@@ -2056,12 +2076,39 @@ void write_static_csv (
 	CSV_file[++j] = '\0';
 	strcat(CSV_file,"out.CSV");
 
+	wa[0] = 'a';
+	if (lc == 1) wa[0] = 'w';
+	wa[1] = '\0';
 
-	wa  = "a";
-	if (lc == 1) wa = "w";
+//	fprintf(stderr," 1. CSV_file = %s  wa = %s \n", CSV_file, wa );
+}
+
+
+/*
+ * WRITE_STATIC_CSV -  save node displacements and frame element end forces
+ * 31 Dec 2008
+ */
+void write_static_csv (
+		char OUT_file[],
+		char title[],
+		int nN, int nE, int nL, int lc, int DoF,
+		int *J1, int *J2,
+		double *F, double *D, double *R, int *r, double **Q,
+		double err, int ok
+){
+	FILE	*fpcsv;
+	int	i,j,n;
+	char	wa[4];
+	char	CSV_file[FILENMAX];
+	time_t  now;		/* modern time variable type	*/
+	char	errMsg[MAXL];
+
+	(void) time(&now);
+
+	CSV_filename( CSV_file, wa, OUT_file, lc );
 
 	if ((fpcsv = fopen (CSV_file, wa)) == NULL) {
-	  sprintf (errMsg,"\n  error: cannot open CSV file %s\n", CSV_file);
+	  sprintf (errMsg,"\n  error: cannot open CSV output data file: %s \n", CSV_file);
 	  errorMsg(errMsg);
 	  exit(17);
 	}
@@ -2070,7 +2117,7 @@ void write_static_csv (
 	if ( lc == 1 ) {
   	 fprintf(fpcsv,"\" Frame3DD version: %s ", VERSION );
 	 fprintf(fpcsv,"              http://frame3dd.sf.net/\"\n");
-	 fprintf(fpcsv,"\"GPL Copyright (C) 1992-2010, Henri P. Gavin \"\n");
+	 fprintf(fpcsv,"\"GPL Copyright (C) 1992-2015, Henri P. Gavin \"\n");
 	 fprintf(fpcsv,"\"Frame3DD is distributed in the hope that it will be useful");
 	 fprintf(fpcsv," but with no warranty.\"\n");
 	 fprintf(fpcsv,"\"For details see the GNU Public Licence:");
@@ -2079,18 +2126,20 @@ void write_static_csv (
 	 fprintf(fpcsv,"\" %s \"\n", ctime(&now) );
 
 	 fprintf(fpcsv,"\" .CSV formatted results of Frame3DD analysis \"\n");
-	 fprintf(fpcsv,"\n , Load Case , Displacements , End Forces , Reactions \n");
+	 fprintf(fpcsv,"\n , Load Case , Displacements , End Forces , Reactions , Internal Forces \n");
 	 for (i = 1; i <= nL; i++) {
-	 	fprintf(fpcsv," First Row , %d , %d , %d , %d  \n",
+	 	fprintf(fpcsv," First Row , %d , %d , %d , %d  , %d  \n",
 			i,
-			15+(i-1)*(nN*2+nE*2+10) + 2*nL,
-			17+(i-1)*(nN*2+nE*2+10) + 2*nL+ nN,
-			19+(i-1)*(nN*2+nE*2+10) + 2*nL+ nN + 2*nE );
-	 	fprintf(fpcsv," Last Row , %d , %d , %d , %d  \n",
+			15+(i-1)*(nN*2+nE*4+13) + 2*nL,
+			17+(i-1)*(nN*2+nE*4+13) + 2*nL + nN,
+			19+(i-1)*(nN*2+nE*4+13) + 2*nL + nN + 2*nE,
+			23+(i-1)*(nN*2+nE*4+13) + 2*nL + 2*nN + 2*nE );
+	 	fprintf(fpcsv," Last Row , %d , %d , %d , %d , %d \n",
 			i,
-			15+(i-1)*(nN*2+nE*2+10) + 2*nL + nN - 1,
-			17+(i-1)*(nN*2+nE*2+10) + 2*nL + nN + 2*nE - 1,
-			19+(i-1)*(nN*2+nE*2+10) + 2*nL + 2*nN + 2*nE - 1 );
+			15+(i-1)*(nN*2+nE*4+13) + 2*nL + nN - 1,
+			17+(i-1)*(nN*2+nE*4+13) + 2*nL + nN + 2*nE - 1,
+			19+(i-1)*(nN*2+nE*4+13) + 2*nL + 2*nN + 2*nE - 1, 
+			23+(i-1)*(nN*2+nE*4+13) + 2*nL + 2*nN + 4*nE - 1 );
 	 }
 
 	}
@@ -2152,9 +2201,8 @@ void write_static_csv (
 		i = 6*(j-1);
 		fprintf(fpcsv, " %5d,", j);
 		for (i=5; i>=0; i--) {
-			if ( !R[6*j-i] || fabs(F[6*j-i]) < 0.0001 )
-				fprintf (fpcsv, "       0.0, ");
-			else    fprintf (fpcsv, " %12.5e,", -F[6*j-i] );
+			if ( r[6*j-i] ) fprintf (fpcsv, " %12.5e,", R[6*j-i] );
+			else	fprintf (fpcsv, "       0.0, ");
 		}
 		fprintf(fpcsv, "\n");
 	}
@@ -2166,16 +2214,16 @@ void write_static_csv (
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_VALUE - write a value in %f or %e notation depending on numerical values
-and the number of available significant figures
-12 Dec 2009
-------------------------------------------------------------------------------*/
 /*
-void write_value (
-		FILE *fp,
-		int sig_figs,
-		float threshold,
+ * WRITE_VALUE - write a value in %f or %e notation depending on numerical values
+ * and the number of available significant figures
+ * 12 Dec 2009
+ */
+/*
+void write_value ( 
+		FILE *fp, 
+		int sig_figs, 
+		float threshold, 
 		char *spaces,
 		double x
 ){
@@ -2189,17 +2237,17 @@ void write_value (
 */
 
 
-/*------------------------------------------------------------------------------
-WRITE_STATIC_MFILE -
-save node displacements and frame element end forces in an m-file
-this function interacts with frame_3dd.m, an m-file interface to frame3dd
-09 Sep 2008
-------------------------------------------------------------------------------*/
+/*
+ * WRITE_STATIC_MFILE -  						
+ * save node displacements and frame element end forces in an m-file
+ * this function interacts with frame_3dd.m, an m-file interface to frame3dd
+ * 09 Sep 2008
+ */
 void write_static_mfile (
 		char *OUT_file, char *title,
 		int nN, int nE, int nL, int lc, int DoF,
 		int *J1, int *J2,
-		double *F, double *D, int *R, double **Q,
+		double *F, double *D, double *R, int *r, double **Q,
 		double err, int ok
 ){
 	FILE	*fpm;
@@ -2234,7 +2282,7 @@ void write_static_mfile (
 	if (lc == 1) wa = "w";
 
 	if ((fpm = fopen (M_file, wa)) == NULL) {
-	  sprintf (errMsg,"\n  error: cannot open file %s\n", M_file );
+	  sprintf (errMsg,"\n  error: cannot open Matlab output data file: %s \n", M_file );
 	  errorMsg(errMsg);
 	  exit(18);
 	}
@@ -2242,7 +2290,7 @@ void write_static_mfile (
 	if ( lc == 1 ) {
   	 fprintf(fpm,"%% Frame3DD version: %s ", VERSION );
 	 fprintf(fpm,"              http://frame3dd.sf.net/\n");
-	 fprintf(fpm,"%%GPL Copyright (C) 1992-2010, Henri P. Gavin \n");
+	 fprintf(fpm,"%%GPL Copyright (C) 1992-2015, Henri P. Gavin \n");
 	 fprintf(fpm,"%%Frame3DD is distributed in the hope that it will be useful");
 	 fprintf(fpm," but with no warranty.\n");
 	 fprintf(fpm,"%%For details see the GNU Public Licence:");
@@ -2310,9 +2358,9 @@ void write_static_mfile (
 	for (j=1; j<=nN; j++) {
 		i = 6*(j-1);
 		for (i=5; i>=0; i--) {
-			if ( !R[6*j-i] || fabs(F[6*j-i]) < 0.0001 )
+			if ( !r[6*j-i] || fabs(R[6*j-i]) < 0.0001 )
 				fprintf (fpm, "\t0.0\t");
-			else    fprintf (fpm, "\t%13.6e", -F[6*j-i] );
+			else    fprintf (fpm, "\t%13.6e", R[6*j-i] );
 		}
 		if ( j < nN )	fprintf(fpm," ; \n");
 		else		fprintf(fpm," ]'; \n\n");
@@ -2327,17 +2375,305 @@ void write_static_mfile (
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_INTERNAL_FORCES -
-calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
-calculate frame element local displacements, Rx, Dx, Dy, Dz
-write internal forces and local displacements to an output data file
-4jan10, 7mar11
-------------------------------------------------------------------------------*/
+/*
+ * PEAK_INTERNAL_FORCES
+ * calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
+ * calculate frame element local displacements, Rx, Dx, Dy, Dz
+ * return the peak values of the internal forces, moments, slopes, and displacements
+ * 18jun13
+ */
+void peak_internal_forces (
+		int lc, 	// load case number
+		int nL, 	// total number of load cases
+		vec3 *xyz, 	// node locations
+		double **Q, int nN, int nE, double *L, int *N1, int *N2, 
+		float *Ax,float *Asy,float *Asz,float *Jx,float *Iy,float *Iz,
+		float *E, float *G, float *p,
+		float *d, float gX, float gY, float gZ,
+		int nU, float **U, int nW, float **W, int nP, float **P,
+		double *D, int shear, 
+		float dx,	// x-axis increment along frame element
+
+		// vectors of peak forces, moments, displacements and slopes 
+		// for each frame element, for load case "lc" 
+		double **pkNx, double **pkVy, double **pkVz, 
+		double **pkTx, double **pkMy, double **pkMz,
+		double **pkDx, double **pkDy, double **pkDz,
+		double **pkRx, double **pkSy, double **pkSz
+){
+	double	t1, t2, t3, t4, t5, t6, t7, t8, t9, /* coord transformation */
+		u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12; /* displ. */
+
+	double	xx1,xx2, wx1,wx2,	/* trapz load data, local x dir */
+		xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
+		xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
+
+	double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i] 
+		wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
+		wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
+		tx=0.0, tx_=0.0;  // distributed torque about local x coord 
+
+	double	xp;		/* location of internal point loads	*/
+
+	double	x, 		/* distance along frame element		*/
+
+		// underscored "_" variables correspond to x=(i-1)*dx;
+		// non-underscored variables correspond to x=i*dx;
+		Nx_, Nx,	/* axial force within frame el.		*/
+		Vy_, Vy, Vz_, Vz,/* shear forces within frame el.	*/
+		Tx_, Tx,		/* torsional moment within frame el.	*/
+		My_, My, Mz_, Mz, /* bending moments within frame el.	*/
+		Sy_, Sy, Sz_, Sz,	/* transverse slopes of frame el.	*/
+		Dx, Dy, Dz,	/* frame el. displ. in local x,y,z, dir's */
+		Rx;		/* twist rotation about the local x-axis */
+
+	int	n, m,		// frame element number	
+		nx=1000,	// number of sections alont x axis
+		cU=0, cW=0, cP=0, // counters for U, W, and P loads
+		i,		// counter along x axis from node N1 to node N2
+		n1,n2,i1,i2;	// starting and stopping node numbers
+
+	if (dx == -1.0)	return;	// skip calculation of internal forces and displ
+
+	for ( m=1; m <= nE; m++ ) {	// initialize peak values to zero
+		pkNx[lc][m] = pkVy[lc][m] = pkVz[lc][m] = 0.0; 
+		pkTx[lc][m] = pkMy[lc][m] = pkMz[lc][m] = 0.0;
+		pkDx[lc][m] = pkDy[lc][m] = pkDz[lc][m] = 0.0;
+		pkRx[lc][m] = pkSy[lc][m] = pkSz[lc][m] = 0.0;
+	}
+
+	for ( m=1; m <= nE; m++ ) {	// loop over all frame elements
+
+		n1 = N1[m];	n2 = N2[m]; // node 1 and node 2 of elmnt m
+
+		dx = L[m] / (float) nx; // x-axis increment, same for each element
+
+	// no need to allocate memory for interior force or displacement data 
+
+	// find interior axial force, shear forces, torsion and bending moments
+
+		coord_trans ( xyz, L[m], n1, n2,
+			&t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[m] );
+
+		// distributed gravity load in local x, y, z coordinates
+		wxg = d[m]*Ax[m]*(t1*gX + t2*gY + t3*gZ);
+		wyg = d[m]*Ax[m]*(t4*gX + t5*gY + t6*gZ);
+		wzg = d[m]*Ax[m]*(t7*gX + t8*gY + t9*gZ);
+
+		// add uniformly-distributed loads to gravity load
+		for (n=1; n<=nE && cU<nU; n++) {
+			if ( (int) U[n][1] == m ) { // load n on element m
+				wxg += U[n][2];
+				wyg += U[n][3];
+				wzg += U[n][4];
+				++cU;
+			}
+		}
+
+		// interior forces for frame element "m" at (x=0)
+		Nx_ = Nx = -Q[m][1];	// positive Nx is tensile
+		Vy_ = Vy = -Q[m][2];	// positive Vy in local y direction
+		Vz_ = Vz = -Q[m][3];	// positive Vz in local z direction
+		Tx_ = Tx = -Q[m][4];	// positive Tx r.h.r. about local x axis
+		My_ = My =  Q[m][5];	// positive My -> positive x-z curvature
+		Mz_ = Mz = -Q[m][6];	// positive Mz -> positive x-y curvature
+
+		i1 = 6*(n1-1);	i2 = 6*(n2-1);
+
+		/* compute end deflections in local coordinates */
+
+		u1  = t1*D[i1+1] + t2*D[i1+2] + t3*D[i1+3];
+		u2  = t4*D[i1+1] + t5*D[i1+2] + t6*D[i1+3];
+		u3  = t7*D[i1+1] + t8*D[i1+2] + t9*D[i1+3];
+
+		u4  = t1*D[i1+4] + t2*D[i1+5] + t3*D[i1+6];
+		u5  = t4*D[i1+4] + t5*D[i1+5] + t6*D[i1+6];
+		u6  = t7*D[i1+4] + t8*D[i1+5] + t9*D[i1+6];
+
+		u7  = t1*D[i2+1] + t2*D[i2+2] + t3*D[i2+3];
+		u8  = t4*D[i2+1] + t5*D[i2+2] + t6*D[i2+3];
+		u9  = t7*D[i2+1] + t8*D[i2+2] + t9*D[i2+3];
+
+		u10 = t1*D[i2+4] + t2*D[i2+5] + t3*D[i2+6];
+		u11 = t4*D[i2+4] + t5*D[i2+5] + t6*D[i2+6];
+		u12 = t7*D[i2+4] + t8*D[i2+5] + t9*D[i2+6];
+
+		// rotations and displacements for frame element "m" at (x=0)
+		Dx =  u1;	// displacement in  local x dir  at node N1
+		Dy =  u2;	// displacement in  local y dir  at node N1
+		Dz =  u3;	// displacement in  local z dir  at node N1
+		Rx =  u4;	// rotationin about local x axis at node N1
+		Sy_ = Sy =  u6;	// slope in  local y  direction  at node N1
+		Sz_ = Sz = -u5;	// slope in  local z  direction  at node N1
+
+		// accumulate interior span loads, forces, moments, slopes, and displacements
+		// all in a single loop  
+
+		for (i=1; i<=nx; i++) {
+
+			x = i*dx;	// location from node N1 along the x-axis
+
+			// start with gravitational plus uniform loads
+			wx = wxg; wy = wyg; wz = wzg;
+
+			if (i==1) { wx_ = wxg; wy_ = wyg; wz_ = wzg; tx_ = tx; }
+
+			// add trapezoidally-distributed loads
+			for (n=1; n<=10*nE && cW<nW; n++) {
+			    if ( (int) W[n][1] == m ) { // load n on element m
+				if (i==nx) ++cW;
+				xx1 = W[n][2];  xx2 = W[n][3];
+				wx1 = W[n][4];  wx2 = W[n][5];
+				xy1 = W[n][6];  xy2 = W[n][7];
+				wy1 = W[n][8];  wy2 = W[n][9];
+				xz1 = W[n][10]; xz2 = W[n][11];
+				wz1 = W[n][12]; wz2 = W[n][13];
+
+				if ( x>xx1 && x<=xx2 )
+				    wx += wx1+(wx2-wx1)*(x-xx1)/(xx2-xx1);
+				if ( x>xy1 && x<=xy2 )
+				    wy += wy1+(wy2-wy1)*(x-xy1)/(xy2-xy1);
+				if ( x>xz1 && x<=xz2 )
+				    wz += wz1+(wz2-wz1)*(x-xz1)/(xz2-xz1);
+			    }
+			}
+
+			// trapezoidal integration of distributed loads 
+			// for axial forces, shear forces and torques
+
+			Nx = Nx - 0.5*(wx+wx_)*dx;
+			Vy = Vy - 0.5*(wy+wy_)*dx;
+			Vz = Vz - 0.5*(wz+wz_)*dx;
+			Tx = Tx - 0.5*(tx+tx_)*dx;
+
+			// update distributed loads at x = (i-1)*dx
+			wx_ = wx;
+			wy_ = wy;
+			wz_ = wz;
+			tx_ = tx;
+			
+			// add interior point loads 
+			for (n=1; n<=10*nE && cP<nP; n++) {
+			    if ( (int) P[n][1] == m ) { // load n on element m
+				if (i==nx) ++cP;
+				xp = P[n][5];
+				if ( x <= xp && xp < x+dx ) {
+					Nx -= P[n][2] * 0.5 * (1.0 - (xp-x)/dx);
+					Vy -= P[n][3] * 0.5 * (1.0 - (xp-x)/dx);
+					Vz -= P[n][4] * 0.5 * (1.0 - (xp-x)/dx);
+					
+				}
+				if ( x-dx <= xp && xp < x ) {
+					Nx -= P[n][2] * 0.5 * (1.0 - (x-dx-xp)/dx);
+					Vy -= P[n][3] * 0.5 * (1.0 - (x-dx-xp)/dx);
+					Vz -= P[n][4] * 0.5 * (1.0 - (x-dx-xp)/dx);
+				}
+			    }
+			}
+
+			// trapezoidal integration of shear force for bending momemnt
+			My = My - 0.5*(Vz_ + Vz)*dx;
+			Mz = Mz - 0.5*(Vy_ + Vy)*dx;
+
+			// displacement along frame element "m"
+			Dx = Dx + 0.5*(Nx_ + Nx)/(E[m]*Ax[m])*dx;
+
+			// torsional rotation along frame element "m"
+			Rx = Rx + 0.5*(Tx_+Tx)/(G[m]*Jx[m])*dx;
+
+			// transverse slope along frame element "m"
+			Sy = Sy + 0.5*(Mz_ + Mz)/(E[m]*Iz[m])*dx;
+			Sz = Sz + 0.5*(My_ + My)/(E[m]*Iy[m])*dx;
+		
+			if ( shear ) {
+				Sy += Vy/(G[m]*Asy[m]);
+				Sz += Vz/(G[m]*Asz[m]);
+			}
+
+			// displacement along frame element "m"
+			Dy = Dy + 0.5*(Sy_+Sy)*dx;
+			Dz = Dz + 0.5*(Sz_+Sz)*dx;
+
+			// update forces, moments, and slopes at x = (i-1)*dx
+			Nx_ = Nx;
+			Vy_ = Vy;
+			Vz_ = Vz;
+			Tx_ = Tx;
+			My_ = My;
+			Mz_ = Mz;
+			Sy_ = Sy;
+			Sz_ = Sz;
+
+			// update the peak forces, moments, slopes and displacements
+			// and their locations along the frame element
+
+			pkNx[lc][m] = (fabs(Nx) > pkNx[lc][m]) ? fabs(Nx) : pkNx[lc][m];
+			pkVy[lc][m] = (fabs(Vy) > pkVy[lc][m]) ? fabs(Vy) : pkVy[lc][m];
+			pkVz[lc][m] = (fabs(Vz) > pkVz[lc][m]) ? fabs(Vz) : pkVz[lc][m];
+
+			pkTx[lc][m] = (fabs(Tx) > pkTx[lc][m]) ? fabs(Tx) : pkTx[lc][m];
+			pkMy[lc][m] = (fabs(My) > pkMy[lc][m]) ? fabs(My) : pkMy[lc][m];
+			pkMz[lc][m] = (fabs(Mz) > pkMz[lc][m]) ? fabs(Mz) : pkMz[lc][m];
+
+
+			pkDx[lc][m] = (fabs(Dx) > pkDx[lc][m]) ? fabs(Dx) : pkDx[lc][m];
+			pkDy[lc][m] = (fabs(Dy) > pkDy[lc][m]) ? fabs(Dy) : pkDy[lc][m];
+			pkDz[lc][m] = (fabs(Dz) > pkDz[lc][m]) ? fabs(Dz) : pkDz[lc][m];
+
+			pkRx[lc][m] = (fabs(Rx) > pkRx[lc][m]) ? fabs(Rx) : pkRx[lc][m];
+			pkSy[lc][m] = (fabs(Sy) > pkSy[lc][m]) ? fabs(Sy) : pkSy[lc][m];
+			pkSz[lc][m] = (fabs(Sz) > pkSz[lc][m]) ? fabs(Sz) : pkSz[lc][m];
+
+		}			// end of loop along element "m"
+
+		// at the end of this loop,
+		// the variables Nx; Vy; Vz; Tx; My; Mz; Dx; Dy; Dz; Rx; Sy; Sz;
+		// contain the forces, moments, displacements, and slopes 
+		// at node N2 of element "m"
+
+		// comparing the internal forces and displacements at node N2
+		// to the values conmputed via trapezoidal rule could give an estimate 
+		// of the accuracy of the trapezoidal rule, (how small "dx" needs to be)
+			
+		// linear correction for bias in trapezoidal integration 
+		// is not implemented, the peak values are affected by accumulation
+		// of round-off error in trapezoidal rule integration.   
+		// round-off errors are larger in the peak displacements than in the peak forces
+
+
+	}				// end of loop over all frame elements
+
+	// DEBUG --- write output to terminal
+	fprintf(stderr,"P E A K   F R A M E   E L E M E N T   I N T E R N A L   F O R C E S");
+	fprintf(stderr,"\t(local)\n");
+	fprintf(stderr,"  Elmnt       Nx          Vy         Vz");
+	fprintf(stderr,"        Txx        Myy        Mzz\n");
+	for (m=1; m<=nE; m++) 
+		fprintf(stderr," %5d  %10.3f  %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+			m, pkNx[lc][m], pkVy[lc][m], pkVz[lc][m], pkTx[lc][m], pkMy[lc][m], pkMz[lc][m] );
+	
+	fprintf(stderr,"\n P E A K   I N T E R N A L   D I S P L A C E M E N T S");
+	fprintf(stderr,"\t\t\t(local)\n");
+  	fprintf(stderr,"  Elmnt  X-dsp       Y-dsp       Z-dsp       X-rot       Y-rot       Z-rot\n");
+	for (m=1; m<=nE; m++) 
+		fprintf(stderr," %5d %10.6f  %10.6f  %10.6f  %10.6f  %10.6f  %10.6f\n",
+			m, pkDx[lc][m], pkDy[lc][m], pkDz[lc][m], pkRx[lc][m], pkSy[lc][m], pkSz[lc][m] );
+
+}
+
+
+/*
+ * WRITE_INTERNAL_FORCES - 
+ * calculate frame element internal forces, Nx, Vy, Vz, Tx, My, Mz
+ * calculate frame element local displacements, Rx, Dx, Dy, Dz
+ * write internal forces and local displacements to an output data file
+ * 4jan10, 7mar11, 21jan14
+ */
 void write_internal_forces (
-		char infcpath[], int lc, int nL, char title[], float dx,
-		vec3 *xyz,
-		double **Q, int nN, int nE, double *L, int *J1, int *J2,
+		char OUT_file[],
+		FILE *fp, char infcpath[], int lc, int nL, char title[], float dx,
+		vec3 *xyz, 
+		double **Q, int nN, int nE, double *L, int *J1, int *J2, 
 		float *Ax,float *Asy,float *Asz,float *Jx,float *Iy,float *Iz,
 		float *E, float *G, float *p,
 		float *d, float gX, float gY, float gZ,
@@ -2351,10 +2687,10 @@ void write_internal_forces (
 		xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
 		xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
 
-	double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i]
+	double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i] 
 		wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
 		wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
-		tx=0.0, tx_=0.0;  // distributed torque about local x coord
+		tx=0.0, tx_=0.0;  // distributed torque about local x coord 
 
 	double	xp;		/* location of internal point loads	*/
 
@@ -2367,26 +2703,48 @@ void write_internal_forces (
 		*Dx, *Dy, *Dz,	/* frame el. displ. in local x,y,z, dir's */
 		*Rx;		/* twist rotation about the local x-axis */
 
+	double	maxNx, maxVy, maxVz, 	/*  maximum internal forces	*/
+		maxTx, maxMy, maxMz,	/*  maximum internal moments	*/
+		maxDx, maxDy, maxDz,	/*  maximum element displacements */
+		maxRx, maxSy, maxSz;	/*  maximum element rotations	*/
+
+	double	minNx, minVy, minVz, 	/*  minimum internal forces	*/
+		minTx, minMy, minMz,	/*  minimum internal moments	*/
+		minDx, minDy, minDz,	/*  minimum element displacements */
+		minRx, minSy, minSz;	/*  minimum element rotations	*/
+
 	int	n, m,		/* frame element number			*/
 		cU=0, cW=0, cP=0, /* counters for U, W, and P loads	*/
 		i, nx,		/* number of sections alont x axis	*/
 		n1,n2,i1,i2;	/* starting and stopping node no's	*/
 
 	char	fnif[FILENMAX];/* file name    for internal force data	*/
+	char	CSV_file[FILENMAX];
 	char	errMsg[MAXL];
-	FILE	*fpif;		/* file pointer for internal force data */
+	char	wa[4];          /* indicate 'write' or 'append' to file */
+	FILE	*fpif,		/* file pointer for internal force data */
+		*fpcsv;         /* file pointer to .CSV output data file */
 	time_t  now;		/* modern time variable type		*/
 
 	if (dx == -1.0)	return;	// skip calculation of internal forces and displ
 
 	(void) time(&now);
 
+ 
+	CSV_filename( CSV_file, wa, OUT_file, lc );
+
+	if ((fpcsv = fopen (CSV_file, "a")) == NULL) {
+	  sprintf (errMsg,"\n  error: cannot open CSV output data file: %s \n", CSV_file);
+	  errorMsg(errMsg);
+	  exit(17);
+	}  
+
 	/* file name for internal force data for load case "lc" */
 	sprintf(fnif,"%s%02d",infcpath,lc);
-
+	
 	/* open the interior force data file */
 	if ((fpif = fopen (fnif, "w")) == NULL) {
-         sprintf (errMsg,"\nERROR: cannot open interior force data file '%s'\n",fnif);
+         sprintf (errMsg,"\n  error: cannot open interior force data file: %s \n",fnif);
 	 errorMsg(errMsg);
          exit(19);
 	}
@@ -2400,6 +2758,23 @@ void write_internal_forces (
 	fprintf(fpif,"# F R A M E   E L E M E N T   I N T E R N A L   F O R C E S (local)\n");
 	fprintf(fpif,"# F R A M E   E L E M E N T   T R A N S V E R S E   D I S P L A C E M E N T S (local)\n\n");
 
+	// write header information for each frame element to txt output data file 
+	fprintf(fp,"\nP E A K   F R A M E   E L E M E N T   I N T E R N A L   F O R C E S");
+	fprintf(fp,"(local)\", \n");
+	fprintf(fp,"  Elmnt   .         Nx          Vy         Vz");
+	fprintf(fp,"        Txx        Myy        Mzz\n");
+
+	// write header information for each frame element to CSV output data file
+	fprintf(fpcsv,"\n\"P E A K   F R A M E   E L E M E N T   I N T E R N A L   F O R C E S ");
+	fprintf(fpcsv,"   (local)\",\n");
+	fprintf(fpcsv," \"Elmnt\",  \".\", \"Nx\", \"Vy\", \"Vz\", ");
+	fprintf(fpcsv," \"Txx\", \"Myy\", \"Mzz\", \n");
+
+
+/*	fprintf(fp,"\n P E A K   I N T E R N A L   D I S P L A C E M E N T S");
+ *	fprintf(fp,"\t\t\t(local)\n");
+ * 	fprintf(fp,"  Elmnt  X-dsp       Y-dsp       Z-dsp       X-rot       Y-rot       Z-rot\n");
+*/
 
 	for ( m=1; m <= nE; m++ ) {	// loop over all frame elements
 
@@ -2423,16 +2798,17 @@ void write_internal_forces (
 		Dy = dvector(0,nx);
 		Dz = dvector(0,nx);
 
+
 	// the local x-axis for frame element "m" starts at 0 and ends at L[m]
-		for (i=0; i<nx; i++)	x[i] = i*dx;
-		x[nx] = L[m];
+		for (i=0; i<nx; i++)	x[i] = i*dx;	
+		x[nx] = L[m];		
 		dxnx = x[nx]-x[nx-1];	// length of the last x-axis increment
+
 
 	// write header information for each frame element
 
-		fprintf(fpif,"#\tElmnt\tJ1\tJ2\t\tX1\t\tY1\t\tZ1\t\tX2\t\tY2\t\tZ2\tnx\n");
+		fprintf(fpif,"#\tElmnt\tN1\tN2        \tX1        \tY1        \tZ1        \tX2        \tY2        \tZ2\tnx\n");
 		fprintf(fpif,"# @\t%5d\t%5d\t%5d\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%5d\n",m, n1, n2, xyz[n1].x, xyz[n1].y, xyz[n1].z, xyz[n2].x, xyz[n2].y, xyz[n2].z, nx+1 );
-		fprintf(fpif,"#.x\t\t\tNx\t\tVy\t\tVz\t\tTx\t\tMy\t\tMz\t\tDx\t\tDy\t\tDz\t\tRx\t~\n");
 
 	// find interior axial force, shear forces, torsion and bending moments
 
@@ -2497,7 +2873,7 @@ void write_internal_forces (
 			    }
 			}
 
-			// trapezoidal integration of distributed loads
+			// trapezoidal integration of distributed loads 
 			// for axial forces, shear forces and torques
 			if (i==nx)	dx_ = dxnx;
 			Nx[i] = Nx[i-1] - 0.5*(wx+wx_)*dx_;
@@ -2510,8 +2886,8 @@ void write_internal_forces (
 			wy_ = wy;
 			wz_ = wz;
 			tx_ = tx;
-
-			// add interior point loads
+			
+			// add interior point loads 
 			for (n=1; n<=10*nE && cP<nP; n++) {
 			    if ( (int) P[n][1] == m ) { // load n on element m
 				if (i==nx) ++cP;
@@ -2520,7 +2896,7 @@ void write_internal_forces (
 					Nx[i] -= P[n][2] * 0.5 * (1.0 - (xp-x[i])/dx);
 					Vy[i] -= P[n][3] * 0.5 * (1.0 - (xp-x[i])/dx);
 					Vz[i] -= P[n][4] * 0.5 * (1.0 - (xp-x[i])/dx);
-
+					
 				}
 				if ( x[i]-dx <= xp && xp < x[i] ) {
 					Nx[i] -= P[n][2] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
@@ -2531,7 +2907,7 @@ void write_internal_forces (
 			}
 
 		}
-		// linear correction for bias in trapezoidal integration
+		// linear correction of forces for bias in trapezoidal integration
 		for (i=1; i<=nx; i++) {
 			Nx[i] -= (Nx[nx]-Q[m][7])  * i/nx;
 			Vy[i] -= (Vy[nx]-Q[m][8])  * i/nx;
@@ -2546,13 +2922,13 @@ void write_internal_forces (
 			Mz[i] = Mz[i-1] - 0.5*(Vy[i]+Vy[i-1])*dx_;
 
 		}
-		// linear correction for bias in trapezoidal integration
+		// linear correction of moments for bias in trapezoidal integration
 		for (i=1; i<=nx; i++) {
 			My[i] -= (My[nx]+Q[m][11]) * i/nx;
 			Mz[i] -= (Mz[nx]-Q[m][12]) * i/nx;
 		}
 
-	// find interior transverse displacements
+	// find interior transverse displacements 
 
 		i1 = 6*(n1-1);	i2 = 6*(n2-1);
 
@@ -2576,12 +2952,12 @@ void write_internal_forces (
 
 
 		// rotations and displacements for frame element "m" at (x=0)
-		Dx[0] =  u1;	// displacement in  local x dir  at node J1
-		Dy[0] =  u2;	// displacement in  local y dir  at node J1
-		Dz[0] =  u3;	// displacement in  local z dir  at node J1
-		Rx[0] =  u4;	// rotationin about local x axis at node J1
-		Sy[0] =  u6;	// slope in  local y  direction  at node J1
-		Sz[0] = -u5;	// slope in  local z  direction  at node J1
+		Dx[0] =  u1;	// displacement in  local x dir  at node N1
+		Dy[0] =  u2;	// displacement in  local y dir  at node N1
+		Dz[0] =  u3;	// displacement in  local z dir  at node N1
+		Rx[0] =  u4;	// rotationin about local x axis at node N1
+		Sy[0] =  u6;	// slope in  local y  direction  at node N1
+		Sz[0] = -u5;	// slope in  local z  direction  at node N1
 
 		// axial displacement along frame element "m"
 		dx_ = dx;
@@ -2589,22 +2965,22 @@ void write_internal_forces (
 			if (i==nx)	dx_ = dxnx;
 			Dx[i] = Dx[i-1] + 0.5*(Nx[i-1]+Nx[i])/(E[m]*Ax[m])*dx_;
 		}
-		// linear correction for bias in trapezoidal integration
+		// linear correction of axial displacement for bias in trapezoidal integration
 		for (i=1; i<=nx; i++) {
 			Dx[i] -= (Dx[nx]-u7) * i/nx;
 		}
-
+		
 		// torsional rotation along frame element "m"
 		dx_ = dx;
 		for (i=1; i<=nx; i++) {
 			if (i==nx)	dx_ = dxnx;
 			Rx[i] = Rx[i-1] + 0.5*(Tx[i-1]+Tx[i])/(G[m]*Jx[m])*dx_;
 		}
-		// linear correction for bias in trapezoidal integration
+		// linear correction of torsional rot'n for bias in trapezoidal integration
 		for (i=1; i<=nx; i++) {
 			Rx[i] -= (Rx[nx]-u10) * i/nx;
 		}
-
+		
 		// transverse slope along frame element "m"
 		dx_ = dx;
 		for (i=1; i<=nx; i++) {
@@ -2612,16 +2988,16 @@ void write_internal_forces (
 			Sy[i] = Sy[i-1] + 0.5*(Mz[i-1]+Mz[i])/(E[m]*Iz[m])*dx_;
 			Sz[i] = Sz[i-1] + 0.5*(My[i-1]+My[i])/(E[m]*Iy[m])*dx_;
 		}
-		if ( shear ) {
-			for (i=1; i<=nx; i++) {
-				Sy[i] += Vy[i]/(G[m]*Asy[m]);
-				Sz[i] += Vz[i]/(G[m]*Asz[m]);
-			}
-		}
 		// linear correction for bias in trapezoidal integration
 		for (i=1; i<=nx; i++) {
 			Sy[i] -= (Sy[nx]-u12) * i/nx;
 			Sz[i] -= (Sz[nx]+u11) * i/nx;
+		}
+		if ( shear ) {		// add-in slope due to shear deformation
+			for (i=0; i<=nx; i++) {
+				Sy[i] += Vy[i]/(G[m]*Asy[m]);
+				Sz[i] += Vz[i]/(G[m]*Asz[m]);
+			}
 		}
 		// displacement along frame element "m"
 		dx_ = dx;
@@ -2636,8 +3012,53 @@ void write_internal_forces (
 			Dz[i] -= (Dz[nx]-u9) * i/nx;
 		}
 
+	// initialize the maximum and minimum element forces and displacements 
+		maxNx = minNx = Nx[0]; maxVy = minVy = Vy[0]; maxVz = minVz = Vz[0];  	//  maximum internal forces
+		maxTx = minTx = Tx[0]; maxMy = minMy = My[0]; maxMz = minMz = Mz[0]; 	//  maximum internal moments
+		maxDx = minDx = Dx[0]; maxDy = minDy = Dy[0]; maxDz = minDz = Dz[0]; 	//  maximum element displacements
+		maxRx =	minRx = Rx[0]; maxSy = minSy = Sy[0]; maxSz = minSz = Sz[0];	//  maximum element rotations
+
+	// find maximum and minimum internal element forces
+		for (i=1; i<=nx; i++) {
+			maxNx = (Nx[i] > maxNx) ? Nx[i] : maxNx;
+			minNx = (Nx[i] < minNx) ? Nx[i] : minNx;
+			maxVy = (Vy[i] > maxVy) ? Vy[i] : maxVy;
+			minVy = (Vy[i] < minVy) ? Vy[i] : minVy;
+			maxVz = (Vz[i] > maxVz) ? Vz[i] : maxVz;
+			minVz = (Vz[i] < minVz) ? Vz[i] : minVz;
+
+			maxTx = (Tx[i] > maxTx) ? Tx[i] : maxTx;
+			minTx = (Tx[i] < minTx) ? Tx[i] : minTx;
+			maxMy = (My[i] > maxMy) ? My[i] : maxMy;
+			minMy = (My[i] < minMy) ? My[i] : minMy;
+			maxMz = (Mz[i] > maxMz) ? Mz[i] : maxMz;
+			minMz = (Mz[i] < minMz) ? Mz[i] : minMz;
+		}
+
+	// find maximum and minimum internal element displacements
+		for (i=1; i<=nx; i++) {
+			maxDx = (Dx[i] > maxDx) ? Dx[i] : maxDx;
+			minDx = (Dx[i] < minDx) ? Dx[i] : minDx;
+			maxDy = (Dy[i] > maxDy) ? Dy[i] : maxDy;
+			minDy = (Dy[i] < minDy) ? Dy[i] : minDy;
+			maxDz = (Dz[i] > maxDz) ? Dz[i] : maxDz;
+			minDz = (Dz[i] < minDz) ? Dz[i] : minDz;
+			maxRx = (Rx[i] > maxRx) ? Rx[i] : maxRx;
+			minRx = (Rx[i] < minRx) ? Rx[i] : minRx;
+			maxSy = (Sy[i] > maxSy) ? Sy[i] : maxSy;
+			minSy = (Sy[i] < minSy) ? Sy[i] : minSy;
+			maxSz = (Sz[i] > maxSz) ? Sz[i] : maxSz;
+			minSz = (Sz[i] < minSz) ? Sz[i] : minSz;
+		}
+
+	// write max and min element forces to the internal frame element force output data file
+		fprintf(fpif,"#                \tNx        \tVy        \tVz        \tTx        \tMy        \tMz        \tDx        \tDy        \tDz         \tRx\t*\n");
+		fprintf(fpif,"# MAXIMUM\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\n", maxNx,maxVy,maxVz,maxTx,maxMy,maxMz,maxDx,maxDy,maxDz,maxRx );
+		fprintf(fpif,"# MINIMUM\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\t%14.6e\n", minNx,minVy,minVz,minTx,minMy,minMz,minDx,minDy,minDz,minRx );
+
 
 	// write results to the internal frame element force output data file
+		fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
 		for (i=0; i<=nx; i++) {
 			fprintf(fpif,"%14.6e\t", x[i] );
 			fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
@@ -2648,6 +3069,25 @@ void write_internal_forces (
 						Dx[i], Dy[i], Dz[i], Rx[i] );
 		}
 		fprintf(fpif,"#---------------------------------------\n\n\n");
+
+	// write max and min element forces to the Frame3DD text output data file
+		fprintf(fp," %5d   max  %10.3f  %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+				m, maxNx, maxVy, maxVz, maxTx, maxMy, maxMz );
+		fprintf(fp," %5d   min  %10.3f  %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+				m, minNx, minVy, minVz, minTx, minMy, minMz );
+
+	// write max and min element forces to the Frame3DD CSV output data file
+		fprintf(fpcsv," %5d, \"max\", %10.3f,  %10.3f, %10.3f, %10.3f, %10.3f, %10.3f\n",
+				m, maxNx, maxVy, maxVz, maxTx, maxMy, maxMz );
+		fprintf(fpcsv," %5d, \"min\", %10.3f,  %10.3f, %10.3f, %10.3f, %10.3f, %10.3f\n",
+				m, minNx, minVy, minVz, minTx, minMy, minMz );
+	
+/*
+		fprintf(fp," %5d %10.6f  %10.6f  %10.6f  %10.6f  %10.6f  %10.6f\n",
+				m, maxDx, maxDy, maxDz, maxRx, maxSy, maxSz );
+		fprintf(fp," %5d %10.6f  %10.6f  %10.6f  %10.6f  %10.6f  %10.6f\n",
+				m, minDx, minDy, minDz, minRx, minSy, minSz );
+*/
 
 	// free memory
 		free_dvector(x,0,nx);
@@ -2667,13 +3107,14 @@ void write_internal_forces (
 	}				// end of loop over all frame elements
 
 	fclose(fpif);
+	fclose(fpcsv);
 }
 
 
-/*------------------------------------------------------------------------------
-WRITE_MODAL_RESULTS -  save modal frequencies and mode shapes
-16 Aug 2001
-------------------------------------------------------------------------------*/
+/*
+ * WRITE_MODAL_RESULTS -  save modal frequencies and mode shapes	
+ * 16 Aug 2001
+ */
 void write_modal_results(
 		FILE *fp,
 		int nN, int nE, int nI, int DoF,
@@ -2758,22 +3199,22 @@ void write_modal_results(
 }
 
 
-/*------------------------------------------------------------------------------
-STATIC_MESH  -
-create mesh data of deformed and undeformed mesh, use gnuplot	22 Feb 1999
-useful gnuplot options: set noxtics noytics noztics noborder view nokey
-This function illustrates how to read the internal force output data file.
-The internal force output data file contains all the information required
-to plot deformed meshes, internal axial force, internal shear force, internal
-torsion, and internal bending moment diagrams.
-------------------------------------------------------------------------------*/
+/*
+ * STATIC_MESH  - create mesh data of deformed and undeformed mesh  22 Feb 1999 
+ * use gnuplot	
+ * useful gnuplot options: unset xtics ytics ztics border view key
+ * This function illustrates how to read the internal force output data file.
+ * The internal force output data file contains all the information required 
+ * to plot deformed meshes, internal axial force, internal shear force, internal
+ * torsion, and internal bending moment diagrams.
+ */
 void static_mesh(
 		char IN_file[],
 		char infcpath[], char meshpath[], char plotpath[],
 		char *title, int nN, int nE, int nL, int lc, int DoF,
 		vec3 *xyz, double *L,
-		int *N1, int *N2, float *p, double *D,
-		double exagg_static, int D3_flag, int anlyz, float dx
+		int *N1, int *N2, float *p, double *D, 
+		double exagg_static, int D3_flag, int anlyz, float dx, float scale
 ){
 	FILE	*fpif=NULL, *fpm=NULL;
 	double	mx, my, mz; /* coordinates of the frame element number labels */
@@ -2795,7 +3236,7 @@ void static_mesh(
 
 	// write gnuplot plotting script commands
 
-	for ( j=1; j<=nN; j++ ) { // check for three-dimensional frame
+	for ( j=1; j<=nN; j++ ) { // check for three-dimensional frame 
 		if (xyz[j].x != 0.0) X=1;
 		if (xyz[j].y != 0.0) Y=1;
 		if (xyz[j].z != 0.0) Z=1;
@@ -2808,19 +3249,19 @@ void static_mesh(
 
 	if (lc <= 1) {	// open plotting script file for writing
 	    if ((fpm = fopen (plotpath, "w")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot open plot file: %s\n", plotpath);
+		sprintf (errMsg,"\n  error: cannot open gnuplot script file: %s \n", plotpath);
 		errorMsg(errMsg);
 		exit(23);
 	    }
 	} else {	// open plotting script file for appending
 	    if ((fpm = fopen (plotpath, "a")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot open plot file: %s\n", plotpath);
+		sprintf (errMsg,"\n  error: cannot open gnuplot script file: %s \n", plotpath);
 		errorMsg(errMsg);
 		exit(24);
 	    }
 	}
 
-	// file name for deformed mesh data for load case "lc"
+	// file name for deformed mesh data for load case "lc" 
 	if ( lc >= 1 && anlyz )	sprintf( meshfl, "%sf.%03d", meshpath, lc );
 
 	// write header, plot-setup cmds, node label, and element label data
@@ -2835,14 +3276,14 @@ void static_mesh(
 	 /* fprintf(fpm,"#  X=%d , Y=%d , Z=%d, D3=%d  \n", X,Y,Z,D3_flag); */
 
 	 fprintf(fpm,"set autoscale\n");
-	 fprintf(fpm,"set noborder\n");
+	 fprintf(fpm,"unset border\n");
 	 fprintf(fpm,"set pointsize 1.0\n");
 	 fprintf(fpm,"set xtics; set ytics; set ztics; \n");
-	 fprintf(fpm,"set nozeroaxis\n");
-	 fprintf(fpm,"set nokey\n");
-	 fprintf(fpm,"set nolabel\n");
-	 fprintf(fpm,"set size ratio -1    # 1:1 2D axis scaling \n");
-	 fprintf(fpm,"# set view equal xyz # 1:1 3D axis scaling \n");
+	 fprintf(fpm,"unset zeroaxis\n");
+	 fprintf(fpm,"unset key\n");
+	 fprintf(fpm,"unset label\n");
+	 fprintf(fpm,"set size ratio -1    # 1:1 2D axis scaling \n");	
+	 fprintf(fpm,"# set view equal xyz # 1:1 3D axis scaling \n");	
 
  	 fprintf(fpm,"# NODE NUMBER LABELS\n");
 	 for (j=1; j<=nN; j++)
@@ -2862,15 +3303,15 @@ void static_mesh(
 	 // 3D plot setup commands
 
 	 fprintf(fpm,"%c set parametric\n", D3 );
-	 fprintf(fpm,"%c set view 60, 70, 1 \n", D3 );
-	 fprintf(fpm,"%c set view equal xyz \n", D3 );
-	 fprintf(fpm,"%c set nokey\n", D3 );
+	 fprintf(fpm,"%c set view 60, 70, %5.2f \n", D3, scale );
+	 fprintf(fpm,"%c set view equal xyz # 1:1 3D axis scaling \n", D3 );
+	 fprintf(fpm,"%c unset key\n", D3 );
 	 fprintf(fpm,"%c set xlabel 'x'\n", D3 );
 	 fprintf(fpm,"%c set ylabel 'y'\n", D3 );
 	 fprintf(fpm,"%c set zlabel 'z'\n", D3 );
-//	 fprintf(fpm,"%c set nolabel\n", D3 );
+//	 fprintf(fpm,"%c unset label\n", D3 );
 
-	}
+	} 
 
 	// different plot title for each load case
 
@@ -2882,6 +3323,8 @@ void static_mesh(
 	} else {
 		fprintf(fpm,"  data check only \"\n");
 	}
+	fprintf(fpm,"unset clip; \nset clip one; set clip two\n");
+	fprintf(fpm,"set xyplane 0 \n"); // requires Gnuplot >= 4.6
 
 	// 2D plot command
 
@@ -2906,7 +3349,7 @@ void static_mesh(
 	if (lc <= 1) {
 	 // open the undeformed mesh data file for writing
 	 if ((fpm = fopen (meshpath, "w")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot open meshpath: %s\n", meshpath );
+		sprintf (errMsg,"\n  error: cannot open gnuplot undeformed mesh data file: %s\n", meshpath );
 		errorMsg(errMsg);
 		exit(21);
 	 }
@@ -2934,9 +3377,9 @@ void static_mesh(
 
 	// write deformed mesh data
 
-	// open the deformed mesh data file for writing
+	// open the deformed mesh data file for writing 
 	if ((fpm = fopen (meshfl, "w")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot open meshpath: %s\n", meshfl );
+		sprintf (errMsg,"\n  error: cannot open gnuplot deformed mesh data file %s \n", meshfl );
 		errorMsg(errMsg);
 		exit(22);
 	}
@@ -2949,13 +3392,13 @@ void static_mesh(
 	fprintf(fpm,"# D E F O R M E D   M E S H   D A T A ");
 	fprintf(fpm,"  deflection exaggeration: %.1f\n", exagg_static );
 	fprintf(fpm,"#       X-dsp        Y-dsp        Z-dsp\n");
-
-	// open the interior force data file for reading
+	
+	// open the interior force data file for reading 
 	if ( dx > 0.0 && anlyz ) {
-	 // file name for internal force data for load case "lc"
+	 // file name for internal force data for load case "lc" 
 	 sprintf( fnif, "%s%02d", infcpath, lc );
 	 if ((fpif = fopen (fnif, "r")) == NULL) {
-          sprintf (errMsg,"\nERROR: cannot open interior force data file '%s'\n",fnif);
+          sprintf (errMsg,"\n  error: cannot open interior force data file: %s \n",fnif);
 	  errorMsg(errMsg);
           exit(20);
 	 }
@@ -2963,13 +3406,13 @@ void static_mesh(
 
 	for (m=1; m<=nE; m++) {	// write deformed shape data for each element
 
-		ch = 'a';
+		ch = 'a'; 
 
 		fprintf( fpm, "\n# element %5d \n", m );
 		if ( dx < 0.0 && anlyz ) {
 			cubic_bent_beam ( fpm,
 				N1[m],N2[m], xyz, L[m],p[m], D, exagg_static );
-		}
+		} 
 		if ( dx > 0.0 && anlyz ) {
 			while ( ch != '@' )	ch = getc(fpif);
 			sfrv=fscanf(fpif,"%d %d %d %f %f %f %f %f %f %d",
@@ -2979,11 +3422,11 @@ void static_mesh(
 			 fprintf(stderr," error in static_mesh parsing\n");
 			 fprintf(stderr,"  frel = %d; m = %d; nx = %d \n", frel,m,nx );
 			}
-			/* debugging ... check mesh data
+			/* debugging ... check mesh data 
 			printf("  frel = %3d; m = %3d; n1 =%4d; n2 = %4d; nx = %3d L = %f \n", frel,m,n1,n2,nx,L[m] );
 			*/
 			while ( ch != '~' )	ch = getc(fpif);
-			force_bent_beam ( fpm, fpif, fnif, nx,
+			force_bent_beam ( fpm, fpif, fnif, nx, 
 				N1[m],N2[m], xyz, L[m],p[m], D, exagg_static );
 		}
 
@@ -2997,10 +3440,10 @@ void static_mesh(
 }
 
 
-/*------------------------------------------------------------------------------
-MODAL_MESH  -  create mesh data of the mode-shape meshes, use gnuplot	19oct98
-	 useful gnuplot options: set noxtics noytics noztics noborder view nokey
-------------------------------------------------------------------------------*/
+/*
+ * MODAL_MESH  -  create mesh data of the mode-shape meshes, use gnuplot	19oct98
+ * useful gnuplot options: unset xtics ytics ztics border view key
+ */
 void modal_mesh(
 		char IN_file[], char meshpath[], char modepath[],
 		char plotpath[], char *title,
@@ -3041,7 +3484,7 @@ void modal_mesh(
 		sprintf( modefl,"%s-%02d-", modepath, m );
 
 		if ((fpm = fopen (modefl, "w")) == NULL) {
-			sprintf (errMsg,"\n  error: cannot open modal mesh file: %s\n", modefl);
+			sprintf (errMsg,"\n  error: cannot open gnuplot modal mesh file: %s \n", modefl);
 			errorMsg(errMsg);
 			exit(27);
 		}
@@ -3085,7 +3528,7 @@ void modal_mesh(
 
 
 		if ((fpm = fopen (plotpath, "a")) == NULL) {
-			sprintf (errMsg,"\n  error: cannot append plot file: %s\n",plotpath);
+			sprintf (errMsg,"\n  error: cannot append gnuplot script file: %s \n",plotpath);
 			errorMsg(errMsg);
 			exit(25);
 		}
@@ -3093,8 +3536,8 @@ void modal_mesh(
 		fprintf(fpm,"pause -1\n");
 
 		if (m==1) {
-			fprintf(fpm,"set nolabel\n");
-			fprintf(fpm,"%c set nokey\n", D3 );
+			fprintf(fpm,"unset label\n");
+			fprintf(fpm,"%c unset key\n", D3 );
 		}
 
 		fprintf(fpm,"set title '%s     mode %d     %lf Hz'\n",IN_file,m,f[m]);
@@ -3105,7 +3548,7 @@ void modal_mesh(
 		if (!anlyz) fprintf(fpm," lw %d lt 1 \n", lw );
 		else fprintf(fpm," lw 1 lt 5 , '%s' u 1:2 t 'mode-shape %d' w l lw %d lt 3\n", modefl, m, lw );
 
-		// 3D plot command
+		// 3D plot command 
 
 		fprintf(fpm,"%c splot '%s' u 2:3:4 t 'undeformed mesh' w l ",
 								D3, meshpath);
@@ -3123,12 +3566,12 @@ void modal_mesh(
 }
 
 
-/*------------------------------------------------------------------------------
-ANIMATE -  create mesh data of animated mode-shape meshes, use gnuplot	16dec98
-	 useful gnuplot options: set noxtics noytics noztics noborder view nokey
-	 mpeg movie example:   % convert mesh_file-03-f-*.ps mode-03.mpeg
-	 ... requires ImageMagick and mpeg2vidcodec packages
-------------------------------------------------------------------------------*/
+/*
+ * ANIMATE -  create mesh data of animated mode-shape meshes, use gnuplot	16dec98
+ * useful gnuplot options: unset xtics ytics ztics border view key
+ * mpeg movie example:   % convert mesh_file-03-f-*.ps mode-03.mpeg
+ * ... requires ImageMagick and mpeg2vidcodec packages
+ */
 void animate(
 	char IN_file[], char meshpath[], char modepath[], char plotpath[],
 	char *title,
@@ -3136,8 +3579,9 @@ void animate(
 	int nN, int nE, int DoF, int nM,
 	vec3 *xyz, double *L, float *p,
 	int *J1, int *J2, double *f, double **V,
-	double exagg_modal, int D3_flag,
-	float pan
+	double exagg_modal, int D3_flag, 
+	float pan,		/* pan rate for animation	     */
+	float scale		/* inital zoom scale in 3D animation */
 ){
 	FILE	*fpm;
 
@@ -3149,9 +3593,9 @@ void animate(
 		rot_x_final =  60.0,	/* final  x-rotation in 3D animation */
 		rot_z_init  = 100.0,	/* inital z-rotation in 3D animation */
 		rot_z_final = 120.0,	/* final  z-rotation in 3D animation */
-		zoom_init  = 1.1,	/* inital zoom scale in 3D animation */
-		zoom_final = 1.2,	/* final  zoom scale in 3D animation */
-		frames = 25;	/* number of frames in animation	*/
+		zoom_init  = 1.0*scale,	/* init.  zoom scale in 3D animation */
+		zoom_final = 1.1*scale, /* final  zoom scale in 3D animation */
+		frames = 25;		/* number of frames in animation */
 
 	double	ex=10,		/* an exageration factor, for animation */
 		*v;
@@ -3192,39 +3636,41 @@ void animate(
 
 
 	if ((fpm = fopen (plotpath, "a")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot append plot file: %s\n",plotpath);
+		sprintf (errMsg,"\n  error: cannot append gnuplot script file: %s \n",plotpath);
 		errorMsg(errMsg);
 		exit(26);
 	}
-	i = 0;
-	while ( (m = anim[i]) != 0 && i < 20) {
-	 if ( i==0 ) {
+	i = 1;
+	while ( (m = anim[i]) != 0 && i < 100) {
+	 if ( i==1 ) {
 
 	   fprintf(fpm,"\n# --- M O D E   S H A P E   A N I M A T I O N ---\n");
-	   fprintf(fpm,"# rot_x_init  = %7.2f\n", rot_x_init );
-	   fprintf(fpm,"# rot_x_final = %7.2f\n", rot_x_final );
-	   fprintf(fpm,"# rot_z_init  = %7.2f\n", rot_z_init );
-	   fprintf(fpm,"# rot_z_final = %7.2f\n", rot_z_final );
-	   fprintf(fpm,"# zoom_init   = %7.2f\n", zoom_init );
+	   fprintf(fpm,"# rot_x_init  = %7.2f\n", rot_x_init ); 
+	   fprintf(fpm,"# rot_x_final = %7.2f\n", rot_x_final ); 
+	   fprintf(fpm,"# rot_z_init  = %7.2f\n", rot_z_init ); 
+	   fprintf(fpm,"# rot_z_final = %7.2f\n", rot_z_final ); 
+	   fprintf(fpm,"# zoom_init   = %7.2f\n", zoom_init ); 
 	   fprintf(fpm,"# zoom_final  = %7.2f\n", zoom_init );
 	   fprintf(fpm,"# pan rate    = %7.2f \n", pan );
-	   fprintf(fpm,"set noborder\n");
-	   fprintf(fpm,"set nozeroaxis\n");
 	   fprintf(fpm,"set autoscale\n");
-	   fprintf(fpm,"set noxtics; set noytics; set noztics; \n");
-	   fprintf(fpm,"set nokey\n");
+	   fprintf(fpm,"unset border\n");
+	   fprintf(fpm,"%c unset xlabel \n", D3 );
+	   fprintf(fpm,"%c unset ylabel \n", D3 );
+	   fprintf(fpm,"%c unset zlabel \n", D3 );
+	   fprintf(fpm,"%c unset label \n", D3 );
+	   fprintf(fpm,"unset key\n");
+	   fprintf(fpm,"%c set parametric\n", D3 );
 
 	   fprintf(fpm,"# x_min = %12.5e     x_max = %12.5e \n", x_min, x_max);
 	   fprintf(fpm,"# y_min = %12.5e     y_max = %12.5e \n", y_min, y_max);
 	   fprintf(fpm,"# z_min = %12.5e     z_max = %12.5e \n", z_min, z_max);
 	   fprintf(fpm,"# Dxyz = %12.5e \n", Dxyz );
 	   fprintf(fpm,"set xrange [ %lf : %lf ] \n",
-			x_min-0.1*Dxyz, x_max+0.1*Dxyz );
+			x_min-0.2*Dxyz, x_max+0.1*Dxyz );
 	   fprintf(fpm,"set yrange [ %lf : %lf ] \n",
-			y_min-0.1*Dxyz, y_max+0.1*Dxyz );
+			y_min-0.2*Dxyz, y_max+0.1*Dxyz );
 	   fprintf(fpm,"set zrange [ %lf : %lf ] \n",
-			z_min-0.1*Dxyz, z_max+0.1*Dxyz );
-	   fprintf(fpm,"set xyplane 0 \n"); // requires Gnuplot >= 4.6
+			z_min-0.2*Dxyz, z_max+0.1*Dxyz );
 
 /*
  *	   if ( x_min != x_max )
@@ -3244,12 +3690,12 @@ void animate(
  *			z_min-exagg_modal, z_max+exagg_modal );
  */
 
-	   fprintf(fpm,"%c set parametric\n", D3 );
-	   fprintf(fpm,"%c set view 60, 70, 1 \n", D3 );
-	   fprintf(fpm,"%c set xlabel \n", D3 );
-	   fprintf(fpm,"%c set ylabel \n", D3 );
-	   fprintf(fpm,"%c set zlabel \n", D3 );
-	   fprintf(fpm,"%c set nolabel \n", D3 );
+	   fprintf(fpm,"unset xzeroaxis; unset yzeroaxis; unset zzeroaxis\n");
+	   fprintf(fpm,"unset xtics; unset ytics; unset ztics; \n");
+	   fprintf(fpm,"%c set view 60, 70, %5.2f \n", D3, scale );
+	   fprintf(fpm,"set size ratio -1    # 1:1 2D axis scaling \n");	
+	   fprintf(fpm,"%c set view equal xyz # 1:1 3D axis scaling \n", D3 );
+
 	 }
 
 	 fprintf(fpm,"pause -1 \n");
@@ -3318,14 +3764,14 @@ void animate(
 
 	v = dvector(1,DoF);
 
-	i = 0;
+	i = 1;
 	while ( (m = anim[i]) != 0 ) {
 	  for ( fr=0; fr<=frames; fr++ ) {
 
 	    sprintf(modefl,"%s-%02d.%03d", modepath, m, fr  );
 
 	    if ((fpm = fopen (modefl, "w")) == NULL) {
-		sprintf (errMsg,"\n  error: cannot open modal mesh file: %s\n", modefl);
+		sprintf (errMsg,"\n  error: cannot open gnuplot modal mesh data file: %s \n", modefl);
 		errorMsg(errMsg);
 		exit(28);
 	    }
@@ -3359,12 +3805,12 @@ void animate(
 }
 
 
-/*------------------------------------------------------------------------------
-CUBIC_BENT_BEAM  -  computes cubic deflection functions from end deflections
-and end rotations.  Saves deflected shapes to a file.  These bent shapes
-are exact for mode-shapes, and for frames loaded at their nodes.
-15 May 2009
-------------------------------------------------------------------------------*/
+/*
+ * CUBIC_BENT_BEAM  -  computes cubic deflection functions from end deflections
+ * and end rotations.  Saves deflected shapes to a file.  These bent shapes
+ * are exact for mode-shapes, and for frames loaded at their nodes.
+ * 15 May 2009
+ */
 void cubic_bent_beam(
 	FILE *fpm, int n1, int n2, vec3 *xyz,
 	double L, float p, double *D, double exagg
@@ -3428,9 +3874,9 @@ void cubic_bent_beam(
 	lu_dcmp ( A, 4, b, 0, 1, &pd );		/* solve for cubic coef's */
 
 	// debug ... if deformed mesh exageration is too big, some elements
-	// may not be plotted.
+	// may not be plotted.  
 	//fprintf( fpm, "# u1=%e  L+u7=%e, dx = %e \n",
-	//				u1, fabs(L+u7), fabs(L+u7-u1)/10.0);
+	//				u1, fabs(L+u7), fabs(L+u7-u1)/10.0); 
 	for ( s = u1; fabs(s) <= 1.01*fabs(L+u7); s += fabs(L+u7-u1) / 10.0 ) {
 
 			/* deformed shape in local coordinates */
@@ -3455,14 +3901,14 @@ void cubic_bent_beam(
 }
 
 
-/*------------------------------------------------------------------------------
-FORCE_BENT_BEAM  -  reads internal frame element forces and deflections
-from the internal force and deflection data file.
-Saves deflected shapes to a file.  These bent shapes are exact.
-Note: It would not be difficult to adapt this function to plot
-internal axial force, shear force, torques, or bending moments.
-9 Jan 2010
-------------------------------------------------------------------------------*/
+/*
+ * FORCE_BENT_BEAM  -  reads internal frame element forces and deflections
+ * from the internal force and deflection data file.  
+ * Saves deflected shapes to a file.  These bent shapes are exact. 
+ * Note: It would not be difficult to adapt this function to plot
+ * internal axial force, shear force, torques, or bending moments. 
+ * 9 Jan 2010
+ */
 void force_bent_beam(
 	FILE *fpm, FILE *fpif, char fnif[], int nx, int n1, int n2, vec3 *xyz,
 	double L, float p, double *D, double exagg
@@ -3492,7 +3938,7 @@ void force_bent_beam(
 //		    printf("x = %12.4f\n", x );		/* debug */
 		    if (sfrv != 11) sferr(fnif);
 		    ++n;
-		}
+		} 
 
 		/* exaggerated deformed shape in global coordinates */
 		dX = exagg * ( t1*Dx + t4*Dy + t7*Dz );
@@ -3515,9 +3961,9 @@ void force_bent_beam(
 }
 
 
-/*------------------------------------------------------------------------------
-SFERR  -  Display error message upon an erronous *scanf operation
-------------------------------------------------------------------------------
+/*
+ * SFERR  -  Display error message upon an erronous *scanf operation
+ *
 void sferr ( char s[] ) {
 	char	errMsg[MAXL];
 	sprintf(errMsg,">> Input Data file error while reading %s\n",s);
@@ -3527,10 +3973,10 @@ void sferr ( char s[] ) {
 */
 
 
-/*------------------------------------------------------------------------------
-MY_ITOA  -  Convert an integer n to charcters in s, from K&R, 1978,   p. 59-60
-... specialized for portability between GNU GCC and DJGPP GCC
-------------------------------------------------------------------------------*/
+/*
+ * MY_ITOA  -  Convert an integer n to charcters in s, from K&R, 1978,   p. 59-60
+ * ... specialized for portability between GNU GCC and DJGPP GCC
+ */
 void my_itoa ( int n, char s[], int k ) {
 	int	c, i, j, sign;
 
@@ -3558,12 +4004,12 @@ void my_itoa ( int n, char s[], int k ) {
 }
 
 
-/*------------------------------------------------------------------------------
-GET_FILE_EXT  -  get the file extension,
-		return 1 if the extension is ".csv"
-		return 2 if the extension is ".fmm"
-		return 0 otherwise
-------------------------------------------------------------------------------*/
+/*
+ * GET_FILE_EXT  -  get the file extension,
+ *		return 1 if the extension is ".csv"
+ *		return 2 if the extension is ".fmm"
+ *		return 0 otherwise
+ */
 int get_file_ext( char *filename, char *ext )
 {
 	int	i=0, full_len=0, len=0;
@@ -3588,19 +4034,19 @@ int get_file_ext( char *filename, char *ext )
 }
 
 
-/*------------------------------------------------------------------------------
-DOTS  -  print a set of dots (periods)
-------------------------------------------------------------------------------*/
+/*
+ * DOTS  -  print a set of dots (periods)
+ */
 void dots ( FILE *fp, int n ) {
 	int i;
 	for (i=1; i<=n; i++)	fprintf(fp,".");
 }
 
 
-/*------------------------------------------------------------------------------
-EVALUATE -  displays a randomly-generated goodbye message.
-------------------------------------------------------------------------------*/
-void evaluate ( float error, float rms_resid, float tol, int geom )
+/*
+ * EVALUATE -  displays a randomly-generated goodbye message.  
+ */
+void evaluate ( float error, float rms_resid, float tol, int geom ) 
 {
 	int r;
 
@@ -3608,19 +4054,19 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	color(0);
 	fprintf(stdout,"  RMS relative equilibrium error  = %9.3e ", error );
-	if ( error < tol && geom ) {
+	if ( error < tol ) {
 		fprintf(stdout," < tol = %7.1e ", tol );
 		(void) fflush(stdout);
 		textColor('y','b','b','x');
 		fprintf(stdout," ** converged ** ");
-	} if ( error > tol && geom ) {
+	} if ( error > tol ) {
 		fprintf(stdout," > tol = %7.1e ", tol );
 		(void) fflush(stdout);
 		textColor('y','r','b','x');
 		fprintf(stdout," !! not converged !! ");
 	}
 	(void) fflush(stdout);
-	color(0);
+	color(0);	
 	fprintf(stdout,"\n");
 	fprintf(stdout,"  RMS residual incremental displ. = %9.3e ", rms_resid);
 	dots(stdout,17);
@@ -3630,19 +4076,19 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','b','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," * brilliant!  * "); break;
-		case 1: fprintf(stdout," *  chuffed!   * "); break;
-		case 2: fprintf(stdout," *  woo-hoo!   * "); break;
-		case 3: fprintf(stdout," *  wicked!    * "); break;
-		case 4: fprintf(stdout," *   beaut!    * "); break;
-		case 5: fprintf(stdout," *   flash!    * "); break;
-		case 6: fprintf(stdout," *  well done! * "); break;
-		case 7: fprintf(stdout," *  priceless! * "); break;
-		case 8: fprintf(stdout," *  sweet as!  * "); break;
-		case 9: fprintf(stdout," *good as gold!* "); break;
+		case 0: fprintf(stdout," * brilliant!  * "); break; 
+		case 1: fprintf(stdout," *  chuffed!   * "); break; 
+		case 2: fprintf(stdout," *  woo-hoo!   * "); break; 
+		case 3: fprintf(stdout," *  wicked!    * "); break; 
+		case 4: fprintf(stdout," *   beaut!    * "); break; 
+		case 5: fprintf(stdout," *   flash!    * "); break; 
+		case 6: fprintf(stdout," *  well done! * "); break; 
+		case 7: fprintf(stdout," *  priceless! * "); break; 
+		case 8: fprintf(stdout," *  sweet as!  * "); break; 
+		case 9: fprintf(stdout," *good as gold!* "); break; 
 	    }
 	    (void) fflush(stdout);
-	    color(0);
+	    color(0);	
 	    fprintf(stdout,"\n");
 	    return;
 	}
@@ -3651,40 +4097,40 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','g','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout,"   acceptable!   "); break;
-		case 1: fprintf(stdout,"      bling!     "); break;
-		case 2: fprintf(stdout,"  that will do!  "); break;
-		case 3: fprintf(stdout,"   not shabby!   "); break;
-		case 4: fprintf(stdout,"   reasonable!   "); break;
-		case 5: fprintf(stdout,"   very good!    "); break;
-		case 6: fprintf(stdout,"   up to snuff!  "); break;
-		case 7: fprintf(stdout,"     bully!      "); break;
-		case 8: fprintf(stdout,"      nice!      "); break;
-		case 9: fprintf(stdout,"     choice!     "); break;
+		case 0: fprintf(stdout,"   acceptable!   "); break; 
+		case 1: fprintf(stdout,"      bling!     "); break; 
+		case 2: fprintf(stdout,"  that will do!  "); break; 
+		case 3: fprintf(stdout,"   not shabby!   "); break; 
+		case 4: fprintf(stdout,"   reasonable!   "); break; 
+		case 5: fprintf(stdout,"   very good!    "); break; 
+		case 6: fprintf(stdout,"   up to snuff!  "); break; 
+		case 7: fprintf(stdout,"     bully!      "); break; 
+		case 8: fprintf(stdout,"      nice!      "); break; 
+		case 9: fprintf(stdout,"     choice!     "); break; 
 	    }
 	    (void) fflush(stdout);
-	    color(0);
+	    color(0);	
 	    fprintf(stdout,"\n");
 	    return;
 	}
-
+	
 	if ( rms_resid < 1e-12 ) {
 
 	    textColor('y','c','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," adequate. "); break;
-		case 1: fprintf(stdout," passable. "); break;
-		case 2: fprintf(stdout," all right. "); break;
-		case 3: fprintf(stdout," ok. "); break;
-		case 4: fprintf(stdout," not bad. "); break;
-		case 5: fprintf(stdout," fine. "); break;
-		case 6: fprintf(stdout," fair. "); break;
-		case 7: fprintf(stdout," respectable. "); break;
-		case 8: fprintf(stdout," tolerable. "); break;
-		case 9: fprintf(stdout," just ok. "); break;
+		case 0: fprintf(stdout," adequate. "); break; 
+		case 1: fprintf(stdout," passable. "); break; 
+		case 2: fprintf(stdout," all right. "); break; 
+		case 3: fprintf(stdout," ok. "); break; 
+		case 4: fprintf(stdout," not bad. "); break; 
+		case 5: fprintf(stdout," fine. "); break; 
+		case 6: fprintf(stdout," fair. "); break; 
+		case 7: fprintf(stdout," respectable. "); break; 
+		case 8: fprintf(stdout," tolerable. "); break; 
+		case 9: fprintf(stdout," just ok. "); break; 
 	    }
 	    (void) fflush(stdout);
-	    color(0);
+	    color(0);	
 	    fprintf(stdout,"\n");
 	    return;
 	}
@@ -3693,19 +4139,19 @@ void evaluate ( float error, float rms_resid, float tol, int geom )
 
 	    textColor('y','r','b','x');
 	    switch ( r ) {
-		case 0: fprintf(stdout," abominable! "); break;
-		case 1: fprintf(stdout," puckeroo! "); break;
-		case 2: fprintf(stdout," atrocious! "); break;
-		case 3: fprintf(stdout," not ok! "); break;
-		case 4: fprintf(stdout," wonky! "); break;
-		case 5: fprintf(stdout," crappy! "); break;
-		case 6: fprintf(stdout," oh noooo! "); break;
-		case 7: fprintf(stdout," abominable! "); break;
-		case 8: fprintf(stdout," munted! "); break;
-		case 9: fprintf(stdout," awful! "); break;
+		case 0: fprintf(stdout," abominable! "); break; 
+		case 1: fprintf(stdout," puckeroo! "); break; 
+		case 2: fprintf(stdout," atrocious! "); break; 
+		case 3: fprintf(stdout," not ok! "); break; 
+		case 4: fprintf(stdout," wonky! "); break; 
+		case 5: fprintf(stdout," crappy! "); break; 
+		case 6: fprintf(stdout," oh noooo! "); break; 
+		case 7: fprintf(stdout," abominable! "); break; 
+		case 8: fprintf(stdout," munted! "); break; 
+		case 9: fprintf(stdout," awful! "); break; 
 	    }
 	    (void) fflush(stdout);
-	    color(0);
+	    color(0);	
 	    fprintf(stdout,"\n");
 	    return;
 	}

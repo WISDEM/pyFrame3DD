@@ -1,35 +1,14 @@
-/*   HPGutil.h  ---  library of general-purpose utility functions       */
-
-/*
- Copyright (C) 2012 Henri P. Gavin
- 
-    HPGutil is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version. 
-    
-    HPGutil is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    
-    You should have received a copy of the GNU General Public License
-    along with HPGutil.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+/*   hpgUtils.h  ---  library of general-purpose utility functions       */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
-#ifndef MAXL
-#define MAXL 256
-#endif
+#define MAXL 512
 
 #define ANSI_SYS	1	/*  compile for ANSI_SYS driver; 0: don't */
 // ... requires ANSI.SYS and the line   DEVICE = C:\ANSI.SYS  in  C:\CONFIG.SYS
-// #define MAXL 128
 
 
 /* ---------------------------------------------------------------------------
@@ -85,6 +64,7 @@ int scanFile ( FILE *fp, int head_lines, int start_chnl, int stop_chnl );
  */
 int getLine ( FILE *fp, int lim, char *s );
 
+
 /*  ---------------------------------------------------------------------------
  * getTime  parse a numeric time string of YYYYMMDDhhmmss 
  * The input variables y, m, d, hr, mn, sc are the indices of the string s[]
@@ -96,10 +76,11 @@ int getLine ( FILE *fp, int lim, char *s );
  */
 time_t getTime( char s[], int y, int m, int d, int hr, int mn, int sc, int os );
 
+
 /*  ---------------------------------------------------------------------------
 SHOW_PROGRESS  -   show the progress of long computations
 --------------------------------------------------------------------------- */
-void showProgress ( int i, int n );
+void showProgress ( int i, int n, int count );
 
 
 /*  ---------------------------------------------------------------------------

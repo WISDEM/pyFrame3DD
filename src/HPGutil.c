@@ -24,14 +24,14 @@
 #define DEBUG 0
 
 
-/* -----------------------------------------------------------------------------
-COLOR - change color on the screen ... 
- Screen   Color  Scheme  : 0 = white on black, 1 = bright
- first digit= 3  for text color	  first digit= 4  for  background color
- second digit codes:
- 0=black, 1=red, 2=green, 3=gold, 4=blue, 5=magenta, 6=cyan, 7=white
- http://en.wikipedia.org/wiki/ANSI_escape_code
-------------------------------------------------------------------------------*/
+/* 
+ * COLOR - change color on the screen ... 
+ * Screen   Color  Scheme  : 0 = white on black, 1 = bright
+ * first digit= 3  for text color	  first digit= 4  for  background color
+ * second digit codes:
+ * 0=black, 1=red, 2=green, 3=gold, 4=blue, 5=magenta, 6=cyan, 7=white
+ * http://en.wikipedia.org/wiki/ANSI_escape_code
+ */
 void color ( const int colorCode )	/*  change the screen color      */
 {
 #if ANSI_SYS
@@ -42,14 +42,14 @@ void color ( const int colorCode )	/*  change the screen color      */
 }
 
 
-/* ---------------------------------------------------------------------------
-TEXTCOLOR - change color of text and background
- tColor : text color : one of 'k' 'r' 'g' 'y' 'b' 'm' 'c' 'w'
- bColor : back color : one of 'k' 'r' 'g' 'y' 'b' 'm' 'c' 'w'
- nbf    : 'n' = normal, 'b' = bright/bold, 'f' = faint
- uline  : 'u' = underline
- http://en.wikipedia.org/wiki/ANSI_escape_code
----------------------------------------------------------------------------- */
+/*
+ * TEXTCOLOR - change color of text and background
+ * tColor : text color : one of 'k' 'r' 'g' 'y' 'b' 'm' 'c' 'w'
+ * bColor : back color : one of 'k' 'r' 'g' 'y' 'b' 'm' 'c' 'w'
+ * nbf    : 'n' = normal, 'b' = bright/bold, 'f' = faint
+ * uline  : 'u' = underline
+ * http://en.wikipedia.org/wiki/ANSI_escape_code
+ */
 void textColor ( const char tColor, const char bColor, const char nbf, const char uline )
 {
 #if ANSI_SYS
@@ -88,9 +88,9 @@ void textColor ( const char tColor, const char bColor, const char nbf, const cha
 }
 
 
-/* ---------------------------------------------------------------------------
-ERRORMSG -  write a diagnostic error message in color
------------------------------------------------------------------------------*/
+/*
+ * ERRORMSG -  write a diagnostic error message in color
+ */
 void errorMsg ( const char *errString )
 {
 	fprintf(stderr,"\n\n");
@@ -108,9 +108,9 @@ void errorMsg ( const char *errString )
 }
 
 
-/* ---------------------------------------------------------------------------
-OPENFILE  -  open a file or print a diagnostic error message 
------------------------------------------------------------------------------*/
+/* 
+ * OPENFILE  -  open a file or print a diagnostic error message 
+ */
 FILE *openFile ( const char *path, const char *fileName, const char *mode, char *usage )
 {
 	FILE	*fp;
@@ -149,9 +149,9 @@ FILE *openFile ( const char *path, const char *fileName, const char *mode, char 
 }
 
 
-/* ---------------------------------------------------------------------------
-SCANLINE -  scan through a line until a 'a' is reached, like getline() 3feb94
------------------------------------------------------------------------------*/
+/* 
+ * SCANLINE -  scan through a line until a 'a' is reached, like getline() 3feb94
+ */
 int scanLine ( FILE *fp, int lim, char *s, const char a ) 
 {
        	int     c=0,  i=-1;
@@ -162,9 +162,9 @@ int scanLine ( FILE *fp, int lim, char *s, const char a )
 }
 
 
-/* ---------------------------------------------------------------------------
-SCANLABEL -  scan through a line until a '"' is reached, like getline()
------------------------------------------------------------------------------*/
+/* 
+ * SCANLABEL -  scan through a line until a '"' is reached, like getline()
+ */
 int scanLabel ( FILE *fp, int lim, char *s, const char a )
 {
        	int     c=0,  i=-1;
@@ -178,10 +178,10 @@ int scanLabel ( FILE *fp, int lim, char *s, const char a )
 }
 
 
-/* ---------------------------------------------------------------------------
-SCANFILE -  count the number of lines of multi-column data in a data file,
-skipping over "head_lines" lines of header information 
------------------------------------------------------------------------------*/
+/* 
+ * SCANFILE -  count the number of lines of multi-column data in a data file,
+ * skipping over "head_lines" lines of header information 
+ */
 int scanFile ( FILE *fp, int head_lines, int start_chnl, int stop_chnl )
 {
 	int	points = 0,
@@ -210,10 +210,9 @@ int scanFile ( FILE *fp, int head_lines, int start_chnl, int stop_chnl )
 }
 
 
-/* ---------------------------------------------------------------------------
+/* 
  * GETLINE -  get line form a stream into a character string, return length
  * from K&R	       3feb94
- * ---------------------------------------------------------------------------
  */  
 int getLine ( FILE *fp, int lim, char *s )
 {
@@ -227,12 +226,11 @@ int getLine ( FILE *fp, int lim, char *s )
 }
 
 
-/* ---------------------------------------------------------------------------
+/* 
  * getTime  parse a numeric time string similar to YYYYMMDDhhmmss 
  * The input variables y, m, d, hr, mn, sc are the indices of the string s[]
  * which start the YYYY, MM, DD, hh, mm, ss sections of the time string.  
  * The corresponding time is returned in "time_t" format.
- * ---------------------------------------------------------------------------
  */  
 time_t getTime( char s[], int y, int m, int d, int hr, int mn, int sc, int os )
 {
@@ -261,10 +259,10 @@ time_t getTime( char s[], int y, int m, int d, int hr, int mn, int sc, int os )
 }
 
 
-/* ---------------------------------------------------------------------------
- SHOW_PROGRESS  -   show the progress of long computations
- --------------------------------------------------------------------------- */
-void showProgress ( int i, int n )
+/*
+ * SHOW_PROGRESS  -   show the progress of long computations
+ */
+void showProgress ( int i, int n, int count )
 {
 	int	k,j, line_length = 55;
 	float	percent_done;
@@ -273,19 +271,20 @@ void showProgress ( int i, int n )
 
 	j = (int) ceil(percent_done*line_length);
 
-	for (k=1;k<=line_length+7;k++)	fprintf(stderr,"\b");
+	for (k=1;k<=line_length+13;k++)	fprintf(stderr,"\b");
 	for (k=1;k<j;k++)		fprintf(stderr,">");
 	for (k=j;k<line_length;k++)	fprintf(stderr," ");
 	fprintf(stderr," %5.1f%%", percent_done*100.0 );
+	fprintf(stderr," %5d", count );
 	fflush(stderr);
 
 	return;
 }
 
 
-/* ---------------------------------------------------------------------------
+/* 
  * SFERR  -  Display error message upon an erronous *scanf operation
- * ------------------------------------------------------------------------- */
+ */
 void sferr ( char s[] )
 {
 	char    errMsg[MAXL];

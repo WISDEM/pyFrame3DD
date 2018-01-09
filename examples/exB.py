@@ -64,7 +64,7 @@ elements = ElementData(element, N1, N2, Ax, Asy, Asz, Jx, Iy, Iz, E, G, roll, de
 
 shear = 1               # 1: include shear deformation
 geom = 1                # 1: include geometric stiffness
-dx = 10.0               # x-axis increment for internal forces
+dx = 20.0               # x-axis increment for internal forces
 
 other = Options(shear, geom, dx)
 
