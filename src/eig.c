@@ -492,9 +492,11 @@ void stodola (
 	    if ( w[k] > shift )	w[k] = w[k] - shift;
 	    else		w[k] = shift - w[k];
 
-	    fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
-	    fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
-		sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
+	    if ( verbose ) {
+	      fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
+	      fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
+		      sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
+	    }
 	}
 
 	eigsort ( w, V, n, m );
