@@ -172,7 +172,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     *m=NULL,	// vector of modes to condense
     write_matrix=0,  //   write stiffness and mass matrix
     debug=0,	// 1: debugging screen output, 0: none
-    verbose=1,	// 1: copious screen output, 0: none
+    verbose=0,	// 1: copious screen output, 0: none
     axial_strain_warning = 0, // 0: "ok", 1: strain > 0.001
     ExitCode = 0;	// error code returned by Frame3DD
 

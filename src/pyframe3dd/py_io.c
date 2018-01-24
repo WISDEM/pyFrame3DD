@@ -462,8 +462,8 @@ void read_and_assemble_loads (
       U[lc][i][3] = uL.Uy[i-1];
       U[lc][i][4] = uL.Uz[i-1];
 
-      if ( U[lc][i][2]==0 && U[lc][i][3]==0 && U[lc][i][4]==0 )
-	fprintf(stderr,"\n   Warning: All distributed loads applied to frame element %d  are zero\n", n );
+      //if ( U[lc][i][2]==0 && U[lc][i][3]==0 && U[lc][i][4]==0 )
+      //fprintf(stderr,"\n   Warning: All distributed loads applied to frame element %d  are zero\n", n );
 
       Nx1 = Nx2 = U[lc][i][2]*Le[n] / 2.0;
       Vy1 = Vy2 = U[lc][i][3]*Le[n] / 2.0;

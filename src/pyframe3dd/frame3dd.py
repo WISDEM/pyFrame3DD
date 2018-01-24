@@ -385,8 +385,11 @@ class Frame(object):
         self.eG = np.copy(elements.G)
         self.eroll = np.copy(elements.roll)
         self.edensity = np.copy(elements.density)
-
-
+        # Compute length of elements
+        self.eL = np.sqrt( (self.nx[self.eN2-1]-self.nx[self.eN1-1])**2.0 +
+                           (self.ny[self.eN2-1]-self.ny[self.eN1-1])**2.0 +
+                           (self.nz[self.eN2-1]-self.nz[self.eN1-1])**2.0 )
+            
         # create c objects
         self.c_nodes = C_Nodes(len(self.nnode), ip(self.nnode), dp(self.nx),
             dp(self.ny), dp(self.nz), dp(self.nr))
@@ -565,37 +568,17 @@ class Frame(object):
 
         if self.addGravityLoadForExtraElementMass:
 
-            element = self.EEMelement
-            mass = self.EEMmass
-
-            # compute length of element
-            nE = len(self.elements.element)  # number of elements
-            x = self.nodes.x
-            y = self.nodes.y
-            z = self.nodes.z
-            N1 = self.elements.N1
-            N2 = self.elements.N2
-
-            L = np.zeros(nE)
-            for i in range(nE):
-
-                L[i] = math.sqrt(
-                    (x[N2[i]-1] - x[N1[i]-1])**2 +
-                    (y[N2[i]-1] - y[N1[i]-1])**2 +
-                    (z[N2[i]-1] - z[N1[i]-1])**2
-                )
-
-            # LE = L[element]
+            L = self.eL
 
             # add to interior point load
 
             # save all data in memory
             nLC = len(self.loadCases)
-            self.IPLE = [0]*nLC
-            self.IPLPx = [0]*nLC
-            self.IPLPy = [0]*nLC
-            self.IPLPz = [0]*nLC
-            self.IPLxE = [0]*nLC
+            self.IPLE  = np.array( [[]*nLC] )
+            self.IPLPx = np.array( [[]*nLC] )
+            self.IPLPy = np.array( [[]*nLC] )
+            self.IPLPz = np.array( [[]*nLC] )
+            self.IPLxE = np.array( [[]*nLC] )
 
 
             for icase, lc in enumerate(self.loadCases):
@@ -623,11 +606,11 @@ class Frame(object):
 
                     else:
                         # otherwise append to the end
-                        self.IPLE[icase] = np.concatenate([self.IPLE[icase], [element]])
-                        self.IPLPx[icase] = np.concatenate([self.IPLPx[icase], [mass*gx]])
-                        self.IPLPy[icase] = np.concatenate([self.IPLPx[icase], [mass*gy]])
-                        self.IPLPz[icase] = np.concatenate([self.IPLPx[icase], [mass*gz]])
-                        self.IPLxE[icase] = np.concatenate([self.IPLxE[icase], 0.5*LE])
+                        self.IPLE[ icase] = np.append(self.IPLE[ icase], element )
+                        self.IPLPx[icase] = np.append(self.IPLPx[icase], mass*gx )
+                        self.IPLPy[icase] = np.append(self.IPLPy[icase], mass*gy )
+                        self.IPLPz[icase] = np.append(self.IPLPz[icase], mass*gz )
+                        self.IPLxE[icase] = np.append(self.IPLxE[icase], 0.5*LE )
 
                 # self.IPLE = np.concatenate([lc.ELE, element])
                 # self.IPLPx = np.concatenate([lc.Px, mass*gx])
@@ -673,21 +656,11 @@ class Frame(object):
             np.zeros((nCases, nR)), np.zeros((nCases, nR)), np.zeros((nCases, nR))
         )
 
-        x = self.nodes.x
-        y = self.nodes.y
-        z = self.nodes.z
-        N1 = self.elements.N1
-        N2 = self.elements.N2
         dx = self.options.dx
 
         ifout = [0]*nE
         for i in range(nE):
-
-            L = math.sqrt(
-                (x[N2[i]-1] - x[N1[i]-1])**2 +
-                (y[N2[i]-1] - y[N1[i]-1])**2 +
-                (z[N2[i]-1] - z[N1[i]-1])**2
-            )
+            L = self.eL[i]
 
             nIF = int(max(math.floor(L/dx), 1)) + 1
 
