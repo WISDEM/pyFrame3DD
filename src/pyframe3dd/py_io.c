@@ -1168,11 +1168,11 @@ void write_static_results (
 
   if ( ok < 0 ) {
     sprintf(errMsg,"  * The Stiffness Matrix is not positive-definite *\n");
-    errorMsg(errMsg);
+    //errorMsg(errMsg);
     sprintf(errMsg,"    Check that all six rigid-body translations are restrained\n");
-    errorMsg(errMsg);
+    //errorMsg(errMsg);
     sprintf(errMsg,"    If geometric stiffness is included, reduce the loads.\n");
-    errorMsg(errMsg);
+    //errorMsg(errMsg);
   }
 
   for (j=1; j<= nN; j++) {
