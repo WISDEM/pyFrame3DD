@@ -1,4 +1,4 @@
-CC=gcc
+CC=clang #gcc
 CFLAGS = -c -O
 
 OBS   = frame3dd.o coordtrans.o eig.o HPGmatrix.o HPGutil.o NRutil.o 
