@@ -459,7 +459,8 @@ class Frame(object):
         self.ENMrhox = np.copy(rhox)
         self.ENMrhoy = np.copy(rhoy)
         self.ENMrhoz = np.copy(rhoz)
-        self.addGravityLoadForExtraNodeMass = addGravityLoad
+        # GB 2018: I don't think the addGravity is working well with frame3dd
+        self.addGravityLoadForExtraNodeMass = False #addGravityLoad
 
         self.c_extraInertia = C_ExtraInertia(len(self.ENMnode), ip(self.ENMnode),
             dp(self.ENMmass), dp(self.ENMIxx), dp(self.ENMIyy), dp(self.ENMIzz),
@@ -472,7 +473,8 @@ class Frame(object):
 
         self.EEMelement = element.astype(np.int32)
         self.EEMmass = np.copy(mass)
-        self.addGravityLoadForExtraElementMass = addGravityLoad
+        # GB 2018: I don't think the addGravity is working well with frame3dd
+        self.addGravityLoadForExtraElementMass = False #addGravityLoad
 
         self.c_extraMass = C_ExtraMass(len(self.EEMelement), ip(self.EEMelement),
             dp(self.EEMmass))
@@ -636,7 +638,7 @@ class Frame(object):
             print('error: must have at least 1 load case')
             return
 
-
+        # GB 2018: I don't think this is working right
         self.__addGravityToExtraMass()
 
 
