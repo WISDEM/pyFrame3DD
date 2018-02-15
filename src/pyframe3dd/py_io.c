@@ -432,8 +432,8 @@ void read_and_assemble_loads (
       F_mech[lc][6*j-1] = pL.Myy[i-1];
       F_mech[lc][6*j] = pL.Mzz[i-1];
 
-      if ( F_mech[lc][6*j-5]==0 && F_mech[lc][6*j-4]==0 && F_mech[lc][6*j-3]==0 && F_mech[lc][6*j-2]==0 && F_mech[lc][6*j-1]==0 && F_mech[lc][6*j]==0 )
-	fprintf(stderr,"\n   Warning: All node loads applied at node %d  are zero\n", j );
+      //if ( F_mech[lc][6*j-5]==0 && F_mech[lc][6*j-4]==0 && F_mech[lc][6*j-3]==0 && F_mech[lc][6*j-2]==0 && F_mech[lc][6*j-1]==0 && F_mech[lc][6*j]==0 )
+	//fprintf(stderr,"\n   Warning: All node loads applied at node %d  are zero\n", j );
     }   /* end node point loads  */
 
         /* uniformly distributed loads */
@@ -534,8 +534,8 @@ void read_and_assemble_loads (
       if ( W[lc][i][ 4]==0 && W[lc][i][ 5]==0 &&
 	   W[lc][i][ 8]==0 && W[lc][i][ 9]==0 &&
 	   W[lc][i][12]==0 && W[lc][i][13]==0 ) {
-	fprintf(stderr,"\n   Warning: All trapezoidal loads applied to frame element %d  are zero\n", n );
-	fprintf(stderr,"     load case: %d , element %d , load %d\n ", lc, n, i );
+	//fprintf(stderr,"\n   Warning: All trapezoidal loads applied to frame element %d  are zero\n", n );
+	//fprintf(stderr,"     load case: %d , element %d , load %d\n ", lc, n, i );
       }
 
       if ( W[lc][i][ 2] < 0 ) {
@@ -1158,7 +1158,7 @@ void write_static_results (
 			   Reactions* reactions, int nR,
 			   int nN, int nE, int nL, int lc, int DoF,
 			   int *J1, int *J2,
-			   double *F, double *D, int *r, double **Q,
+			   double *R, double *D, int *r, double **Q,
 			   double err, int ok){
 
   // double  disp;
@@ -1215,7 +1215,7 @@ void write_static_results (
 
     for (i=5; i>=0; i--) {
       if (r[6*j-i]){
-	vals[i] = F[6*j-i];
+	vals[i] = R[6*j-i];
       } else{
 	vals[i] = 0.0;
       }
