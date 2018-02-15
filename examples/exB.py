@@ -196,7 +196,7 @@ EMy = np.array([0.0])
 EMz = np.array([0.0])
 
 # frame.changeExtraInertia(N, EMs, EMx, EMy, EMz)
-frame.changeExtraNodeMass(N, EMs, EMx, EMy, EMz, [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], True)
+frame.changeExtraNodeMass(N, EMs, EMx, EMy, EMz, [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], False)
 
 # extra frame element mass data ...
 # dynamic.changeExtraMass(EL, EMs)
@@ -215,7 +215,7 @@ nE = len(elements.element)  # number of elements
 # nM = dynamic.nM  # number of modes
 
 # node displacements
-
+'''
 for iCase in range(nC):
 
     print 'case_idx:', iCase
@@ -228,17 +228,6 @@ for iCase in range(nC):
     print 'dyrot:', displacements.dyrot[iCase, :]
     print 'dzrot:', displacements.dzrot[iCase, :]
     print
-
-print
-print
-
-
-# frame element end forces
-
-for iCase in range(nC):
-
-    print 'case_idx:', iCase
-
     print 'element =', forces.element[iCase, :]
     print 'node =', forces.node[iCase, :]
     print 'Nx =', forces.Nx[iCase, :]
@@ -248,17 +237,6 @@ for iCase in range(nC):
     print 'Myy =', forces.Myy[iCase, :]
     print 'Mzz =', forces.Mzz[iCase, :]
     print
-
-print
-print
-
-
-# reactions
-
-for iCase in range(nC):
-
-    print 'case_idx:', iCase
-
     print 'nodesR =', reactions.node[iCase, :]
     print 'RFx =', reactions.Fx[iCase, :]
     print 'RFy =', reactions.Fy[iCase, :]
@@ -333,3 +311,4 @@ for iM in range(nM):
     print 'zrot =', modal.zrot[iM, :]
     print
 
+'''
