@@ -508,7 +508,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     write_static_results ( displacements, forces, reactionForces,
 			   reactions, nR,
 			   nN, nE, nL, lc, DoF, N1, N2,
-			   F, D, r, Q, rms_resid, ok );
+			   R, D, r, Q, rms_resid, ok );
     /*
       write_static_results ( fp, nN,nE,nL, lc, DoF, N1,N2,
       F,D,R, r,Q, rms_resid, ok, axial_sign );
