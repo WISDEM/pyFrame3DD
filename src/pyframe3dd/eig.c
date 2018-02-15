@@ -201,7 +201,7 @@ void subspace(
 						*iter, modes, w[modes], error );
 		w_old = w[modes];
 
-		if ( *iter > 1000 ) {
+		if ( *iter > 10000 ) {
 		    sprintf(errMsg,"  subspace: Iteration limit exceeded\n rel. error = %e > %e\n", error, tol );
 		    errorMsg(errMsg);
 		    exit(32);
@@ -478,7 +478,7 @@ void stodola (
 		RQ = xtAy ( u, K, u, n, d );		/* Raleigh quotient */
 		(*iter)++;
 
-		if ( *iter > 1000 ) {
+		if ( *iter > 10000 ) {
 		    sprintf(errMsg,"  stodola: Iteration limit exceeded\n  rel. error = %e > %e\n", (fabs(RQ - RQold)/RQ) , tol );
 		    errorMsg(errMsg);
 		    exit(32);
