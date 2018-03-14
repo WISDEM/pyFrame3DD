@@ -581,7 +581,7 @@ int sturm(
 	if ( verbose )
 	 fprintf(stdout,"  There are %d modes below %f Hz.", -ok, sqrt(ws)/(2.0*PI) );
 
-	if ( -ok > modes ) {
+	if (( -ok > modes ) && (verbose)){
 		fprintf(stderr," ... %d modes were not found.\n", -ok-modes );
 		fprintf(stderr," Try increasing the number of modes in \n");
 		fprintf(stderr," order to get the missing modes below %f Hz.\n",
