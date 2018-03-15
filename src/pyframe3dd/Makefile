@@ -1,5 +1,5 @@
 CC=clang #gcc
-CFLAGS = -c -g -O2
+CFLAGS = -c -g -O2 -fPIC
 
 OBS   = frame3dd.o coordtrans.o eig.o HPGmatrix.o HPGutil.o NRutil.o 
 PYOBS = py_main.o py_io.o
@@ -14,7 +14,7 @@ else
     ifeq ($(UNAME_S),Linux)
         ARCHFLAGS=-D LINUX
 	LIB := _pyframe3dd.so
-	LDFLAGS=-shared -W1,-soname,$(LIB)
+	LDFLAGS=-shared -Wl,-soname,$(LIB)
     endif
     ifeq ($(UNAME_S),Darwin)
         ARCHFLAGS=-D OSX
