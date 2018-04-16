@@ -17,12 +17,14 @@ else:
 
 setup(
     name='pyFrame3DD',
-    version='1.0.0',
+    version='1.1.0',
     description='Python bindings to Frame3DD',
     author='S. Andrew Ning',
     author_email='andrew.ning@nrel.gov',
     package_dir={'': 'src'},
     py_modules=['frame3dd'],
+    package_data={'pyframe3dd': []},
+    packages=['pyframe3dd'],
     license='Apache License, Version 2.0',
     ext_modules=[Extension('_pyframe3dd', ['src/pyframe3dd/py_main.c', 'src/pyframe3dd/py_io.c',
                                            'src/pyframe3dd/frame3dd.c', 'src/pyframe3dd/HPGmatrix.c', 'src/pyframe3dd/coordtrans.c',
