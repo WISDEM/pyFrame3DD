@@ -363,8 +363,8 @@ void solve_system(
 	/*  vectors F and D are unchanged */
 	ldl_dcmp_pm ( K, DoF, diag, F, D, R, q,r, 1, 0, ok );
 	if ( *ok < 0 ) {
-	 	fprintf(stderr," Make sure that all six");
-		fprintf(stderr," rigid body translations are restrained!\n");
+	  //fprintf(stderr," Make sure that all six");
+	  //fprintf(stderr," rigid body translations are restrained!\n");
 		/* exit(31); */
 	} else {	/* LDL'  back-substitution for D[q] and R[r] */
 		ldl_dcmp_pm ( K, DoF, diag, F,D,R, q,r, 0, 1, ok );
