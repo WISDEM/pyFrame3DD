@@ -5,6 +5,7 @@ frame3dd
 # C extensions
 *.so
 *.o
+*.dSYM
 
 # Packages
 *.egg
