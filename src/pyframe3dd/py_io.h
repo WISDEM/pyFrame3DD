@@ -17,7 +17,7 @@ Nov 1, 2013
 /**
     Read node coordinate data
 */
-void read_node_data (
+int read_node_data (
     Nodes *nodes,   /**node struct            */
     int nN,     /**< number of nodes                */
     vec3 *xyz,  /**< XYZ coordinates of each node       */
@@ -27,7 +27,7 @@ void read_node_data (
 /**
     Read frame element property data
 */
-void read_frame_element_data (
+int read_frame_element_data (
     Elements *elements, // element data
     int nN,     /**< number of nodes                */
     int nE,     /**< number of frame elements           */
@@ -46,7 +46,7 @@ void read_frame_element_data (
 /**
     Read data controlling certain aspects of the analysis
 */
-void read_run_data (
+int read_run_data (
     OtherElementData *other, // struct
     int *shear, /**< 1: include shear deformations, 0: don't    */
     int *geom,  /**< 1: include geometric stiffness, 0: don't   */
@@ -58,7 +58,7 @@ void read_run_data (
 /**
     Read fixed node displacement boundary conditions
 */
-void read_reaction_data(
+int read_reaction_data(
     Reactions *reactions,  // struct
     int DoF,    /**< number of degrees of freedom       */
     int nN,     /**< number of nodes                */
@@ -74,7 +74,7 @@ void read_reaction_data(
 /**
     read load information data, form un-restrained load vector
 */
-void read_and_assemble_loads(
+int read_and_assemble_loads(
     LoadCase* loadcases, //struct
     int nN,     /**< number of nodes                */
     int nE,     /**< number of frame elements           */
@@ -117,7 +117,7 @@ void read_and_assemble_loads(
 /**
     read member densities and extra inertial mass data
 */
-void read_mass_data(
+int read_mass_data(
     DynamicData *dynamic, ExtraInertia *extraInertia, ExtraMass *extraMass, // structs
     int nN, int nE, /**< number of nodes, number of frame elements */
     int *nI,    /**< number of nodes with extra inertia */
@@ -144,7 +144,7 @@ void read_mass_data(
 /**
     read matrix condensation information
 */
-void read_condensation_data(
+int read_condensation_data(
     Condensation *condensation, //struct
     int nN, int nM,     /**< number of nodes, number of modes   */
     int *nC,    /**< number of nodes with condensed DoF's   */

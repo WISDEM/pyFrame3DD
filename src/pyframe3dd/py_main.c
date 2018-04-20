@@ -54,8 +54,8 @@
 #include "frame3dd.h"
 //#include "frame3dd_io.h"
 #include "py_io.h"
-#include "eig.h"
-#include "HPGmatrix.h"
+#include "py_eig.h"
+#include "py_HPGmatrix.h"
 #include "HPGutil.h"
 #include "NRutil.h"
 
@@ -198,17 +198,17 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
   rj  =  vector(1,nN);		/* rigid radius around each node */
   xyz = (vec3 *)malloc(sizeof(vec3)*(1+nN));	/* node coordinates */
 
-  read_node_data ( nodes, nN, xyz, rj );
+  ExitCode += read_node_data ( nodes, nN, xyz, rj );
   if ( verbose )	printf(" ... complete\n");
 
   DoF = 6*nN;		/* total number of degrees of freedom	*/
 
   // andrewng: read this first because want geom for check in read_reaction_data
-  read_run_data ( other, &shear, &geom, &exagg_static, &dx); 
+  ExitCode += read_run_data ( other, &shear, &geom, &exagg_static, &dx); 
       
   q   = ivector(1,DoF);	/* allocate memory for reaction data ... */
   r   = ivector(1,DoF);	/* allocate memory for reaction data ... */
-  read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose, geom );
+  ExitCode += read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose, geom );
   if ( verbose )	fprintf(stdout," ... complete\n");
 
   nE = elements->nE;  /* number of frame elements */
@@ -240,7 +240,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
   p   =  vector(1,nE);	/* element rotation angle about local x axis */
   d   =  vector(1,nE);	/* element mass density			*/
 
-  read_frame_element_data( elements, nN, nE, xyz,rj, L, Le, N1, N2,
+  ExitCode += read_frame_element_data( elements, nN, nE, xyz,rj, L, Le, N1, N2,
 			   Ax, Asy, Asz, Jx, Iy, Iz, E, G, p, d );
   if ( verbose) 	fprintf(stdout," ... complete\n");
 
@@ -306,7 +306,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
   pkSy = dmatrix(1,nL,1,nE);
   pkSz = dmatrix(1,nL,1,nE); 
 
-  read_and_assemble_loads( loadcases, nN, nE, nL, DoF, xyz, L, Le, N1, N2,
+  ExitCode += read_and_assemble_loads( loadcases, nN, nE, nL, DoF, xyz, L, Le, N1, N2,
 			   Ax,Asy,Asz, Iy,Iz, E, G, p,
 			   d, gX, gY, gZ, r, shear,
 			   nF, nU, nW, nP, nT, nD,
@@ -318,7 +318,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     fprintf(stdout," load data ... complete\n");
   }
 
-  read_mass_data( dynamic, extraInertia, extraMass, nN, nE, &nI, &nX,
+  ExitCode += read_mass_data( dynamic, extraInertia, extraMass, nN, nE, &nI, &nX,
 		  d, EMs, NMs, NMx, NMy, NMz,
 		  L, Ax, &total_mass, &struct_mass, &nM,
 		  &Mmethod, &lump, &tol, &shift,
@@ -330,7 +330,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     fprintf(stdout," mass data ... complete\n");
   }
 
-  read_condensation_data( condensation, nN,nM, &nC, &Cdof, 
+  ExitCode += read_condensation_data( condensation, nN,nM, &nC, &Cdof, 
 			  &Cmethod, c,m, verbose );
 
   if( nC>0 && verbose ) {	/*  display condensation data complete */
@@ -608,9 +608,9 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 
     if ( anlyz ) {	/* subspace or stodola methods */
       if( Mmethod == 1 )
-	subspace( K, M, DoF, nM_calc, f, V, tol,shift,&iter,&ok, verbose );
+	ExitCode += subspace( K, M, DoF, nM_calc, f, V, tol,shift,&iter,&ok, verbose );
       if( Mmethod == 2 )
-	stodola ( K, M, DoF, nM_calc, f, V, tol,shift,&iter,&ok, verbose );
+	ExitCode += stodola ( K, M, DoF, nM_calc, f, V, tol,shift,&iter,&ok, verbose );
 
       for (j=1; j<=nM_calc; j++) f[j] = sqrt(f[j])/(2.0*PI);
 

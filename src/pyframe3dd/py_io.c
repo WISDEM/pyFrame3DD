@@ -13,7 +13,7 @@
 #include "common.h"
 // #include "frame3dd_io.h"
 #include "coordtrans.h"
-#include "HPGmatrix.h"
+#include "py_HPGmatrix.h"
 #include "HPGutil.h"
 #include "NRutil.h"
 #include "py_io.h"
@@ -26,7 +26,7 @@
   READ_NODE_DATA  -  read node location data
   Oct 31 2013
   ------------------------------------------------------------------------------*/
-void read_node_data(Nodes *nodes, int nN, vec3 *xyz, float *r ){
+int read_node_data(Nodes *nodes, int nN, vec3 *xyz, float *r ){
 
   int i, j;
   char errMsg[MAXL];
@@ -36,14 +36,14 @@ void read_node_data(Nodes *nodes, int nN, vec3 *xyz, float *r ){
     if ( j <= 0 || j > nN ) {
       sprintf(errMsg,"\nERROR: in node coordinate data, node number out of range\n(node number %d is <= 0 or > %d)\n", j, nN);
       errorMsg(errMsg);
-      exit(41);
+      return 41;
     }
     xyz[j].x = nodes->x[i-1];
     xyz[j].y = nodes->y[i-1];
     xyz[j].z = nodes->z[i-1];
     r[j] = fabs(nodes->r[i-1]);
   }
-  return;
+  return 0;
 }
 
 
@@ -52,7 +52,7 @@ void read_node_data(Nodes *nodes, int nN, vec3 *xyz, float *r ){
   READ_FRAME_ELEMENT_DATA  -  read frame element property data
   Oct 31, 2013
   ------------------------------------------------------------------------------*/
-void read_frame_element_data (Elements *elements,
+int read_frame_element_data (Elements *elements,
 			      int nN, int nE, vec3 *xyz, float *r,
 			      double *L, double *Le,
 			      int *N1, int *N2,
@@ -72,7 +72,7 @@ void read_frame_element_data (Elements *elements,
     if ( b <= 0 || b > nE ) {
       sprintf(errMsg,"\n  error in frame element property data: Element number out of range  \n Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(51);
+      return 51;
     }
     N1[b] = elements->N1[i-1];
     N2[b] = elements->N2[i-1];
@@ -82,7 +82,7 @@ void read_frame_element_data (Elements *elements,
     if ( N1[b] <= 0 || N1[b] > nN || N2[b] <= 0 || N2[b] > nN ) {
       sprintf(errMsg,"\n  error in frame element property data: node number out of range  \n Frame element number: %d \n", b);
       errorMsg(errMsg);
-      exit(52);
+      return 52;
     }
 
     Ax[b] = elements->Ax[i-1];
@@ -102,37 +102,37 @@ void read_frame_element_data (Elements *elements,
 	 Jx[b] < 0 ||  Iy[b] < 0 ||  Iz[b] < 0  ) {
       sprintf(errMsg,"\n  error in frame element property data: section property < 0 \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(53);
+      return 53;
     }
     if ( Ax[b] == 0 ) {
       sprintf(errMsg,"\n  error in frame element property data: cross section area is zero   \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(54);
+      return 54;
     }
     if ( (Asy[b] == 0 || Asz[b] == 0) && G[b] == 0 ) {
       sprintf(errMsg,"\n  error in frame element property data: a shear area and shear modulus are zero   \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(55);
+      return 55;
     }
     if ( Jx[b] == 0 ) {
       sprintf(errMsg,"\n  error in frame element property data: torsional moment of inertia is zero   \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(56);
+      return 56;
     }
     if ( Iy[b] == 0 || Iz[b] == 0 ) {
       sprintf(errMsg,"\n  error: cross section bending moment of inertia is zero   \n  Frame element number : %d  \n", b);
       errorMsg(errMsg);
-      exit(57);
+      return 57;
     }
     if ( E[b] <= 0 || G[b] <= 0 ) {
       sprintf(errMsg,"\n  error : material elastic modulus E or G is not positive   \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(58);
+      return 58;
     }
     if ( d[b] <= 0 ) {
       sprintf(errMsg,"\n  error : mass density d is not positive   \n  Frame element number: %d  \n", b);
       errorMsg(errMsg);
-      exit(59);
+      return 59;
     }
   }
 
@@ -153,13 +153,13 @@ void read_frame_element_data (Elements *elements,
 	      " Frame elements must start and stop at different nodes\n  frame element %d  N1= %d N2= %d L= %e\n   Perhaps frame element number %d has not been specified.\n  or perhaps the Input Data file is missing expected data.\n",
 	      b, n1,n2, L[b], i );
       errorMsg(errMsg);
-      exit(60);
+      return 60;
     }
     if ( Le[b] <= 0.0 ) {
       sprintf(errMsg, " Node  radii are too large.\n  frame element %d  N1= %d N2= %d L= %e \n  r1= %e r2= %e Le= %e \n",
 	      b, n1,n2, L[b], r[n1], r[n2], Le[b] );
       errorMsg(errMsg);
-      exit(61);
+      return 61;
     }
   }
 
@@ -173,9 +173,9 @@ void read_frame_element_data (Elements *elements,
 
   free_ivector(epn,1,nN);
 
-  if ( epn0 > 0 ) exit(42);
+  if ( epn0 > 0 ) return 42;
 
-  return;
+  return 0;
 }
 
 
@@ -184,7 +184,7 @@ void read_frame_element_data (Elements *elements,
   Oct 31, 2013
   ------------------------------------------------------------------------------*/
 
-void read_run_data (OtherElementData *other, int *shear, int *geom, double *exagg_static, float *dx){
+int read_run_data (OtherElementData *other, int *shear, int *geom, double *exagg_static, float *dx){
 
   *shear = other->shear;
   *geom = other->geom;
@@ -193,25 +193,25 @@ void read_run_data (OtherElementData *other, int *shear, int *geom, double *exag
 
   if (*shear != 0 && *shear != 1) {
     errorMsg(" Rember to specify shear deformations with a 0 or a 1 \n after the frame element property info.\n");
-    exit(71);
+    return 71;
   }
 
   if (*geom != 0 && *geom != 1) {
     errorMsg(" Rember to specify geometric stiffness with a 0 or a 1 \n after the frame element property info.\n");
-    exit(72);
+    return 72;
   }
 
   if ( *exagg_static < 0.0 ) {
     errorMsg(" Remember to specify an exageration factor greater than zero.\n");
-    exit(73);
+    return 73;
   }
 
   if ( *dx <= 0.0 && *dx != -1 ) {
     errorMsg(" Remember to specify a frame element increment greater than zero.\n");
-    exit(74);
+    return 74;
   }
 
-  return;
+  return 0;
 }
 
 
@@ -220,7 +220,7 @@ void read_run_data (OtherElementData *other, int *shear, int *geom, double *exag
   READ_REACTION_DATA - Read fixed node displacement boundary conditions
   Oct 31, 2013
   ------------------------------------------------------------------------------*/
-void read_reaction_data (Reactions *reactions, int DoF, int nN,
+int read_reaction_data (Reactions *reactions, int DoF, int nN,
 			 int *nR, int *q, int *r, int *sumR, int verbose, int geom){
 
   int i,j;
@@ -240,7 +240,7 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
     fprintf(stderr," nR = %3d ", *nR );
     sprintf(errMsg,"\n  error: valid ranges for nR is 0 ... %d \n", DoF/6 );
     errorMsg(errMsg);
-    exit(80);
+    return 80;
   }
 
 
@@ -250,7 +250,7 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
     if ( j > nN ) {
       sprintf(errMsg,"\n  error in reaction data: node number %d is greater than the number of nodes, %d \n", j, nN );
       errorMsg(errMsg);
-      exit(81);
+      return 81;
     }
 
     // save rigid locations (and extra stiffness if needed)
@@ -279,22 +279,22 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
   if ( *sumR < 4 && geom) {
     sprintf(errMsg,"\n  error:  geometric stiffness can not be used for unrestrained structure.  set geom=0 or added more reactions.\n");
     errorMsg(errMsg);
-    exit(84);
+    return 84;
   }
   // if ( *sumR < 4 ) {
   //     sprintf(errMsg,"\n  Warning:  un-restrained structure   %d imposed reactions.\n  At least 4 reactions are required to support static loads.\n", *sumR );
   //     errorMsg(errMsg);
-  //     /*  exit(84); */
+  //     /*  return 84; */
   // }
   if ( *sumR >= DoF ) {
     sprintf(errMsg,"\n  error in reaction data:  Fully restrained structure\n   %d imposed reactions >= %d degrees of freedom\n", *sumR, DoF );
     errorMsg(errMsg);
-    exit(85);
+    return 85;
   }
 
   for (i=1; i<=DoF; i++)  if (r[i]) q[i] = 0; else q[i] = 1;
 
-  return;
+  return 0;
 }
 
 
@@ -303,7 +303,7 @@ void read_reaction_data (Reactions *reactions, int DoF, int nN,
   read load information data, assemble un-restrained load vectors
   09 Sep 2008
   ------------------------------------------------------------------------------*/
-void read_and_assemble_loads (
+int read_and_assemble_loads (
 			      LoadCase* loadcases,
 			      int nN, int nE, int nL, int DoF,
 			      vec3 *xyz,
@@ -422,7 +422,7 @@ void read_and_assemble_loads (
       if ( j < 1 || j > nN ) {
 	sprintf(errMsg,"\n  error in node load data: node number out of range ... Node : %d\n   Perhaps you did not specify %d node loads \n  or perhaps the Input Data file is missing expected data.\n", j, nF[lc] );
 	errorMsg(errMsg);
-	exit(121);
+	return 121;
       }
 
       F_mech[lc][6*j-5] = pL.Fx[i-1];
@@ -448,14 +448,14 @@ void read_and_assemble_loads (
       fprintf(stderr," nU = %3d\n", nU[lc]);
       sprintf(errMsg,"\n  error: valid ranges for nU is 0 ... %d \n", nE );
       errorMsg(errMsg);
-      exit(131);
+      return 131;
     }
     for (i=1; i <= nU[lc]; i++) { /* ! local element coordinates ! */
       n = uL.EL[i-1];
       if ( n < 1 || n > nE ) {
 	sprintf(errMsg,"\n  error in uniform distributed loads: element number %d is out of range\n",n);
 	errorMsg(errMsg);
-	exit(132);
+	return 132;
       }
       U[lc][i][1] = (double) n;
       U[lc][i][2] = uL.Ux[i-1];
@@ -504,14 +504,14 @@ void read_and_assemble_loads (
     if ( nW[lc] < 0 || nW[lc] > 10*nE ) {
       sprintf(errMsg,"\n  error: valid ranges for nW is 0 ... %d \n", 10*nE );
       errorMsg(errMsg);
-      exit(140);
+      return 140;
     }
     for (i=1; i <= nW[lc]; i++) { /* ! local element coordinates ! */
       n = tL.EL[i-1];
       if ( n < 1 || n > nE ) {
 	sprintf(errMsg,"\n  error in trapezoidally-distributed loads: element number %d is out of range\n",n);
 	errorMsg(errMsg);
-	exit(141);
+	return 141;
       }
       W[lc][i][1] = (double) n;
       W[lc][i][2] = tL.xx1[i-1];
@@ -542,54 +542,54 @@ void read_and_assemble_loads (
 	sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f < 0\n",
 		lc, n, i , W[lc][i][2]);
 	errorMsg(errMsg);
-	exit(142);
+	return 142;
       }
       if ( W[lc][i][ 2] > W[lc][i][3] ) {
 	sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n",
 		lc, n, i , W[lc][i][2], W[lc][i][3] );
 	errorMsg(errMsg);
-	exit(143);
+	return 143;
       }
       if ( W[lc][i][ 3] > Ln ) {
 	sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",
 		lc, n, i, W[lc][i][3], Ln );
 	errorMsg(errMsg);
-	exit(144);
+	return 144;
       }
       if ( W[lc][i][ 6] < 0 ) {
 	sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f < 0\n",
 		lc, n, i, W[lc][i][6]);
 	errorMsg(errMsg);
-	exit(142);
+	return 142;
       }
       if ( W[lc][i][ 6] > W[lc][i][7] ) {
 	sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f > ending location = %f \n",
 		lc, n, i, W[lc][i][6], W[lc][i][7] );
 	errorMsg(errMsg);
-	exit(143);
+	return 143;
       }
       if ( W[lc][i][ 7] > Ln ) {
 	sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",
 		lc, n, i, W[lc][i][7],Ln );
 	errorMsg(errMsg);
-	exit(144);
+	return 144;
       }
       if ( W[lc][i][10] < 0 ) {
 	sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f < 0\n",
 		lc, n, i, W[lc][i][10]);
 	errorMsg(errMsg);
-	exit(142);
+	return 142;
       }
       if ( W[lc][i][10] > W[lc][i][11] ) {
 	sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f > ending location = %f \n",
 		lc, n, i, W[lc][i][10], W[lc][i][11] );
 	errorMsg(errMsg);
-	exit(143);
+	return 143;
       }
       if ( W[lc][i][11] > Ln ) {
 	sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",lc, n, i, W[lc][i][11], Ln );
 	errorMsg(errMsg);
-	exit(144);
+	return 144;
       }
 
       if ( shear ) {
@@ -693,14 +693,14 @@ void read_and_assemble_loads (
       fprintf(stderr," nP = %3d\n", nP[lc]);
       sprintf(errMsg,"\n  error: valid ranges for nP is 0 ... %d \n", 10*nE );
       errorMsg(errMsg);
-      exit(150);
+      return 150;
     }
     for (i=1; i <= nP[lc]; i++) { /* ! local element coordinates ! */
       n = eL.EL[i-1];
       if ( n < 1 || n > nE ) {
 	sprintf(errMsg,"\n   error in internal point loads: frame element number %d is out of range\n",n);
 	errorMsg(errMsg);
-	exit(151);
+	return 151;
       }
       P[lc][i][1] = (double) n;
       P[lc][i][2] = eL.Px[i-1];
@@ -714,7 +714,7 @@ void read_and_assemble_loads (
 	sprintf(errMsg,"\n  error in point load data: Point load coord. out of range\n   Frame element number: %d  L: %lf  load coord.: %lf\n",
                 n, L[n], P[lc][i][5] );
 	errorMsg(errMsg);
-	exit(152);
+	return 152;
       }
 
       if ( shear ) {
@@ -782,14 +782,14 @@ void read_and_assemble_loads (
       fprintf(stderr," nT = %3d\n", nT[lc] );
       sprintf(errMsg,"\n  error: valid ranges for nT is 0 ... %d \n", nE );
       errorMsg(errMsg);
-      exit(160);
+      return 160;
     }
     for (i=1; i <= nT[lc]; i++) { /* ! local element coordinates ! */
       n = tempL.EL[i-1];
       if ( n < 1 || n > nE ) {
 	sprintf(errMsg,"\n  error in temperature loads: frame element number %d is out of range\n",n);
 	errorMsg(errMsg);
-	exit(161);
+	return 161;
       }
       T[lc][i][1] = (double) n;
       T[lc][i][2] = tempL.a[i-1];
@@ -807,7 +807,7 @@ void read_and_assemble_loads (
       if ( hy < 0 || hz < 0 ) {
 	sprintf(errMsg,"\n  error in thermal load data: section dimension < 0\n   Frame element number: %d  hy: %f  hz: %f\n", n,hy,hz);
 	errorMsg(errMsg);
-	exit(162);
+	return 162;
       }
 
       Nx2 = (a/4.0)*( T[lc][i][5]+T[lc][i][6]+T[lc][i][7]+T[lc][i][8])*E[n]*Ax[n];
@@ -869,14 +869,14 @@ void read_and_assemble_loads (
 	  sprintf(errMsg," Initial displacements can be prescribed only at restrained coordinates\n  node: %d  dof: %d  r: %d\n",
 		  j, 6-l, r[6*j-l] );
 	  errorMsg(errMsg);
-	  exit(171);
+	  return 171;
 	}
       }
     }
 
   }                   /* end load-case loop */
 
-  return;
+  return 0;
 }
 
 
@@ -884,7 +884,7 @@ void read_and_assemble_loads (
   READ_MASS_DATA  -  read element densities and extra inertial mass data
   Oct 31, 2013
   ------------------------------------------------------------------------------*/
-void read_mass_data (
+int read_mass_data (
 		     DynamicData *dynamic, ExtraInertia *extraInertia, ExtraMass *extraMass,
 		     int nN, int nE, int *nI, int *nX,
 		     float *d, float *EMs,
@@ -923,7 +923,7 @@ void read_mass_data (
       *struct_mass += d[b]*Ax[b]*L[b];
     }
 
-    return;
+    return 0;
   }
 
   *Mmethod = dynamic->Mmethod;
@@ -958,7 +958,7 @@ void read_mass_data (
       sprintf(errMsg,"\n  error in node mass data: node number out of range    Node : %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
 	      jnt, *nI );
       errorMsg(errMsg);
-      exit(86);
+      return 86;
     }
     NMs[jnt] = extraInertia->EMs[j-1];
     NMx[jnt] = extraInertia->EMx[j-1];
@@ -988,7 +988,7 @@ void read_mass_data (
       sprintf(errMsg,"\n  error in element mass data: element number out of range   Element: %d  \n   Perhaps you did not specify %d extra masses \n   or perhaps the Input Data file is missing expected data.\n",
 	      b, *nX );
       errorMsg(errMsg);
-      exit(87);
+      return 87;
     }
     EMs[b] = extraMass->EMs[m-1];
   }
@@ -1005,7 +1005,7 @@ void read_mass_data (
     if ( d[m] < 0.0 || EMs[m] < 0.0 || d[m]+EMs[m] <= 0.0 ) {
       sprintf(errMsg,"\n  error: Non-positive mass or density\n  d[%d]= %f  EMs[%d]= %f\n",m,d[m],m,EMs[m]);
       errorMsg(errMsg);
-      exit(88);
+      return 88;
     }
   }
 
@@ -1056,7 +1056,7 @@ void read_mass_data (
   // strcat(mode_file,"-m");
   // output_path(mode_file,modepath,FRAME3DD_PATHMAX,NULL);
 
-  return;
+  return 0;
 }
 
 
@@ -1064,7 +1064,7 @@ void read_mass_data (
   READ_CONDENSE   -  read matrix condensation information
   Oct 31, 2013
   ------------------------------------------------------------------------------*/
-void read_condensation_data (
+int read_condensation_data (
 			     Condensation *condensation,
 			     int nN, int nM,
 			     int *nC, int *Cdof,
@@ -1079,7 +1079,7 @@ void read_condensation_data (
 
   if ( *Cmethod <= 0 )  {
     *Cmethod = *nC = *Cdof = 0;
-    return;
+    return 0;
   }
 
   if ( *Cmethod > 3 ) *Cmethod = 1;   /* default */
@@ -1102,7 +1102,7 @@ void read_condensation_data (
     sprintf(errMsg,"\n  error in matrix condensation data: \n error: nC > nN ... nC=%d; nN=%d;\n The number of nodes with condensed DoF's may not exceed the total number of nodes.\n",
 	    *nC, nN );
     errorMsg(errMsg);
-    exit(90);
+    return 90;
   }
 
   cm = imatrix( 1, *nC, 1,7 );
@@ -1118,7 +1118,7 @@ void read_condensation_data (
     if ( cm[i][1] < 1 || cm[i][1] > nN ) {     /* error check */
       sprintf(errMsg,"\n  error in matrix condensation data: \n  condensed node number out of range\n  cj[%d] = %d  ... nN = %d  \n", i, cm[i][1], nN );
       errorMsg(errMsg);
-      exit(91);
+      return 91;
     }
   }
 
@@ -1140,12 +1140,12 @@ void read_condensation_data (
       sprintf(errMsg,"\n  error in matrix condensation data: \n  m[%d] = %d \n The condensed mode number must be between   1 and %d (modes).\n",
 	      i, m[i], nM );
       errorMsg(errMsg);
-      exit(92);
+      return 92;
     }
   }
 
   free_imatrix(cm,1, *nC, 1,7);
-  return;
+  return 0;
 }
 
 
