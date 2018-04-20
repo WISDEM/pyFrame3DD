@@ -745,16 +745,22 @@ class Frame(object):
         exagg_modal = 1.0  # not used
         c_dynamicData = C_DynamicData(self.nM, self.Mmethod, self.lump, self.tol, self.shift, exagg_modal)
 
-        self._frame3dd.run(self.c_nodes, self.c_reactions, self.c_elements, self.c_other,
-            nCases, c_loadcases, c_dynamicData, self.c_extraInertia,
-            self.c_extraMass, self.c_condensation,
-            c_disp, c_forces, c_reactions, c_internalForces, c_massResults, c_modalResults)
+        exitCode = self._frame3dd.run(self.c_nodes, self.c_reactions, self.c_elements, self.c_other,
+                                      nCases, c_loadcases, c_dynamicData, self.c_extraInertia,
+                                      self.c_extraMass, self.c_condensation,
+                                      c_disp, c_forces, c_reactions, c_internalForces, c_massResults, c_modalResults)
+
+        nantest = np.isnan( np.c_[fout.Nx, fout.Vy, fout.Vz, fout.Txx, fout.Myy, fout.Mzz] )
+        if (exitCode == 182 or exitCode == 183) and not np.any(nantest):
+            pass
+        elif exitCode != 0 or np.any(nantest):
+            raise RuntimeError('Frame3DD did not exit gracefully')
 
         # put mass values back in since tuple is read only
         mout = NodeMasses(total_mass.value, struct_mass.value, mout.node,
             mout.xmass, mout.ymass, mout.zmass,
             mout.xinrta, mout.yinrta, mout.zinrta)
-
+        
         # put modal results back in
         for i in range(nM):
             modalout.freq[i] = freq[i].value
@@ -764,7 +770,8 @@ class Frame(object):
 
         return dout, fout, rout, ifout, mout, modalout
 
-    
+
+
     def write(self, fname):
         f = open(fname, 'wb')
         f.write('pyFrame3dd auto-generated file\n')
