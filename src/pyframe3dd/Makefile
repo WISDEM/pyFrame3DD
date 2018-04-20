@@ -1,9 +1,9 @@
 CC=clang #gcc
 CFLAGS = -c -g -O2 -fPIC
 
-OBS   = frame3dd.o coordtrans.o eig.o HPGmatrix.o HPGutil.o NRutil.o 
-PYOBS = py_main.o py_io.o
-EOBS  = main.o frame3dd_io.o
+OBS   = frame3dd.o coordtrans.o HPGutil.o NRutil.o 
+PYOBS = py_main.o py_io.o py_eig.o py_HPGmatrix.o 
+EOBS  = main.o frame3dd_io.o eig.o HPGmatrix.o 
 
 ifeq ($(OS),Windows_NT)
     ARCHFLAGS=-D WIN64
@@ -18,7 +18,7 @@ else
     endif
     ifeq ($(UNAME_S),Darwin)
         ARCHFLAGS=-D OSX
-	LIB := _pyframe3dd.dylib
+	LIB := _pyframe3dd.so
 	LDFLAGS=-dynamiclib
     endif
 endif
