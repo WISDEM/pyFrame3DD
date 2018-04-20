@@ -201,7 +201,7 @@ void subspace(
 						*iter, modes, w[modes], error );
 		w_old = w[modes];
 
-		if ( *iter > 10000 ) {
+		if ( *iter > 1000 ) {
 		    sprintf(errMsg,"  subspace: Iteration limit exceeded\n rel. error = %e > %e\n", error, tol );
 		    errorMsg(errMsg);
 		    exit(32);
@@ -478,7 +478,7 @@ void stodola (
 		RQ = xtAy ( u, K, u, n, d );		/* Raleigh quotient */
 		(*iter)++;
 
-		if ( *iter > 10000 ) {
+		if ( *iter > 1000 ) {
 		    sprintf(errMsg,"  stodola: Iteration limit exceeded\n  rel. error = %e > %e\n", (fabs(RQ - RQold)/RQ) , tol );
 		    errorMsg(errMsg);
 		    exit(32);
@@ -492,11 +492,9 @@ void stodola (
 	    if ( w[k] > shift )	w[k] = w[k] - shift;
 	    else		w[k] = shift - w[k];
 
-	    if ( verbose ) {
-	      fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
-	      fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
-		      sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
-	    }
+	    fprintf(stdout,"  mode: %2d\tDoF: %5d\t", k, i_ex );
+	    fprintf(stdout," %9.4f Hz\t iter: %4d   error: %.4e \n",
+		sqrt(w[k])/(2.0*PI), *iter, (fabs(RQ - RQold)/RQ) );
 	}
 
 	eigsort ( w, V, n, m );
@@ -581,7 +579,7 @@ int sturm(
 	if ( verbose )
 	 fprintf(stdout,"  There are %d modes below %f Hz.", -ok, sqrt(ws)/(2.0*PI) );
 
-	if (( -ok > modes ) && (verbose)){
+	if ( -ok > modes ) {
 		fprintf(stderr," ... %d modes were not found.\n", -ok-modes );
 		fprintf(stderr," Try increasing the number of modes in \n");
 		fprintf(stderr," order to get the missing modes below %f Hz.\n",
