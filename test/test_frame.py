@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 from StringIO import StringIO
 
-from pyframe3dd.frame3dd import Frame, NodeData, ReactionData, ElementData, Options, \
+from pyframe3dd import Frame, NodeData, ReactionData, ElementData, Options, \
     StaticLoadCase
 
 
