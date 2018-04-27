@@ -13,7 +13,17 @@ from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
 import os
 
-
+from sys import platform
+if platform == "linux" or platform == "linux2":
+    libext = '.so'
+elif platform == "darwin":
+    #libext = '.dyld'
+    libext = '.so'
+elif platform == "win32":
+    #libext = '.dll'
+    libext = '.pyd'
+libname = '_pyframe3dd' + libext
+    
 c_int_p = POINTER(c_int)
 c_double_p = POINTER(c_double)
 
@@ -428,8 +438,8 @@ class Frame(object):
 
 
         # load c module
-        dir = os.path.dirname(os.path.realpath(__file__))  # get path to this file
-        self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', dir)
+        mydir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))  # get path to this file
+        self._frame3dd = np.ctypeslib.load_library(libname, mydir)
 
         self._frame3dd.run.argtypes = [POINTER(C_Nodes), POINTER(C_Reactions), POINTER(C_Elements),
             POINTER(C_OtherElementData), c_int, POINTER(C_LoadCase),
