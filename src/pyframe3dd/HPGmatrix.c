@@ -33,6 +33,7 @@
     along with HPGmatrix.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _USE_MATH_DEFINES // For windows to get M_PI
 #include <math.h>
 #include <stdio.h>
 
