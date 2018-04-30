@@ -22,6 +22,8 @@ elif platform == "darwin":
 elif platform == "win32":
     #libext = '.dll'
     libext = '.pyd'
+elif platform == "cygwin":
+    libext = '.dll'
 libname = '_pyframe3dd' + libext
     
 c_int_p = POINTER(c_int)
