@@ -429,7 +429,11 @@ class Frame(object):
 
         # load c module
         dir = os.path.dirname(os.path.realpath(__file__))  # get path to this file
-        self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', dir)
+        try:
+            self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', dir)
+        except:
+            dir = os.path.abspath(os.path.join(dir,'..'))
+            self._frame3dd = np.ctypeslib.load_library('_pyframe3dd', dir)
 
         self._frame3dd.run.argtypes = [POINTER(C_Nodes), POINTER(C_Reactions), POINTER(C_Elements),
             POINTER(C_OtherElementData), c_int, POINTER(C_LoadCase),
@@ -1131,7 +1135,8 @@ if __name__ == '__main__':
     lump = 0            # 0: consistent mass ... 1: lumped mass matrix
     tol = 1e-9          # mode shape tolerance
     shift = 0.0         # shift value ... for unrestrained structures
-    options = Options(shear, geom, dx, nM, Mmethod, lump, tol, shift)
+    # options = Options(shear, geom, dx, nM, Mmethod, lump, tol, shift)
+    options = Options(shear, geom, dx)
 
 
     frame = Frame(nodes, reactions, elements, options)
