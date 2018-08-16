@@ -8,10 +8,11 @@ import os
 
 
 
-if os.name == 'nt':  # Windows.
-    extra_compile_args = ['/TC', '/D', 'ANSI'] # for msvs
-else:
-    extra_compile_args = ''
+#if os.name == 'nt':  # Windows.
+#    extra_compile_args = ['/TC', '/D', 'ANSI'] # for msvs
+#     # TODO: Not with Anaconda MINGW
+#else:
+extra_compile_args = ''
 
 
 setup(
