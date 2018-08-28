@@ -27,7 +27,7 @@ setup(
     packages=['pyframe3dd'],
     license='Apache License, Version 2.0',
     ext_modules=[Extension('_pyframe3dd', ['src/pyframe3dd/py_main.c', 'src/pyframe3dd/py_io.c',
-                                           'src/pyframe3dd/frame3dd.c', 'src/pyframe3dd/py_HPGmatrix.c', 'src/pyframe3dd/coordtrans.c',
+                                           'src/pyframe3dd/pyframe3dd.c', 'src/pyframe3dd/py_HPGmatrix.c', 'src/pyframe3dd/coordtrans.c',
                                            'src/pyframe3dd/py_eig.c', 'src/pyframe3dd/HPGutil.c', 'src/pyframe3dd/NRutil.c'],
                  extra_compile_args=extra_compile_args)]
 )

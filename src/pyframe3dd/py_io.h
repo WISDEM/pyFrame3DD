@@ -67,7 +67,9 @@ int read_reaction_data(
     int *r,     /**< r[i]=1: DoF i is fixed, r[i]=0: DoF i is free */
     int *sumR,  /**< sum of vector R                */
     int verbose, /**< 1: copious screen output; 0: none      */
-    int geom
+    int geom,
+    float *EKx, float *EKy, float *EKz,  /* extra stiffness */
+    float *EKtx, float *EKty, float *EKtz    
 );
 
 

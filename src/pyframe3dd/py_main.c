@@ -51,7 +51,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "frame3dd.h"
+#include "pyframe3dd.h"
 //#include "frame3dd_io.h"
 #include "py_io.h"
 #include "py_eig.h"
@@ -96,6 +96,8 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     *d, *EMs=NULL,	// member densities and extra inertia
     *NMs=NULL, 	// mass of a node
     *NMx,*NMy,*NMz,	// inertia of a node in global coord	
+    *EKx, *EKy, *EKz, // extra linear stiffness in global coord
+    *EKtx, *EKty, *EKtz, // extra rotational stiffness in global coord
     gX[_NL_],	// gravitational acceleration in global X 
     gY[_NL_],	// gravitational acceleration in global Y
     gZ[_NL_],	// gravitational acceleration in global Z
@@ -208,7 +210,14 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
       
   q   = ivector(1,DoF);	/* allocate memory for reaction data ... */
   r   = ivector(1,DoF);	/* allocate memory for reaction data ... */
-  ExitCode += read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose, geom );
+  EKx =  vector(1,nN);    /* extra linear stiffness in global coord */
+  EKy =  vector(1,nN);    /* extra linear stiffness in global coord */
+  EKz =  vector(1,nN);    /* extra linear stiffness in global coord */
+  EKtx =  vector(1,nN);    /* extra rotational stiffness in global coord */
+  EKty =  vector(1,nN);    /* extra rotational stiffness in global coord */
+  EKtz =  vector(1,nN);    /* extra rotational stiffness in global coord */
+  ExitCode += read_reaction_data ( reactions, DoF, nN, &nR, q, r, &sumR, verbose, geom,
+				   EKx, EKy, EKz, EKtx, EKty, EKtz);
   if ( verbose )	fprintf(stdout," ... complete\n");
 
   nE = elements->nE;  /* number of frame elements */
@@ -362,9 +371,10 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
     for (i=1; i<=nE; i++)	for (j=1;j<=12;j++)	Q[i][j] = 0.0;
 
     /*  elastic stiffness matrix  [K({D}^(i))], {D}^(0)={0} (i=0) */
-    assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+    assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
 		 Ax, Asy, Asz, Jx,Iy,Iz, E, G, p,
-		 shear, geom, Q, debug );
+		 shear, geom, Q, debug,
+		 EKx, EKy, EKz, EKtx, EKty, EKtz);
 
 #ifdef MATRIX_DEBUG
     save_dmatrix ( "Ku", K, 1,DoF, 1,DoF, 0, "w" ); // unloaded stiffness matrix
@@ -391,9 +401,10 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 			     &axial_strain_warning );
 
 	/* assemble temp.-stressed stiffness [K({D_t})]     */
-	assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+	assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
 		     Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-		     shear,geom, Q, debug );
+		     shear,geom, Q, debug,
+		     EKx, EKy, EKz, EKtx, EKty, EKtz);
       }
     }
 
@@ -451,9 +462,11 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
       ++iter;
 
       /*  assemble stiffness matrix [K({D}^(i))]	      */
-      assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+      assemble_K ( K, DoF, nE, nN, xyz, rj, L, Le, N1, N2,
 		   Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-		   shear,geom, Q, debug );
+		   shear,geom, Q, debug,
+		   EKx, EKy, EKz, EKtx, EKty, EKtz);
+		   
 
       /*  compute equilibrium error, {dF}, at iteration i   */
       /*  {dF}^(i) = {F} - [K({D}^(i))]*{D}^(i)	      */
@@ -691,8 +704,8 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 	       K, Q, D, dD, R, dR, 
 	       d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m, 
 	       pkNx, pkVy, pkVz, pkTx, pkMy, pkMz,
-	       pkDx, pkDy, pkDz, pkRx, pkSy, pkSz
-	       );
+	       pkDx, pkDy, pkDz, pkRx, pkSy, pkSz,
+	       EKx, EKy, EKz, EKtx, EKty, EKtz);
 
   if ( verbose ) fprintf(stdout,"\n");
 
