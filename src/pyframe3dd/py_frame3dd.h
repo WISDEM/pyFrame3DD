@@ -24,8 +24,8 @@
 	Main functions of the FRAME3DD solver API
 */
 
-#ifndef FRAME_FRAME_H
-#define FRAME_FRAME_H
+#ifndef FRAME_PY_FRAME_H
+#define FRAME_PY_FRAME_H
 
 /* for Micro-Stran compatability, structure for cartesian vectors */
 #include "microstran/vec3.h"
@@ -239,5 +239,5 @@ void deallocate(
 );
 
 
-#endif /* FRAME_FRAME_H */
+#endif /* FRAME_PY_FRAME_H */
 

@@ -51,7 +51,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "pyframe3dd.h"
+#include "py_frame3dd.h"
 //#include "frame3dd_io.h"
 #include "py_io.h"
 #include "py_eig.h"
@@ -391,7 +391,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
       /* increment {D_t} = {0} + {D_t} temp.-induced displ */
       for (i=1; i<=DoF; i++)	if (q[i]) D[i] += dD[i];
       /* increment {R_t} = {0} + {R_t} temp.-induced react */
-      for (i=1; i<=DoF; i++)	if (r[i]) R[i] += dR[i];
+      for (i=1; i<=DoF; i++)	if (r[i]>0) R[i] += dR[i];
 
       if (geom) {	/* assemble K = Ke + Kg */
 	/* compute   {Q}={Q_t} ... temp.-induced forces     */
@@ -414,7 +414,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
       if ( verbose )
 	fprintf(stdout," Linear Elastic Analysis ... Mechanical Loads\n");
       /* incremental displ at react'ns = prescribed displ */
-      for (i=1; i<=DoF; i++)	if (r[i]) dD[i] = Dp[lc][i];
+      for (i=1; i<=DoF; i++)	if (r[i]>0) dD[i] = Dp[lc][i];
 
       /*  solve {F_m} = [K({D_t})] * {D_m}	*/
       solve_system(K,dD,F_mech[lc],dR,DoF,q,r,&ok,verbose,&rms_resid);
@@ -425,7 +425,7 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 	else {		D[i]  = Dp[lc][i]; dD[i] = 0.0; }
       }
       /* combine {R} = {R_t} + {R_m} --- for linear systems */
-      for (i=1; i<=DoF; i++)	if (r[i]) R[i] += dR[i];
+      for (i=1; i<=DoF; i++)	if (r[i]>0) R[i] += dR[i];
     }
 
 
@@ -600,15 +600,17 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 #endif
 
     for (j=1; j<=DoF; j++) { /*  compute traceK and traceM */
-      if ( !r[j] ) {
+      if ( r[j] == 0 ) {
 	traceK += K[j][j];
 	traceM += M[j][j];
       }
     }
     for (i=1; i<=DoF; i++) { /*  modify K and M for reactions    */
-      if ( r[i] ) {	/* apply reactions to upper triangle */
-	K[i][i] = traceK * 1e4;
-	M[i][i] = traceM;
+      if ( r[i] > 0 ) {	/* apply full and partial reactions to upper triangle */
+	if ( r[i] == 1 ) {	/* apply full reactions to upper triangle */
+	  K[i][i] = traceK * 1e4;
+	  M[i][i] = traceM;
+	}
 	for (j=i+1; j<=DoF; j++)
 	  K[j][i]=K[i][j]=M[j][i]=M[i][j] = 0.0;
       }

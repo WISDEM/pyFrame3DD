@@ -26,7 +26,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "pyframe3dd.h"
+#include "py_frame3dd.h"
 #include "common.h"
 #include "coordtrans.h"
 #include "eig.h"
