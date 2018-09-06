@@ -7,23 +7,29 @@ Created by Andrew Ning on 2013-11-01.
 Copyright (c) NREL. All rights reserved.
 """
 
+from __future__ import print_function
 import numpy as np
 import math
 from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
 import os
+from distutils.sysconfig import get_config_var
 
 from sys import platform
-if platform == "linux" or platform == "linux2":
-    libext = '.so'
-elif platform == "darwin":
-    #libext = '.dyld'
-    libext = '.so'
-elif platform == "win32":
-    #libext = '.dll'
-    libext = '.pyd'
-elif platform == "cygwin":
-    libext = '.dll'
+
+libext = get_config_var('EXT_SUFFIX')
+if libext is None or libext == '':
+    if platform == "linux" or platform == "linux2":
+        libext = '.so'
+    elif platform == "darwin":
+        #libext = '.dyld'
+        libext = '.so'
+    elif platform == "win32":
+        #libext = '.dll'
+        libext = '.pyd'
+    elif platform == "cygwin":
+        libext = '.dll'
+        
 libname = '_pyframe3dd' + libext
     
 c_int_p = POINTER(c_int)
@@ -1184,52 +1190,52 @@ if __name__ == '__main__':
 
     iCase = 0
 
-    print 'nodes =', displacements.node[iCase, :]
-    print 'dx =', displacements.dx[iCase, :]
-    print 'dy =', displacements.dy[iCase, :]
-    print 'dz =', displacements.dz[iCase, :]
-    print 'dxrot =', displacements.dxrot[iCase, :]
-    print 'dyrot =', displacements.dyrot[iCase, :]
-    print 'dzrot =', displacements.dzrot[iCase, :]
+    print('nodes =', displacements.node[iCase, :])
+    print('dx =', displacements.dx[iCase, :])
+    print('dy =', displacements.dy[iCase, :])
+    print('dz =', displacements.dz[iCase, :])
+    print('dxrot =', displacements.dxrot[iCase, :])
+    print('dyrot =', displacements.dyrot[iCase, :])
+    print('dzrot =', displacements.dzrot[iCase, :])
 
-    print
+    print()
 
-    print 'element =', forces.element[iCase, :]
-    print 'node =', forces.node[iCase, :]
-    print 'Nx =', forces.Nx[iCase, :]
-    print 'Vy =', forces.Vy[iCase, :]
-    print 'Vz =', forces.Vz[iCase, :]
-    print 'Txx =', forces.Txx[iCase, :]
-    print 'Myy =', forces.Myy[iCase, :]
-    print 'Mzz =', forces.Mzz[iCase, :]
+    print('element =', forces.element[iCase, :])
+    print('node =', forces.node[iCase, :])
+    print('Nx =', forces.Nx[iCase, :])
+    print('Vy =', forces.Vy[iCase, :])
+    print('Vz =', forces.Vz[iCase, :])
+    print('Txx =', forces.Txx[iCase, :])
+    print('Myy =', forces.Myy[iCase, :])
+    print('Mzz =', forces.Mzz[iCase, :])
 
-    print
+    print()
 
-    print 'nodesR =', reactions.node[iCase, :]
-    print 'RFx =', reactions.Fx[iCase, :]
-    print 'RFy =', reactions.Fy[iCase, :]
-    print 'RFz =', reactions.Fz[iCase, :]
-    print 'RMxx =', reactions.Mxx[iCase, :]
-    print 'RMyy =', reactions.Myy[iCase, :]
-    print 'RMzz =', reactions.Mzz[iCase, :]
+    print('nodesR =', reactions.node[iCase, :])
+    print('RFx =', reactions.Fx[iCase, :])
+    print('RFy =', reactions.Fy[iCase, :])
+    print('RFz =', reactions.Fz[iCase, :])
+    print('RMxx =', reactions.Mxx[iCase, :])
+    print('RMyy =', reactions.Myy[iCase, :])
+    print('RMzz =', reactions.Mzz[iCase, :])
 
-    print
+    print()
 
 
     iE = 2
 
-    print 'xE =', internalForces[iE].x[iCase, :]
-    print 'Nx =', internalForces[iE].Nx[iCase, :]
-    print 'Vy =', internalForces[iE].Vy[iCase, :]
-    print 'Vz =', internalForces[iE].Vz[iCase, :]
-    print 'Tx =', internalForces[iE].Tx[iCase, :]
-    print 'My =', internalForces[iE].My[iCase, :]
-    print 'Mz =', internalForces[iE].Mz[iCase, :]
-    print 'Dx =', internalForces[iE].Dx[iCase, :]
-    print 'Dy =', internalForces[iE].Dy[iCase, :]
-    print 'Dz =', internalForces[iE].Dz[iCase, :]
-    print 'Rx =', internalForces[iE].Rx[iCase, :]
+    print('xE =', internalForces[iE].x[iCase, :])
+    print('Nx =', internalForces[iE].Nx[iCase, :])
+    print('Vy =', internalForces[iE].Vy[iCase, :])
+    print('Vz =', internalForces[iE].Vz[iCase, :])
+    print('Tx =', internalForces[iE].Tx[iCase, :])
+    print('My =', internalForces[iE].My[iCase, :])
+    print('Mz =', internalForces[iE].Mz[iCase, :])
+    print('Dx =', internalForces[iE].Dx[iCase, :])
+    print('Dy =', internalForces[iE].Dy[iCase, :])
+    print('Dz =', internalForces[iE].Dz[iCase, :])
+    print('Rx =', internalForces[iE].Rx[iCase, :])
 
-    print
+    print()
 
-    print mass.total_mass
+    print(mass.total_mass)
