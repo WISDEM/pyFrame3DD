@@ -791,27 +791,27 @@ class Frame(object):
 
 
     def write(self, fname):
-        f = open(fname, 'wb')
+        f = open(fname, 'w')
         f.write('pyFrame3dd auto-generated file\n')
         f.write('\n')
         f.write(str(len(self.nnode))+' # number of nodes\n')
         f.write('#.node  x       y       z       r\n')
         f.write('#        m      m      m      m\n')
         f.write('\n')
-        for k in xrange(len(self.nnode)):
+        for k in range(len(self.nnode)):
             f.write(str(self.nnode[k])+'\t'+str(self.nx[k])+'\t'+
                     str(self.ny[k])+'\t'+str(self.nz[k])+'\t'+str(self.nr[k])+'\n')
         f.write('\n')
         f.write(str(len(self.rnode))+' # number of nodes with reactions\n')
         f.write('#.n     x  y  z xx yy zz          1=fixed, 0=free\n')
-        for k in xrange(len(self.rnode)):
-            f.write(str(self.rnode[k])+'\t'+str(int(self.rKx[k]))+'\t'+str(int(self.rKy[k]))+'\t'+str(int(self.rKz[k]))+
-                    '\t'+str(int(self.rKtx[k]))+'\t'+str(int(self.rKty[k]))+'\t'+str(int(self.rKtz[k]))+'\n')
+        for k in range(len(self.rnode)):
+            f.write(str(self.rnode[k])+'\t'+str(self.rKx[k])+'\t'+str(self.rKy[k])+'\t'+str(self.rKz[k])+
+                    '\t'+str(self.rKtx[k])+'\t'+str(self.rKty[k])+'\t'+str(self.rKtz[k])+'\n')
         f.write('\n')
         f.write(str(len(self.eelement))+' # number of frame elements\n')
         f.write('#.e n1 n2 Ax    Asy     Asz     Jxx     Iyy     Izz     E       G   roll density\n')
         f.write('#   .  .  m^2   m^2     m^2     m^4     m^4     m^4     Pa      Pa  deg  kg/m^3\n')
-        for k in xrange(len(self.eelement)):
+        for k in range(len(self.eelement)):
             f.write(str(self.eelement[k])+'\t'+str(self.eN1[k])+'\t'+str(self.eN2[k])+
                     '\t'+str(self.eAx[k])+'\t'+str(self.eAsy[k])+'\t'+str(self.eAsz[k])+
                     '\t'+str(self.eJx[k])+'\t'+str(self.eIy[k])+'\t'+str(self.eIz[k])+
@@ -828,7 +828,7 @@ class Frame(object):
         f.write(str(self.options.dx)+' # x-axis increment for internal forces, m\n')
         f.write('\n')
         f.write(str(len(self.loadCases))+' # number of static load cases\n')
-        for iC in xrange(len(self.loadCases)):
+        for iC in range(len(self.loadCases)):
             mylc = self.loadCases[iC]
             f.write('\n')
             f.write('# Begin Static Load Case '+str(iC+1)+' of '+str(len(self.loadCases))+'\n')
@@ -843,20 +843,20 @@ class Frame(object):
             f.write(str(len(mylc.NF))+'	# number of loaded nodes\n')
             f.write('#.e      Fx       Fy     Fz      Mxx     Myy     Mzz\n')
             f.write('#        N        N      N       N.m     N.m     N.m\n')
-            for k in xrange(len(mylc.NF)):
+            for k in range(len(mylc.NF)):
                 f.write(str(mylc.NF[k])+'\t'+str(mylc.Fx[k])+'\t'+str(mylc.Fy[k])+'\t'+str(mylc.Fz[k])+
                         '\t'+str(mylc.Mxx[k])+'\t'+str(mylc.Myy[k])+'\t'+str(mylc.Mzz[k])+'\n')
             
             f.write(str(len(mylc.ELU))+' # number of uniform loads\n')
             f.write('#.e    Ux   Uy   Uz\n')
             f.write('#      N/m  N/m  N/m\n')
-            for k in xrange(len(mylc.ELU)):
+            for k in range(len(mylc.ELU)):
                 f.write(str(mylc.ELU[k])+'\t'+str(mylc.Ux[k])+'\t'+str(mylc.Uy[k])+'\t'+str(mylc.Uz[k])+'\n')
             
             f.write(str(len(mylc.ELT))+' # number of trapezoidal loads\n')
             f.write('#.e     x1       x2        w1      w2\n')
             f.write('#       m        m         N/m     N/m\n')
-            for k in xrange(len(mylc.ELT)):
+            for k in range(len(mylc.ELT)):
                 f.write(str(mylc.ELT[k])+'\t'+str(mylc.xx1[k])+'\t'+str(mylc.xx2[k])+
                         '\t'+str(mylc.wx1[k])+'\t'+str(mylc.wx2[k])+'\n')
                 f.write('\t'+str(mylc.xy1[k])+'\t'+str(mylc.xy2[k])+'\t'+str(mylc.wy1[k])+'\t'+str(mylc.wy2[k])+'\n')
@@ -865,14 +865,14 @@ class Frame(object):
             f.write(str(len(mylc.ELE))+' # number of internal concentrated loads\n')
             f.write('#.e    Px   Py    Pz   x    \n')
             f.write('#      N    N     N    m\n')
-            for k in xrange(len(mylc.ELE)):
+            for k in range(len(mylc.ELE)):
                 f.write(str(mylc.ELE[k])+'\t'+str(mylc.Px[k])+'\t'+str(mylc.Py[k])+'\t'+str(mylc.Pz[k])+'\t'+str(mylc.xE[k])+'\n')
 
             
             f.write(str(len(mylc.ELTemp))+' # number of temperature loads\n')
             f.write('#.e  alpha   hy   hz   Ty+  Ty-  Tz+  Tz-\n')
             f.write('#    /degC   m    m   degC degC degC degC\n')
-            for k in xrange(len(mylc.ELTemp)):
+            for k in range(len(mylc.ELTemp)):
                 f.write(str(mylc.ELTemp[k])+'\t'+str(mylc.a[k])+'\t'+str(mylc.hy[k])+'\t'+str(mylc.hz[k])+'\t'+
                         str(mylc.Typ[k])+'\t'+str(mylc.Tym[k])+str(mylc.Tzp[k])+'\t'+str(mylc.Tzm[k])+'\n')
 
@@ -892,14 +892,14 @@ class Frame(object):
         f.write(str(len(self.ENMnode))+'                               # number of nodes with extra inertia\n')
         f.write('#.n      Mass   Ixx      Iyy      Izz\n')
         f.write('#        kg    kg.m^2   kg.m^2   kg.m^2\n')
-        for k in xrange(len(self.ENMnode)):
+        for k in range(len(self.ENMnode)):
             f.write(str(self.ENMnode[k])+'\t'+str(self.ENMmass[k])+'\t'+
                     str(self.ENMIxx[k])+'\t'+str(self.ENMIyy[k])+'\t'+str(self.ENMIzz[k])+'\n')
         f.write('\n')
         f.write('0 # frame elements with extra mass\n')
         f.write('\n')
         f.write(str(self.nM)+'				# number of modes to animate, nA\n')
-        for k in xrange(self.nM):
+        for k in range(self.nM):
             f.write(' '+str(k+1))
         f.write('  # list of modes to animate - omit if nA == 0\n')
         f.write('2                               # pan rate during animation\n')

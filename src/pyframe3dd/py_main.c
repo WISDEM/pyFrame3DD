@@ -606,13 +606,12 @@ ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
       }
     }
     for (i=1; i<=DoF; i++) { /*  modify K and M for reactions    */
-      if ( r[i] > 0 ) {	/* apply full and partial reactions to upper triangle */
-	if ( r[i] == 1 ) {	/* apply full reactions to upper triangle */
-	  K[i][i] = traceK * 1e4;
-	  M[i][i] = traceM;
-	}
-	for (j=i+1; j<=DoF; j++)
-	  K[j][i]=K[i][j]=M[j][i]=M[i][j] = 0.0;
+      if ( r[i] == 1 ) {	/* apply full reactions to upper triangle */
+	K[i][i] = traceK * 1e4;
+	for (j=i+1; j<=DoF; j++) K[j][i] = K[i][j] = 0.0;
+
+	M[i][i] = traceM;
+	for (j=i+1; j<=DoF; j++) M[j][i] = M[i][j] = 0.0;
       }
     }
 
