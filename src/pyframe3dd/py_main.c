@@ -1,3 +1,4 @@
+
 /*
   Garrett Barter
   Jan 8, 2018
@@ -70,6 +71,7 @@
 
 // for Windows if building with Python's Distribute
 void init_pyframe3dd() { }
+void PyInit__pyframe3dd() { }
 
 ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
 		       OtherElementData* other, int nL, LoadCase* loadcases,
