@@ -9,7 +9,10 @@ Copyright (c) NREL. All rights reserved.
 
 import unittest
 import numpy as np
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from pyframe3dd import Frame, NodeData, ReactionData, ElementData, Options, \
     StaticLoadCase
