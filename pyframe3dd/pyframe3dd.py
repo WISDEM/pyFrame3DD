@@ -943,7 +943,7 @@ class StaticLoadCase(object):
     def changePointLoads(self, N, Fx, Fy, Fz, Mxx, Myy, Mzz):
 
         # copying to prevent any user error with variables pointing to something else (b/c memory address is shared by C)
-        self.NF = N.astype(np.int32)
+        self.NF = np.array(N).astype(np.int32)
         self.Fx = np.copy(Fx)
         self.Fy = np.copy(Fy)
         self.Fz = np.copy(Fz)
@@ -957,7 +957,7 @@ class StaticLoadCase(object):
 
     def changeUniformLoads(self, EL, Ux, Uy, Uz):
 
-        self.ELU = EL.astype(np.int32)
+        self.ELU = np.array(EL).astype(np.int32)
         self.Ux = np.copy(Ux)
         self.Uy = np.copy(Uy)
         self.Uz = np.copy(Uz)
@@ -968,7 +968,7 @@ class StaticLoadCase(object):
 
     def changeTrapezoidalLoads(self, EL, xx1, xx2, wx1, wx2, xy1, xy2, wy1, wy2, xz1, xz2, wz1, wz2):
 
-        self.ELT = EL.astype(np.int32)
+        self.ELT = np.array(EL).astype(np.int32)
         self.xx1 = np.copy(xx1)
         self.xx2 = np.copy(xx2)
         self.wx1 = np.copy(wx1)
@@ -989,7 +989,7 @@ class StaticLoadCase(object):
 
     def changeElementLoads(self, EL, Px, Py, Pz, x):
 
-        self.ELE = EL.astype(np.int32)
+        self.ELE = np.array(EL).astype(np.int32)
         self.Px = np.copy(Px)
         self.Py = np.copy(Py)
         self.Pz = np.copy(Pz)
@@ -1002,7 +1002,7 @@ class StaticLoadCase(object):
 
     def changeTemperatureLoads(self, EL, a, hy, hz, Typ, Tym, Tzp, Tzm):
 
-        self.ELTemp = EL.astype(np.int32)
+        self.ELTemp = np.array(EL).astype(np.int32)
         self.a = np.copy(a)
         self.hy = np.copy(hy)
         self.hz = np.copy(hz)
@@ -1019,7 +1019,7 @@ class StaticLoadCase(object):
 
     def changePrescribedDisplacements(self, N, Dx, Dy, Dz, Dxx, Dyy, Dzz):
 
-        self.ND = N.astype(np.int32)
+        self.ND = np.array(N).astype(np.int32)
         self.Dx = np.copy(Dx)
         self.Dy = np.copy(Dy)
         self.Dz = np.copy(Dz)
