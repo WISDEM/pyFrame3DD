@@ -471,7 +471,7 @@ class Frame(object):
 
     def changeExtraNodeMass(self, node, mass, Ixx, Iyy, Izz, Ixy, Ixz, Iyz, rhox, rhoy, rhoz, addGravityLoad):
 
-        self.ENMnode = node.astype(np.int32)
+        self.ENMnode = np.array(node).astype(np.int32)
         self.ENMmass = np.copy(mass)
         self.ENMIxx = np.copy(Ixx)
         self.ENMIyy = np.copy(Iyy)
@@ -493,7 +493,7 @@ class Frame(object):
 
     def changeExtraElementMass(self, element, mass, addGravityLoad):
 
-        self.EEMelement = element.astype(np.int32)
+        self.EEMelement = np.array(element).astype(np.int32)
         self.EEMmass = np.copy(mass)
         self.addGravityLoadForExtraElementMass = addGravityLoad
 
