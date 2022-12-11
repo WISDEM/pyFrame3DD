@@ -24,7 +24,7 @@ jobs:
               uses: actions/checkout@v2
               
             - name: Create environment
-              uses: conda-incubator/setup-miniconda@v2
+              uses: conda-incubator/setup-miniconda@v2.2.0
               # https://github.com/marketplace/actions/setup-miniconda
               with:
                   miniconda-version: "latest"
@@ -56,12 +56,10 @@ jobs:
             # Install 
             - name: Conda Install pyFrame3DD
               run: |
-                  conda activate test
                   python setup.py develop
 
             # Run tests
             - name: Conda Run pytest
               run: |
-                  conda activate test
                   pytest test
 

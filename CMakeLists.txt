@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.11.0)
 project(pyframe3dd)
 find_package(PythonExtensions REQUIRED)
 
+include_directories(
+        ${PROJECT_SOURCE_DIR}/pyframe3dd/src
+)
+
 set(my_sources
     py_HPGmatrix.h
     HPGutil.h
