@@ -7,13 +7,6 @@ include_directories(
 )
 
 set(my_sources
-    py_HPGmatrix.h
-    HPGutil.h
-    NRutil.h
-    coordtrans.h
-    py_eig.h
-    py_frame3dd.h
-    py_io.h
     py_HPGmatrix.c
     HPGutil.c
     NRutil.c
