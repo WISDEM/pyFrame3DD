@@ -49,12 +49,14 @@ jobs:
               shell: bash -l {0}
               #shell: pwsh
               run: |
-                  pip install -vv --no-deps .
+                  conda activate test
+                  pip install -vv .
 
             # Run tests
             - name: Conda Run pytest
               shell: bash -l {0}
               #shell: pwsh
               run: |
+                  conda activate test
                   pytest test
 
