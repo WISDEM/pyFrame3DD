@@ -149,7 +149,7 @@ class FrameTestEXA(unittest.TestCase):
         disp = self.displacements
         iCase = 0
 
-        node = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], dtype=np.int)
+        node = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], dtype=np.int_)
         dx = np.array([0.0, 0.010776, 0.035528, 0.060279, 0.086295, 0.112311, 0.129754, 0.100000, 0.089226, 0.059394, 0.029563, 0.012122])
         dy = np.array([0.0, -0.171344, -0.297816, -0.332643, -0.295487, -0.184135, 0.0, -0.152896, -0.289325, -0.332855, -0.291133, -0.166951])
         dz = np.zeros(12)
@@ -171,7 +171,7 @@ class FrameTestEXA(unittest.TestCase):
         disp = self.displacements
         iCase = 1
 
-        node = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], dtype=np.int)
+        node = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], dtype=np.int_)
         dx = np.array([0.0, 0.071965, 0.134909, 0.189577, 0.220207, 0.242560, 0.254035, 0.100000, 0.048727, 0.016113, -0.016502, -0.027973])
         dy = np.array([-1.000000, -1.067463, -1.018927, -0.850595, -0.615710, -0.325659, 0.0, -1.076148, -1.018711, -0.850807, -0.615495, -0.314444])
         dz = np.zeros(12)
@@ -482,7 +482,7 @@ class FrameTestEXB(unittest.TestCase):
           4 1  1  1  1  1  1
           5 1  1  1  1  1  1
         """)
-        out = np.loadtxt(string, dtype=np.int)
+        out = np.loadtxt(string, dtype=np.int_)
         rigid = 1
 
         reactions = ReactionData(out[:, 0], out[:, 1], out[:, 2], out[:, 3], out[:, 4],
