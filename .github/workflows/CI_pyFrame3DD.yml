@@ -27,28 +27,29 @@ jobs:
                   activate-environment: test
 
             # Install dependencies of WISDEM specific to linux/mac
-            - name: Add compilers
-              run: |
-                  conda install compilers
+            #- name: Add compilers
+            #  run: |
+            #      conda install compilers
 
             # Install dependencies of WISDEM specific to linux/mac
             - name: Add dependencies linux specific
               if: false == contains( matrix.os, 'windows')
               run: |
+                  conda install ninja
                   conda init bash
 
             # Install dependencies of WISDEM specific to windows
-            #- name: Add dependencies windows specific
-            #  if: contains( matrix.os, 'windows')
-            #  run: |
-            #      conda install -y m2w64-toolchain libpython
+            - name: Add dependencies windows specific
+              if: contains( matrix.os, 'windows')
+              run: |
+                  conda install -y m2w64-toolchain libpython
 
             # Install 
             - name: Conda Install pyFrame3DD
               shell: bash -l {0}
               #shell: pwsh
               run: |
-                  python setup.py develop
+                  pip install -vv --no-deps .
 
             # Run tests
             - name: Conda Run pytest
