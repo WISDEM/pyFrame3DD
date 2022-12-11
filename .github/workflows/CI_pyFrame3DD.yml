@@ -23,18 +23,30 @@ jobs:
             - name: checkout repository
               uses: actions/checkout@v2
               
-            - name: Create environment
-              uses: conda-incubator/setup-miniconda@v2.2.0
-              # https://github.com/marketplace/actions/setup-miniconda
-              with:
-                  miniconda-version: "latest"
-                  channels: conda-forge
-                  auto-update-conda: true
-                  python-version: ${{ matrix.python-version }}
-                  environment-file: environment.yml
-                  activate-environment: test
-                  auto-activate-base: false
+            # Official way to do miniconda, but it messes with the worker environment and shell
+            #- name: Create environment
+            #  uses: conda-incubator/setup-miniconda@v2.2.0
+            #  # https://github.com/marketplace/actions/setup-miniconda
+            #  with:
+            #      miniconda-version: "latest"
+            #      channels: conda-forge
+            #      auto-update-conda: true
+            #      python-version: ${{ matrix.python-version }}
+            #      environment-file: environment.yml
+            #      activate-environment: test
+            #      auto-activate-base: false
 
+            # This is a less official, but more lightweight way to do miniconda
+            - uses: s-weigand/setup-conda@v1
+              # https://github.com/marketplace/actions/setup-conda
+              with:
+                  update-conda: true
+                  python-version: ${{ matrix.python-version }}
+                  conda-channels: conda-forge
+                  activate-conda: true
+              run: |
+                  conda env update --file environment.yml
+                  
             # Install dependencies of WISDEM specific to linux/mac
             #- name: Add compilers
             #  run: |
