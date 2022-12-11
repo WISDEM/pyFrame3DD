@@ -6,7 +6,7 @@ channels:
 
 dependencies:
   - cmake
-  - cpython
+  - cython
   - ninja
   - numpy
   - pip
