@@ -50,7 +50,7 @@ jobs:
               #shell: pwsh
               run: |
                   conda activate test
-                  pip install -vv .
+                  python setup.py develop
 
             # Run tests
             - name: Conda Run pytest
