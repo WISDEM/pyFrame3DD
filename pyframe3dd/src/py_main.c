@@ -73,13 +73,13 @@
 void init_pyframe3dd() { }
 void PyInit__pyframe3dd() { }
 
-ALLOW_DLL_CALL int run(Nodes* nodes, Reactions* reactions, Elements* elements,
-		       OtherElementData* other, int nL, LoadCase* loadcases,
-		       DynamicData *dynamic, ExtraInertia *extraInertia, ExtraMass *extraMass,
-		       Condensation *condensation, // end of inputs, rest are outputs
-		       Displacements* displacements, Forces* forces, ReactionForces* reactionForces,
-		       InternalForces** internalForces, MassResults *massResults, ModalResults *modalResults){
-
+int run(Nodes* nodes, Reactions* reactions, Elements* elements,
+	OtherElementData* other, int nL, LoadCase* loadcases,
+	DynamicData *dynamic, ExtraInertia *extraInertia, ExtraMass *extraMass,
+	Condensation *condensation, // end of inputs, rest are outputs
+	Displacements* displacements, Forces* forces, ReactionForces* reactionForces,
+	InternalForces** internalForces, MassResults *massResults, ModalResults *modalResults){
+  
 
   char	errMsg[MAXL];		// the text of an error message
 
