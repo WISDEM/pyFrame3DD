@@ -3,6 +3,15 @@ project(pyframe3dd)
 find_package(PythonExtensions REQUIRED)
 
 set(my_sources
+    py_HPGmatrix.h
+    HPGutil.h
+    NRutil.h
+    coordtrans.h
+    preframe.h
+    py_eig.h
+    py_frame3dd.h
+    py_io.h
+    py_main.h
     py_HPGmatrix.c
     HPGutil.c
     NRutil.c
