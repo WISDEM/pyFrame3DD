@@ -1,0 +1,38 @@
+name: CI_pyFrame3DD
+
+# We run CI on push commits and pull requests on all branches
+on: [push, pull_request]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    build_conda:
+        name: Conda Build (${{ matrix.os }})
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: False
+            matrix:
+                os: ["ubuntu-latest", "windows-latest"]
+                python-version: [3.8, 3.9, 3.10]
+
+        steps:
+            - uses: actions/checkout@v2
+            - uses: conda-incubator/setup-miniconda@v2
+              # https://github.com/marketplace/actions/setup-miniconda
+              with:
+                  miniconda-version: "latest"
+                  auto-update-conda: true
+                  python-version: ${{ matrix.python-version }}
+                  environment-file: environment.yml
+
+            # Install 
+            - name: Conda Install pyFrame3DD
+              shell: pwsh
+              run: |
+                  python setup.py develop
+
+            # Run tests
+            - name: Conda Run pytest
+              shell: pwsh
+              run: |
+                  pytest test
+

@@ -1,0 +1,15 @@
+name: test
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - cmake
+  - ninja
+  - numpy
+  - pip
+  - python
+  - pytest
+  - scikit-built
+  - setuptools

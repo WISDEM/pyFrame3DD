@@ -29,7 +29,7 @@ from skbuild import setup
 
 setup(
     name='pyFrame3DD',
-    version='1.1.1',
+    version='1.2',
     description='Python bindings to Frame3DD',
     author='NREL WISDEM Team',
     author_email='systems.engineering@nrel.gov',
