@@ -11,5 +11,5 @@ dependencies:
   - pip
   - python
   - pytest
-  - scikit-built
+  - scikit-build
   - setuptools
