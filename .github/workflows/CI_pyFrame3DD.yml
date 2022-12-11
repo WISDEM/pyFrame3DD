@@ -34,14 +34,14 @@ jobs:
 
             # Install 
             - name: Conda Install pyFrame3DD
-              shell: bash -l {0}
+              #shell: bash -l {0}
               #shell: pwsh
               run: |
                   python setup.py develop
 
             # Run tests
             - name: Conda Run pytest
-              shell: bash -l {0}
+              #shell: bash -l {0}
               #shell: pwsh
               run: |
                   pytest test
