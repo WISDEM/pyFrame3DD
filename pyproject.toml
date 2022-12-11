@@ -6,4 +6,4 @@ requires = [
   "ninja",
 ]
 build-backend = "setuptools.build_meta"
-  "ninja; platform_system!='Windows'",
+#  "ninja; platform_system!='Windows'",
