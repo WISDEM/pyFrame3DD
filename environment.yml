@@ -5,12 +5,10 @@ channels:
   - defaults
 
 dependencies:
-  - cmake
-  - make
+  - meson
   - ninja
   - numpy
   - pip
   - python
   - pytest
-  - scikit-build
   - setuptools
