@@ -24,7 +24,7 @@ jobs:
               uses: actions/checkout@v2
               
             # Official way to do miniconda, but it messes with the worker environment and shell
-            #- name: Create environment
+            #- name: Install miniconda
             #  uses: conda-incubator/setup-miniconda@v2.2.0
             #  # https://github.com/marketplace/actions/setup-miniconda
             #  with:
@@ -37,13 +37,16 @@ jobs:
             #      auto-activate-base: false
 
             # This is a less official, but more lightweight way to do miniconda
-            - uses: s-weigand/setup-conda@v1
+            - name: Install miniconda
+              uses: s-weigand/setup-conda@v1
               # https://github.com/marketplace/actions/setup-conda
               with:
                   update-conda: true
                   python-version: ${{ matrix.python-version }}
                   conda-channels: conda-forge
                   activate-conda: true
+                  
+            - name: Update environment
               run: |
                   conda env update --file environment.yml
                   
