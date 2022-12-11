@@ -20,19 +20,29 @@ jobs:
               # https://github.com/marketplace/actions/setup-miniconda
               with:
                   miniconda-version: "latest"
+                  channels: conda-forge
                   auto-update-conda: true
                   python-version: ${{ matrix.python-version }}
                   environment-file: environment.yml
+                  activate-environment: test
+
+            # Install dependencies of WISDEM specific to windows
+            - name: Add dependencies windows specific
+              if: contains( matrix.os, 'windows')
+              run: |
+                  conda install -y m2w64-toolchain libpython
 
             # Install 
             - name: Conda Install pyFrame3DD
-              shell: pwsh
+              shell: bash -l {0}
+              #shell: pwsh
               run: |
                   python setup.py develop
 
             # Run tests
             - name: Conda Run pytest
-              shell: pwsh
+              shell: bash -l {0}
+              #shell: pwsh
               run: |
                   pytest test
 
