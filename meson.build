@@ -1,26 +1,12 @@
-# Much of this is from SciPy
-
-test = project(
-  'pyframe3dd',
-  'c',
-# unnecessary metadata commented out until Meson supports PEP517 and installation with pip
-#  version: 'x.x.x',
-#  license: 'Apache',
+project('pyframe3dd', 'c',
+  version : '1.2',
   meson_version: '>= 0.60',
   default_options: [
     'buildtype=debugoptimized',
   ],
-)
+  license : 'Apache')
 
 cc = meson.get_compiler('c')
-
-# We need -lm for all C code (assuming it uses math functions, which is safe to
-# assume for SciPy). For C++ it isn't needed, because libstdc++/libc++ is
-# guaranteed to depend on it. For Fortran code, Meson already adds `-lm`.
-#m_dep = cc.find_library('m', required : false)
-#if m_dep.found()
-#  add_project_link_arguments('-lm', language : 'c')
-#endif
 
 # https://mesonbuild.com/Python-module.html
 # Here we differentiate from the python used by meson, py3_command, and that python target, py3_target. This is useful
@@ -34,18 +20,6 @@ else
 endif
 py3_dep = py3_target.dependency()
 
-# NumPy include directory - needed in all submodules
-incdir_numpy = get_option('incdir_numpy')
-if incdir_numpy == ''
-    incdir_numpy = run_command(py3_target,
-      [
-        '-c',
-        'import os; os.chdir(".."); import numpy; print(numpy.get_include())'
-      ],
-      check: true
-    ).stdout().strip()
-endif
-# this creates a raw string which is useful for Windows use of '\' for paths
-incdir_numpy = '''@0@'''.format(incdir_numpy)
-
 subdir('pyframe3dd')
+
+			    

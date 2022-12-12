@@ -13,25 +13,25 @@ import math
 from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
 import os
-from distutils.sysconfig import get_config_var
+#from distutils.sysconfig import get_config_var
 
 from sys import platform
 
-libext = get_config_var('EXT_SUFFIX')
+libext = None #get_config_var('EXT_SUFFIX')
 if libext is None or libext == '':
     if platform == "linux" or platform == "linux2":
         libext = '.so'
     elif platform == "darwin":
-        #libext = '.dyld'
-        libext = '.so'
+        libext = '.dylib'
+        #libext = '.so'
     elif platform == "win32":
-        #libext = '.dll'
-        libext = '.pyd'
+        libext = '.dll'
+        #libext = '.pyd'
     elif platform == "cygwin":
         libext = '.dll'
         
 libname = '_pyframe3dd' + libext
-    
+
 c_int_p = POINTER(c_int)
 c_double_p = POINTER(c_double)
 
