@@ -1,7 +1,7 @@
 # Much of this is from SciPy
 
-project(
-  'pyoptsparse',
+test = project(
+  'pyframe3dd',
   'c',
 # unnecessary metadata commented out until Meson supports PEP517 and installation with pip
 #  version: 'x.x.x',
