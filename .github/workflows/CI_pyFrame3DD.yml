@@ -77,8 +77,10 @@ jobs:
             - name: Library name
               run: |
                   ls
+                  echo "BREAK"
                   ls pyframe3dd
-                  ls meson_build
+                  echo "BREAK"
+                  ls meson_build/pyframe3dd
 
             # Run tests
             - name: Conda Run pytest

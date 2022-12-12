@@ -34,7 +34,7 @@ def run_meson_build():
         raise OSError(sysargs, f"The meson setup command failed! Check the log at {setup_log} for more information.")
 
     # build
-    meson_call = f"{meson_path} compile -C {staging_dir}"
+    meson_call = f"{meson_path} compile -vC {staging_dir}"
     sysargs = meson_call.split(" ")
     p2 = subprocess.run(sysargs, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     compile_log = os.path.join(staging_dir, "compile.log")
@@ -52,8 +52,8 @@ def copy_shared_libraries():
     build_path = os.path.join(staging_dir, "pyframe3dd")
     for root, _dirs, files in os.walk(build_path):
         for file in files:
-            # move pyoptsparse to just under staging_dir
-            if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib")):
+            # move pyframe3dd to just under staging_dir
+            if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll")):
                 if ".so.p" in root or ".pyd.p" in root:  # excludes intermediate object files
                     continue
                 file_path = os.path.join(root, file)
