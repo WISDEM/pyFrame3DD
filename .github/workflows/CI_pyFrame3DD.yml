@@ -6,7 +6,7 @@ on: [push, pull_request]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
     build_conda:
-        name: Conda Build (${{ matrix.os }})
+        name: Build (${{ matrix.os }} Python ${{ matrix.python-version }})
         runs-on: ${{ matrix.os }}
         
         defaults:
@@ -50,10 +50,10 @@ jobs:
             #  run: |
             #      conda env update --file environment.yml
                   
-            # Install dependencies of WISDEM specific to linux/mac
-            #- name: Add compilers
-            #  run: |
-            #      conda install compilers
+            # Install compilers
+            - name: Add compilers
+              run: |
+                  conda install compilers
 
             # Install dependencies of WISDEM specific to linux/mac
             #- name: Add dependencies linux specific
@@ -63,24 +63,24 @@ jobs:
             #      conda init bash
 
             # Install dependencies of WISDEM specific to windows
-            - name: Add dependencies windows specific
-              if: contains( matrix.os, 'windows')
-              run: |
-                  conda install -y m2w64-toolchain libpython
+            #- name: Add dependencies windows specific
+            #  if: contains( matrix.os, 'windows')
+            #  run: |
+            #      conda install -y m2w64-toolchain libpython
 
             # Install 
             - name: Conda Install pyFrame3DD
               run: |
                   python setup.py develop
 
-            # Install 
-            - name: Library name
-              run: |
-                  ls
-                  echo "BREAK"
-                  ls pyframe3dd
-                  echo "BREAK"
-                  ls meson_build/pyframe3dd
+            # Peek
+            #- name: Library name
+            #  run: |
+            #      ls
+            #      echo "BREAK"
+            #      ls pyframe3dd
+            #      echo "BREAK"
+            #      ls meson_build/pyframe3dd
 
             # Run tests
             - name: Conda Run pytest
