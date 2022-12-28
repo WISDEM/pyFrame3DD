@@ -1,6 +1,4 @@
 include README.md
 include CHANGELOG.md
 include LICENSE.txt
-include pyLICENSE.txt
 graft test
-global-exclude openmdao_log.txt

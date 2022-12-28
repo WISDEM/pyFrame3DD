@@ -1,0 +1,89 @@
+name: CI_pyFrame3DD
+
+# We run CI on push commits and pull requests on all branches
+on: [push, pull_request]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    build_conda:
+        name: Build (${{ matrix.os }} Python ${{ matrix.python-version }})
+        runs-on: ${{ matrix.os }}
+        
+        defaults:
+            run:
+                shell: bash -l {0}
+                
+        strategy:
+            fail-fast: False
+            matrix:
+                os: ["ubuntu-latest", "windows-latest"]
+                python-version: ["3.8", "3.9", "3.10"]
+
+        steps:
+            - name: checkout repository
+              uses: actions/checkout@v2
+              
+            # Official way to do miniconda, but it messes with the worker environment and shell
+            - name: Install miniconda
+              uses: conda-incubator/setup-miniconda@v2
+              # https://github.com/marketplace/actions/setup-miniconda
+              with:
+                  miniconda-version: "latest"
+                  channels: conda-forge
+                  auto-update-conda: true
+                  python-version: ${{ matrix.python-version }}
+                  environment-file: environment.yml
+                  activate-environment: test
+                  auto-activate-base: false
+
+            # This is a less official, but more lightweight way to do miniconda
+            #- name: Install miniconda
+            #  uses: s-weigand/setup-conda@v1
+            #  # https://github.com/marketplace/actions/setup-conda
+            #  with:
+            #      update-conda: true
+            #      python-version: ${{ matrix.python-version }}
+            #      conda-channels: conda-forge
+            #      activate-conda: true
+            #      
+            #- name: Update environment
+            #  run: |
+            #      conda env update --file environment.yml
+                  
+            # Install compilers
+            - name: Add compilers
+              run: |
+                  conda install compilers
+
+            # Install dependencies of WISDEM specific to linux/mac
+            #- name: Add dependencies linux specific
+            #  if: false == contains( matrix.os, 'windows')
+            #  run: |
+            #      conda install ninja
+            #      conda init bash
+
+            # Install dependencies of WISDEM specific to windows
+            #- name: Add dependencies windows specific
+            #  if: contains( matrix.os, 'windows')
+            #  run: |
+            #      conda install -y m2w64-toolchain libpython
+
+            # Install 
+            - name: Conda Install pyFrame3DD
+              run: |
+                  python setup.py develop
+
+            # Peek
+            #- name: Library name
+            #  run: |
+            #      ls
+            #      echo "BREAK"
+            #      ls pyframe3dd
+            #      echo "BREAK"
+            #      ls meson_build/pyframe3dd
+
+            # Run tests
+            - name: Conda Run pytest
+              run: |
+                  pytest test
+
