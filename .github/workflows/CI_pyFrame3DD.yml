@@ -58,7 +58,7 @@ jobs:
               env:
                   MESON_ARGS: -Dpython_target=${{ steps.cp.outputs.python-path }}
               run: |
-                  '${{ steps.cp.outputs.python-path }}' -m pip install -vv -e .
+                  '${{ steps.cp.outputs.python-path }}' -m pip install -vv .[test]
 
             - name: Test run
               run: |
