@@ -104,7 +104,7 @@ jobs:
                   
             # Install dependencies of WISDEM specific to windows
             - name: Add dependencies mac specific
-              if: not contains( matrix.os, 'windows')
+              if: false == contains( matrix.os, 'windows')
               run: |
                   conda install -y compilers
 
