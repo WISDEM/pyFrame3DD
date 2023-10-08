@@ -20,6 +20,7 @@ jobs:
 
         steps:
             - name: Setup C/C++ Compiler
+              id: install_cc
               uses: rlalik/setup-cpp-compiler@v1.2
 
             - name: checkout repository
@@ -57,6 +58,8 @@ jobs:
             - name: Pip Install pyFrame3DD
               env:
                   MESON_ARGS: -Dpython_target=${{ steps.cp.outputs.python-path }}
+                  CC: ${{ steps.install_cc.outputs.cc }}
+                  CXX: ${{ steps.install_cc.outputs.cxx }}
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pip install -vv .[test]
 
