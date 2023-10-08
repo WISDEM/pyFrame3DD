@@ -17,7 +17,7 @@ endif
 
 is_windows = host_machine.system() == 'windows'
 add_project_arguments('-DANSI=1', language : 'c')
-if is_windows:
+if is_windows
   add_project_arguments('-D_WIN64=1', language : 'c')
 endif
 
