@@ -423,7 +423,7 @@ void NRerror(error_text)
 char error_text[];
 /* Numerical Recipes standard error handler */
 {
-	void exit();
+  //void exit();
 
 	fprintf(stderr,"Numerical Recipes run-time error...\n");
 	fprintf(stderr,"%s\n",error_text);
@@ -829,7 +829,7 @@ void save_vector( char filename[], float *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -857,7 +857,7 @@ void save_dvector( char filename[], double *V, int nl, int nh, const char *mode 
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -885,7 +885,7 @@ void save_ivector( char filename[], int *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -913,7 +913,7 @@ void save_matrix ( char filename[], float **A, int ml, int mh, int nl, int nh, i
 {
 	FILE    *fp_m;
 	int     i,j, rows, cols;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
@@ -956,7 +956,7 @@ void save_dmatrix ( char filename[], double **A, int ml, int mh, int nl, int nh,
 {
 	FILE    *fp_m;
 	int     i,j, rows, cols;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
@@ -1001,7 +1001,7 @@ void save_ut_matrix ( char filename[], float **A, int n, const char *mode )
 {
 	FILE    *fp_m;
 	int     i,j;
-        void	exit();
+        //void	exit();
 	time_t	now;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {
@@ -1038,7 +1038,7 @@ void save_ut_dmatrix ( char filename[], double **A, int n, const char *mode )
 {
 	FILE    *fp_m;
 	int     i,j;
-        void	exit();
+        //void	exit();
 	time_t	now;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {

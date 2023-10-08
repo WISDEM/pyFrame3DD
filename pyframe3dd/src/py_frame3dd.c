@@ -696,10 +696,10 @@ void assemble_M(
 	float *NMs, float *NMx, float *NMy, float *NMz,
 	int lump, int debug
 ){
-	double  **m,	    /* element mass matrix in global coord */
-		**dmatrix();
+  double  **m;	    /* element mass matrix in global coord */
+		//**dmatrix();
 	int     **ind,	  /* member-structure DoF index table     */
-		**imatrix(),
+		//**imatrix(),
 		res=0, 
 		i, j, ii, jj, l, ll;
 	char	mass_fn[FILENMAX];
@@ -1109,7 +1109,7 @@ void deallocate(
 	
 ){
 
-	void	free();
+  //void	free();
 
 	free(xyz);
 
