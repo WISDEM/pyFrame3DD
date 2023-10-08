@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 # setup.py
 # only if building in place: ``python setup.py build_ext --inplace``
 import os
@@ -6,6 +9,22 @@ import platform
 import shutil
 import setuptools
 import subprocess
+
+#######
+# This forces wheels to be platform specific
+from setuptools.dist import Distribution
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
+class bdist_wheel(_bdist_wheel):
+    def finalize_options(self):
+        _bdist_wheel.finalize_options(self)
+        self.root_is_pure = False
+
+class BinaryDistribution(Distribution):
+    """Distribution which always forces a binary package with platform name"""
+    def has_ext_modules(foo):
+        return True
+#######
 
 
 def run_meson_build(staging_dir):
@@ -16,6 +35,8 @@ def run_meson_build(staging_dir):
     meson_args = ""
     if "MESON_ARGS" in os.environ:
         meson_args = os.environ["MESON_ARGS"]
+        # A weird add-on on mac github action runners needs to be removed
+        if meson_args.find("buildtype") >= 0: meson_args = ""
 
     if platform.system() == "Windows":
         if not "FC" in os.environ:
@@ -25,14 +46,15 @@ def run_meson_build(staging_dir):
 
     # configure
     meson_path = shutil.which("meson")
-    meson_call = (
-        f"{meson_path} setup {staging_dir} --prefix={prefix} "
-        + f"-Dpython.purelibdir={purelibdir} -Dpython.platlibdir={purelibdir} {meson_args}"
-    )
-    sysargs = meson_call.split(" ")
-    sysargs = [arg for arg in sysargs if arg != ""]
-    print(sysargs)
-    p1 = subprocess.run(sysargs, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if meson_path is None:
+        raise OSError("The meson command cannot be found on the system")
+        
+    meson_call = [meson_path, "setup", staging_dir, "--wipe",
+                  f"--prefix={prefix}", f"-Dpython.purelibdir={purelibdir}",
+                  f"-Dpython.platlibdir={purelibdir}", meson_args]
+    meson_call = [m for m in meson_call if m != ""]
+    print(meson_call)
+    p1 = subprocess.run(meson_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     os.makedirs(staging_dir, exist_ok=True)
     setup_log = os.path.join(staging_dir, "setup.log")
     with open(setup_log, "wb") as f:
@@ -40,23 +62,20 @@ def run_meson_build(staging_dir):
     if p1.returncode != 0:
         with open(setup_log, "r") as f:
             print(f.read())
-        raise OSError(sysargs, f"The meson setup command failed! Check the log at {setup_log} for more information.")
+        raise OSError(meson_call, f"The meson setup command failed! Check the log at {setup_log} for more information.")
 
     # build
-    meson_call = f"{meson_path} compile -vC {staging_dir}"
-    sysargs = meson_call.split(" ")
-    sysargs = [arg for arg in sysargs if arg != ""]
-    print(sysargs)
-    p2 = subprocess.run(sysargs, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    meson_call = [meson_path, "compile", "-vC", staging_dir]
+    meson_call = [m for m in meson_call if m != ""]
+    print(meson_call)
+    p2 = subprocess.run(meson_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     compile_log = os.path.join(staging_dir, "compile.log")
     with open(compile_log, "wb") as f:
         f.write(p2.stdout)
     if p2.returncode != 0:
         with open(compile_log, "r") as f:
             print(f.read())
-        raise OSError(
-            sysargs, f"The meson compile command failed! Check the log at {compile_log} for more information."
-        )
+        raise OSError(meson_call, f"The meson compile command failed! Check the log at {compile_log} for more information.")
 
 
 def copy_shared_libraries():
@@ -64,7 +83,7 @@ def copy_shared_libraries():
     for root, _dirs, files in os.walk(build_path):
         for file in files:
             # move pyframe3dd to just under staging_dir
-            if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll")):
+            if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll", ".mod")):
                 if ".so.p" in root or ".pyd.p" in root:  # excludes intermediate object files
                     continue
                 file_path = os.path.join(root, file)
@@ -72,7 +91,7 @@ def copy_shared_libraries():
                 match = re.search(staging_dir, new_path)
                 new_path = new_path[match.span()[1] + 1 :]
                 print(f"Copying build file {file_path} -> {new_path}")
-                shutil.copy(file_path, new_path)
+                shutil.move(file_path, new_path)
 
 
 if __name__ == "__main__":
@@ -87,53 +106,12 @@ if __name__ == "__main__":
         os.chdir(cwd)
         copy_shared_libraries()
 
-    #docs_require = ""
-    #req_txt = os.path.join("doc", "requirements.txt")
-    #if os.path.isfile(req_txt):
-    #    with open(req_txt) as f:
-    #        docs_require = f.read().splitlines()
-
     init_file = os.path.join("pyframe3dd", "__init__.py")
     #__version__ = re.findall(
     #    r"""__version__ = ["']+([0-9\.]*)["']+""",
     #    open(init_file).read(),
     #)[0]
 
-    setuptools.setup(
-        name="pyFrame3DD",
-        version="1.2",
-        description="Python bindings to Frame3DD",
-        long_description="pyFrame3DD is a Python package that provides a library-like interface to the structural analysis program, Frame3DD",
-        author='NREL WISDEM Team',
-        author_email='systems.engineering@nrel.gov',
-        install_requires=[
-            "numpy",
-        ],
-        extras_require={
-            "testing": ["pytest"],
-        },
-        python_requires=">=3.8",
-        packages=["pyframe3dd"],
-        package_data={"": ["*.yaml", "*.so", "*.lib", "*.pyd", "*.pdb", "*.dylib", "*.dll"]},
-        license='Apache License, Version 2.0',
-        zip_safe=False,
-    )
+    setuptools.setup(cmdclass={'bdist_wheel': bdist_wheel}, distclass=BinaryDistribution)
 
 #os.environ['NPY_DISTUTILS_APPEND_FLAGS'] = '1'
-
-#if os.name == 'nt':  # Windows.
-#    extra_compile_args = ['/TC', '/D', 'ANSI'] # for msvs
-#     # TODO: Not with Anaconda MINGW
-#else:
-#extra_compile_args = ''
-
-#froot = 'pyframe3dd' + os.sep + 'src' + os.sep
-#pyframeExt = Extension('pyframe3dd._pyframe3dd', sources=[froot+'py_HPGmatrix.c',
-#                                               froot+'HPGutil.c',
-#                                               froot+'NRutil.c',
-#                                               froot+'coordtrans.c',
-#                                               froot+'preframe.c',
-#                                               froot+'py_eig.c',
-#                                               froot+'py_frame3dd.c',
-#                                               froot+'py_io.c',
-#                                               froot+'py_main.c'])
