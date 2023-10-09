@@ -33,6 +33,7 @@ float *vector(long nl, long nh)
 
 	v=(float *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(float)));
 	if (!v) NRerror("allocation failure in vector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -43,6 +44,7 @@ int *ivector(long nl, long nh)
 
 	v=(int *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(int)));
 	if (!v) NRerror("allocation failure in ivector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -63,6 +65,7 @@ unsigned long *lvector(long nl, long nh)
 
 	v=(unsigned long *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(long)));
 	if (!v) NRerror("allocation failure in lvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -73,6 +76,7 @@ double *dvector(long nl, long nh)
 
 	v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
 	if (!v) NRerror("allocation failure in dvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -95,6 +99,9 @@ float **matrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -119,6 +126,9 @@ double **dmatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -144,6 +154,9 @@ int **imatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -222,6 +235,11 @@ float ***f3tensor(long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 		for(j=ncl+1;j<=nch;j++) t[i][j]=t[i][j-1]+ndep;
 	}
 
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (long k=ndl; k<=ndh; k++)
+	      t[i][j][k]=0.0;
+	
 	/* return pointer to array of pointers to rows */
 	return t;
 }
@@ -346,6 +364,12 @@ float ***D3matrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 			m[i][j] -= nzl;
 		}
 	}
+
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (int k=nzl; k<=nzh; k++)
+	      m[i][j][k]=0.0;
+	
 	return m;
 }
 
@@ -369,6 +393,12 @@ double ***D3dmatrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 			m[i][j] -= nzl;
 		}
 	}
+
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (int k=nzl; k<=nzh; k++)
+	      m[i][j][k]=0.0;
+	
 	return m;
 }
 
@@ -423,7 +453,7 @@ void NRerror(error_text)
 char error_text[];
 /* Numerical Recipes standard error handler */
 {
-	void exit();
+  //void exit();
 
 	fprintf(stderr,"Numerical Recipes run-time error...\n");
 	fprintf(stderr,"%s\n",error_text);
@@ -439,6 +469,7 @@ long nh,nl;
 
 	v=(float *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(float)));
 	if (!v) NRerror("allocation failure in vector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -450,6 +481,7 @@ long nh,nl;
 
 	v=(int *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(int)));
 	if (!v) NRerror("allocation failure in ivector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -472,6 +504,7 @@ long nh,nl;
 
 	v=(unsigned long *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(long)));
 	if (!v) NRerror("allocation failure in lvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -483,6 +516,7 @@ long nh,nl;
 
 	v=(double *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(double)));
 	if (!v) NRerror("allocation failure in dvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -506,6 +540,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -531,6 +568,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -557,6 +597,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -639,6 +682,11 @@ long nch,ncl,ndh,ndl,nrh,nrl;
 		for(j=ncl+1;j<=nch;j++) t[i][j]=t[i][j-1]+ndep;
 	}
 
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (long k=ndl; k<=ndh; k++)
+	      t[i][j][k]=0.0;
+	
 	/* return pointer to array of pointers to rows */
 	return t;
 }
@@ -829,7 +877,7 @@ void save_vector( char filename[], float *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -857,7 +905,7 @@ void save_dvector( char filename[], double *V, int nl, int nh, const char *mode 
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -885,7 +933,7 @@ void save_ivector( char filename[], int *V, int nl, int nh, const char *mode )
 {
 	FILE    *fp_v;
 	int     i;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ((fp_v = fopen (filename, mode)) == NULL) {
@@ -913,7 +961,7 @@ void save_matrix ( char filename[], float **A, int ml, int mh, int nl, int nh, i
 {
 	FILE    *fp_m;
 	int     i,j, rows, cols;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
@@ -956,7 +1004,7 @@ void save_dmatrix ( char filename[], double **A, int ml, int mh, int nl, int nh,
 {
 	FILE    *fp_m;
 	int     i,j, rows, cols;
-	void	exit();
+	//void	exit();
 	time_t	now;
 
 	if ( transpose ) rows = nh-nl+1; else rows = mh-ml+1;
@@ -1001,7 +1049,7 @@ void save_ut_matrix ( char filename[], float **A, int n, const char *mode )
 {
 	FILE    *fp_m;
 	int     i,j;
-        void	exit();
+        //void	exit();
 	time_t	now;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {
@@ -1038,7 +1086,7 @@ void save_ut_dmatrix ( char filename[], double **A, int n, const char *mode )
 {
 	FILE    *fp_m;
 	int     i,j;
-        void	exit();
+        //void	exit();
 	time_t	now;
 
 	if ((fp_m = fopen (filename, mode)) == NULL) {

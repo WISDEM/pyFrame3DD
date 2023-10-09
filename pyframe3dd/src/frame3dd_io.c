@@ -624,7 +624,7 @@ int     lim
 
 /* platform-dependent path sperator character ... */
 
-#if defined(WIN32) || defined(DJGPP)
+#if defined(_WIN32) || defined(_WIN64) || defined(DJGPP)
 static const char sep = '\\';
 #else
 static const char sep = '/';
@@ -636,7 +636,7 @@ static const char sep = '/';
  * John Pye, Feb 2009
  */
 static const char *temp_dir(){
-#if defined(WIN32) || defined(DJGPP)
+#if defined(_WIN32) || defined(_WIN64) || defined(DJGPP)
 	char *tmp;
 	tmp = getenv("TEMP");
 	if ( tmp==NULL ) {

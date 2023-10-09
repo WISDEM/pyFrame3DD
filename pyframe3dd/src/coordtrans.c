@@ -134,7 +134,7 @@ void atma(
 	double t7, double t8, double t9,
 	double **m, float r1, float r2
 ){
-	double  **a, **ma, **dmatrix();
+  double  **a, **ma;//, **dmatrix();
 	int     i,j,k;
 
 	a  = dmatrix(1,12,1,12);

@@ -1,6 +1,5 @@
 project('pyframe3dd', 'c',
-  version : '1.2',
-  meson_version: '>= 0.60',
+  meson_version: '>= 1.1',
   default_options: [
     'buildtype=debugoptimized',
   ],
@@ -16,6 +15,11 @@ if m_dep.found()
   add_project_link_arguments('-lm', language : 'c')
 endif
 
+is_windows = host_machine.system() == 'windows'
+add_project_arguments('-DANSI=1', language : 'c')
+if is_windows
+  add_project_arguments('-D_WIN64=1', language : 'c')
+endif
 
 # https://mesonbuild.com/Python-module.html
 # Here we differentiate from the python used by meson, py3_command, and that python target, py3_target. This is useful
