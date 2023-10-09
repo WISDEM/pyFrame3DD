@@ -238,7 +238,7 @@ float ***f3tensor(long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 	for (i=nrl; i<=nrh; i++)
 	  for (j=ncl; j<=nch; j++)
 	    for (long k=ndl; k<=ndh; k++)
-	      t[i][j][k]=0;
+	      t[i][j][k]=0.0;
 	
 	/* return pointer to array of pointers to rows */
 	return t;
