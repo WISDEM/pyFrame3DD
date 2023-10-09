@@ -8,7 +8,7 @@ version = "1.0.1"
 description = "Python bindings to Frame3DD, a code for static and dynamic structural analysis of 2D and 3D frames and trusses, with permission from Prof Henri Gavin"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "Apache-2.0"}
+license = {text = "GPL-3.0-only"}
 keywords = ["wind", "turbine", "mdao", "design", "optimization"]
 authors = [
   {name = "NREL WISDEM Team", email = "systems.engineering@nrel.gov" }
