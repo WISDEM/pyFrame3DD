@@ -33,6 +33,7 @@ float *vector(long nl, long nh)
 
 	v=(float *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(float)));
 	if (!v) NRerror("allocation failure in vector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -43,6 +44,7 @@ int *ivector(long nl, long nh)
 
 	v=(int *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(int)));
 	if (!v) NRerror("allocation failure in ivector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -63,6 +65,7 @@ unsigned long *lvector(long nl, long nh)
 
 	v=(unsigned long *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(long)));
 	if (!v) NRerror("allocation failure in lvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -73,6 +76,7 @@ double *dvector(long nl, long nh)
 
 	v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
 	if (!v) NRerror("allocation failure in dvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -95,6 +99,9 @@ float **matrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	//for (i=0; i<nrow; i++)
+	//  for (long j=0; j<ncol; j++)
+	//    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -119,6 +126,9 @@ double **dmatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	//for (i=0; i<nrow; i++)
+	//  for (long j=0; j<ncol; j++)
+	//    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -144,6 +154,9 @@ int **imatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	//for (i=0; i<nrow; i++)
+	//  for (long j=0; j<ncol; j++)
+	//    m[i][j]=0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -164,6 +177,9 @@ float **subMatrix(float **a, long oldrl, long oldrh, long oldcl, long oldch,
 
 	/* set pointers to rows */
 	for(i=oldrl,j=newrl;i<=oldrh;i++,j++) m[j]=a[i]+ncol;
+	for (i=0; i<nrow; i++)
+	  for (long j=0; j<ncol; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
