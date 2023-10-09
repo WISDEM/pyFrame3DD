@@ -23,7 +23,7 @@ jobs:
               id: install_cc
               uses: rlalik/setup-cpp-compiler@v1.2
               with:
-                  compiler: clang
+                  compiler: gcc #clang
 
             - name: checkout repository
               uses: actions/checkout@v4
