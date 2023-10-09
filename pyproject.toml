@@ -3,8 +3,8 @@ requires = ["setuptools", "meson>=1.1", "ninja", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyFrame3DD"
-version = "1.0.0"
+name = "WISDEM-pyFrame3DD"
+version = "1.0.1"
 description = "Python bindings to Frame3DD, a code for static and dynamic structural analysis of 2D and 3D frames and trusses, with permission from Prof Henri Gavin"
 readme = "README.md"
 requires-python = ">=3.9"
