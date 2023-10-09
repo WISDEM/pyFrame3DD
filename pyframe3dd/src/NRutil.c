@@ -99,9 +99,9 @@ float **matrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
-	//for (i=0; i<nrow; i++)
-	//  for (long j=0; j<ncol; j++)
-	//    m[i][j]=0.0;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -126,9 +126,9 @@ double **dmatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
-	//for (i=0; i<nrow; i++)
-	//  for (long j=0; j<ncol; j++)
-	//    m[i][j]=0.0;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -154,9 +154,9 @@ int **imatrix(long nrl, long nrh, long ncl, long nch)
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
-	//for (i=0; i<nrow; i++)
-	//  for (long j=0; j<ncol; j++)
-	//    m[i][j]=0;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -177,9 +177,6 @@ float **subMatrix(float **a, long oldrl, long oldrh, long oldcl, long oldch,
 
 	/* set pointers to rows */
 	for(i=oldrl,j=newrl;i<=oldrh;i++,j++) m[j]=a[i]+ncol;
-	for (i=0; i<nrow; i++)
-	  for (long j=0; j<ncol; j++)
-	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -238,6 +235,11 @@ float ***f3tensor(long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 		for(j=ncl+1;j<=nch;j++) t[i][j]=t[i][j-1]+ndep;
 	}
 
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (long k=ndl; k<=ndh; k++)
+	      t[i][j][k]=0;
+	
 	/* return pointer to array of pointers to rows */
 	return t;
 }
