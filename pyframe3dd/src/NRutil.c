@@ -364,6 +364,12 @@ float ***D3matrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 			m[i][j] -= nzl;
 		}
 	}
+
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (int k=nzl; k<=nzh; k++)
+	      m[i][j][k]=0.0;
+	
 	return m;
 }
 
@@ -387,6 +393,12 @@ double ***D3dmatrix(int nrl, int nrh, int ncl, int nch, int nzl, int nzh)
 			m[i][j] -= nzl;
 		}
 	}
+
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (int k=nzl; k<=nzh; k++)
+	      m[i][j][k]=0.0;
+	
 	return m;
 }
 
@@ -457,6 +469,7 @@ long nh,nl;
 
 	v=(float *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(float)));
 	if (!v) NRerror("allocation failure in vector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -468,6 +481,7 @@ long nh,nl;
 
 	v=(int *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(int)));
 	if (!v) NRerror("allocation failure in ivector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -490,6 +504,7 @@ long nh,nl;
 
 	v=(unsigned long *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(long)));
 	if (!v) NRerror("allocation failure in lvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0;
 	return v-nl+NR_END;
 }
 
@@ -501,6 +516,7 @@ long nh,nl;
 
 	v=(double *)malloc((unsigned int) ((nh-nl+1+NR_END)*sizeof(double)));
 	if (!v) NRerror("allocation failure in dvector()");
+	for (int k=0; k<(nh-nl+1+NR_END); k++) v[k]=0.0;
 	return v-nl+NR_END;
 }
 
@@ -524,6 +540,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -549,6 +568,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0.0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -575,6 +597,9 @@ long nch,ncl,nrh,nrl;
 	m[nrl] -= ncl;
 
 	for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+	for (i=nrl; i<=nrh; i++)
+	  for (long j=ncl; j<=nch; j++)
+	    m[i][j]=0;
 
 	/* return pointer to array of pointers to rows */
 	return m;
@@ -657,6 +682,11 @@ long nch,ncl,ndh,ndl,nrh,nrl;
 		for(j=ncl+1;j<=nch;j++) t[i][j]=t[i][j-1]+ndep;
 	}
 
+	for (i=nrl; i<=nrh; i++)
+	  for (j=ncl; j<=nch; j++)
+	    for (long k=ndl; k<=ndh; k++)
+	      t[i][j][k]=0.0;
+	
 	/* return pointer to array of pointers to rows */
 	return t;
 }
