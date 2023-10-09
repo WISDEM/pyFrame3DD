@@ -14,22 +14,22 @@ There is example code that shows usage contained in ``examples/exB.py``.  This f
 
 ## Prerequisites
 
-pyMAP requires a C compiler
+pyFrame3DD requires a C compiler
 
 ## Install
 
 For detailed installation instructions of WISDEM modules see <https://github.com/WISDEM/WISDEM> or to install pyFrame3DD by itself do:
 
-    $ python setup.py install
+    $ pip install WISDEM-pyFrame3DD
 
 ## Unit Tests
 
-    $ python test/test_frame.py
+    $ pytest test
 
 For software issues please use <https://github.com/WISDEM/pyFrame3DD/issues>.  For functionality and theory related questions and comments please use the NWTC forum for [Systems Engineering Software Questions](https://wind.nrel.gov/forum/wind/viewtopic.php?f=34&t=1002).
 
 
 ## License
 
-Frame3DD uses the GNU GPL so this code must also be under the same license.
+Frame3DD uses the GNU GPL so this code must also be under the same license.  The larger WISDEM code has a special dispensation to use the Apache License.
 
