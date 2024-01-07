@@ -91,9 +91,6 @@ class MesonBuildExt(build_ext):
 
             self.build_temp = build_dir
 
-            # Need fresh build directory for CMake
-            os.makedirs(self.build_temp, exist_ok=True)
-
             self.spawn(configure_call)
             self.spawn(build_call)
             copy_shared_libraries()
