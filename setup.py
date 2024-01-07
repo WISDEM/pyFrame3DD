@@ -26,7 +26,7 @@ staging_dir = os.path.join(this_dir, "meson_build")
 build_dir = os.path.join(this_dir, "build")
 
 def copy_shared_libraries():
-    build_path = os.path.join(build_dir, "pyframe3dd")
+    build_path = os.path.join(staging_dir, "pyframe3dd")
     for root, _dirs, files in os.walk(build_path):
         for file in files:
             if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll")):
@@ -34,7 +34,7 @@ def copy_shared_libraries():
                     continue
                 file_path = os.path.join(root, file)
                 new_path = str(file_path)
-                match = re.search(build_dir, new_path)
+                match = re.search(staging_dir, new_path)
                 new_path = new_path[match.span()[1] + 1 :]
                 print(f"Copying build file {file_path} -> {new_path}")
                 shutil.copy(file_path, new_path)

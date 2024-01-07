@@ -43,11 +43,11 @@ jobs:
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pip install -vv .[test]
 
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v3
-              with:
-                  detached: true
-              if: contains( matrix.os, 'ubuntu')
+            #- name: Setup tmate session
+            #  uses: mxschmitt/action-tmate@v3
+            #  with:
+            #      detached: true
+            #  if: contains( matrix.os, 'ubuntu')
 
             - name: Test run
               run: |
