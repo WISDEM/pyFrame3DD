@@ -81,7 +81,7 @@ class MesonBuildExt(build_ext):
 
             purelibdir = "."
             configure_call = ["meson", "setup", staging_dir, "--wipe",
-                          f"-Dpython.purelibdir={purelibdir}", f"--prefix={build_dir}", 
+                          f"-Dpython.purelibdir={purelibdir}", f"--prefix={staging_dir}", 
                           f"-Dpython.platlibdir={purelibdir}"] + meson_args.split()
             configure_call = [m for m in configure_call if m.strip() != ""]
             print(configure_call)
@@ -96,7 +96,7 @@ class MesonBuildExt(build_ext):
 
             self.spawn(configure_call)
             self.spawn(build_call)
-            self.spawn(install_call)
+            #self.spawn(install_call)
             copy_shared_libraries()
 
             
