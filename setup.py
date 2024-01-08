@@ -28,14 +28,10 @@ build_dir = os.path.join(this_dir, "build")
 def copy_shared_libraries():
     build_path = os.path.join(staging_dir, "pyframe3dd")
     for root, _dirs, files in os.walk(build_path):
-        for file in files:
-            if file.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll")):
-                if ".so.p" in root or ".pyd.p" in root:  # excludes intermediate object files
-                    continue
-                file_path = os.path.join(root, file)
-                new_path = str(file_path)
-                match = re.search(staging_dir, new_path)
-                new_path = new_path[match.span()[1] + 1 :]
+        for f in files:
+            if f.endswith((".so", ".lib", ".pyd", ".pdb", ".dylib", ".dll")):
+                file_path = os.path.join(root, f)
+                new_path = str(file_path).replace(staging_dir + os.sep, "")
                 print(f"Copying build file {file_path} -> {new_path}")
                 shutil.copy(file_path, new_path)
 
