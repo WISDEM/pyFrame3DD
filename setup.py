@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import re
 import shutil
 import platform
 import setuptools
@@ -85,14 +84,10 @@ class MesonBuildExt(build_ext):
             build_call = ["meson", "compile", "-vC", staging_dir]
             print(build_call)
 
-            install_call = ["meson", "install", "-C", staging_dir]
-            print(install_call)
-
             self.build_temp = build_dir
 
             self.spawn(configure_call)
             self.spawn(build_call)
-            #self.spawn(install_call)
             copy_shared_libraries()
 
             
