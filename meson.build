@@ -24,17 +24,10 @@ endif
 # https://mesonbuild.com/Python-module.html
 # Here we differentiate from the python used by meson, py3_command, and that python target, py3_target. This is useful
 # when cross compiling like on conda-forge
-py_mod = import('python')
-if get_option('python_target') != ''
-  py3 = py_mod.find_installation(get_option('python_target'))
-else
-  py3 = py_mod.find_installation('python')
-endif
+py3 = import('python').find_installation(pure: false)
 py3_dep = py3.dependency()
 
 message(py3.path())
 message(py3.get_install_dir())
 
 subdir('pyframe3dd')
-
-			    
