@@ -51,6 +51,18 @@ jobs:
             - name: Test run
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pytest test
+              
+            - name: Editable Pip Install pyFrame3DD
+              env:
+                  CC: '${{ steps.install_cc.outputs.cc }}'
+                  CXX: '${{ steps.install_cc.outputs.cxx }}'
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
+                  '${{ steps.cp.outputs.python-path }}' -m pip install -e --no-build-isolation .
+
+            - name: Editable Test run
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pytest test
 
 
     build_conda:
@@ -93,13 +105,11 @@ jobs:
               run: |
                   conda install -y compilers
 
-            # Install 
             - name: Debug
               run: |
                   conda list
                   printenv
                     
-            # Install 
             - name: Conda Install pyFrame3DD
               env:
                   MESON_ARGS: ""
@@ -107,6 +117,17 @@ jobs:
                   python -m pip install . -v
 
             - name: Test run
+              run: |
+                  python -m pytest test
+                    
+            - name: Editable Conda Install pyFrame3DD
+              env:
+                  MESON_ARGS: ""
+              run: |
+                  python -m pip uninstall pyframe3dd
+                  python -m pip install -e --no-build-isolation . -v
+
+            - name: Editable Test run
               run: |
                   python -m pytest test
 
