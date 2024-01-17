@@ -31,5 +31,3 @@ message(py3.path())
 message(py3.get_install_dir())
 
 subdir('pyframe3dd')
-
-			    

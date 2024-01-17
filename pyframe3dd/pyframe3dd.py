@@ -12,25 +12,43 @@ import numpy as np
 import math
 from ctypes import POINTER, c_int, c_double, Structure, pointer
 from collections import namedtuple
+import platform
 import os
-#from distutils.sysconfig import get_config_var
+import sysconfig
+import sys
 
-from sys import platform
+if platform.system() == "Windows":
+    lib_ext = ".dll"
+elif platform.system() == "Darwin":
+    lib_ext = ".dylib"
+else:
+    lib_ext = ".so"
 
-libext = None #get_config_var('EXT_SUFFIX')
-if libext is None or libext == '':
-    if platform == "linux" or platform == "linux2":
-        libext = '.so'
-    elif platform == "darwin":
-        libext = '.dylib'
-        #libext = '.so'
-    elif platform == "win32":
-        libext = '.dll'
-        #libext = '.pyd'
-    elif platform == "cygwin":
-        libext = '.dll'
-        
-libname = '_pyframe3dd' + libext
+libname = '_pyframe3dd' + lib_ext
+    
+pyframe3dd_dir = os.path.dirname( os.path.abspath(__file__) )
+
+lib_opt = [os.path.join(pyframe3dd_dir, libname), # pip installs (regular and editable)
+            os.path.join(os.path.dirname( os.path.dirname( pyframe3dd_dir )), "local", "lib", libname), # WEIS library
+            os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), libname), # conda installs
+            os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), "lib", libname), # conda installs
+            os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), "Library", "lib", libname), # conda installs
+            os.path.join( sysconfig.get_path('platlib'), "pyframe3dd", "lib", libname), # system-wide pip installs
+            os.path.join( sysconfig.get_config_var("userbase"), "lib", "python", "site-packages", "pyframe3dd", libname), # system wide local
+            ]
+
+for p in sys.meta_path:
+    if "_build_path" in p.__dict__:
+        lib_opt += [os.path.join(p._build_path, "pyframe3dd", libname)]
+
+lib_path = None
+for p in lib_opt:
+    if os.path.exists(p):
+        lib_path = str(p)
+        break
+
+if lib_path is None:
+    raise Exception(f"Cannot find {libname} in {lib_opt}")
 
 c_int_p = POINTER(c_int)
 c_double_p = POINTER(c_double)
@@ -446,12 +464,10 @@ class Frame(object):
 
 
         # load c module
-        mydir = os.path.dirname(os.path.realpath(__file__))  # get path to this file
-        try:
-            self._pyframe3dd = np.ctypeslib.load_library(libname, mydir)
-        except:
-            mydir = os.path.abspath(os.path.dirname(mydir))
-            self._pyframe3dd = np.ctypeslib.load_library(libname, mydir)
+        #mydir = impresources.files(pyframe3dd)
+        #with impresources.as_file(mydir) as f:
+        #    print(f)
+        self._pyframe3dd = np.ctypeslib.load_library(libname, os.path.dirname(lib_path))
 
         self._pyframe3dd.run.argtypes = [POINTER(C_Nodes), POINTER(C_Reactions), POINTER(C_Elements),
             POINTER(C_OtherElementData), c_int, POINTER(C_LoadCase),
