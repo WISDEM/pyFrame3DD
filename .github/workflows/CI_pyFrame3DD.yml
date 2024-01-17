@@ -35,13 +35,26 @@ jobs:
                   python-version: ${{ matrix.python-version }}
                   update-environment: true
               
-            - name: Pip Install pyFrame3DD
+            - name: Editable Pip Install pyFrame3DD
               env:
-                  MESON_ARGS: -Dpython_target=${{ steps.cp.outputs.python-path }}
                   CC: '${{ steps.install_cc.outputs.cc }}'
                   CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
-                  '${{ steps.cp.outputs.python-path }}' -m pip install -vv .[test]
+                  '${{ steps.cp.outputs.python-path }}' -m pip install --upgrade pip
+                  '${{ steps.cp.outputs.python-path }}' -m pip install meson-python meson numpy ninja wheel
+                  '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .[test]
+
+            - name: Editable Test run
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pytest test
+                  
+            - name: Pip Install pyFrame3DD
+              env:
+                  CC: '${{ steps.install_cc.outputs.cc }}'
+                  CXX: '${{ steps.install_cc.outputs.cxx }}'
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
+                  '${{ steps.cp.outputs.python-path }}' -m pip install -v .[test]
 
             #- name: Setup tmate session
             #  uses: mxschmitt/action-tmate@v3
@@ -94,20 +107,29 @@ jobs:
               run: |
                   conda install -y compilers
 
-            # Install 
             - name: Debug
               run: |
                   conda list
                   printenv
                     
-            # Install 
             - name: Conda Install pyFrame3DD
               env:
                   MESON_ARGS: ""
               run: |
-                  python -m pip install .
+                  python -m pip install . -v
 
             - name: Test run
+              run: |
+                  python -m pytest test
+                    
+            - name: Editable Conda Install pyFrame3DD
+              env:
+                  MESON_ARGS: ""
+              run: |
+                  python -m pip uninstall pyframe3dd
+                  python -m pip install --no-build-isolation -e . -v
+
+            - name: Editable Test run
               run: |
                   python -m pytest test
 

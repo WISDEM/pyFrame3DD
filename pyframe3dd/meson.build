@@ -1,3 +1,12 @@
+python_sources = [
+  '__init__.py',
+  'pyframe3dd.py',
+]
+
+py3.install_sources(
+  python_sources,
+  subdir: 'pyframe3dd',
+)
 
 sources = ['src/py_main.c',
      'src/py_structs.h',
@@ -19,9 +28,8 @@ sources = ['src/py_main.c',
 # We need to build a shared library NOT A PYTHON EXTENSION
 # The ctypes wrapper handles the extension part.
 # If the interface was done purely in C, then need the python extension.
-shared_library('_pyframe3dd', sources,
+temp = shared_library('_pyframe3dd', sources,
      name_prefix: '',
      include_directories: 'src',
-     dependencies : py3_dep,
+     install_dir: py3.get_install_dir() / 'pyframe3dd',
      install : true)
-

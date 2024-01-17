@@ -4,9 +4,9 @@ channels:
 
 dependencies:
   - meson
+  - meson-python
   - ninja
   - numpy
   - pip
   - python
   - pytest
-  - setuptools

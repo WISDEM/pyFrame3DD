@@ -16,11 +16,27 @@ There is example code that shows usage contained in ``examples/exB.py``.  This f
 
 pyFrame3DD requires a C compiler
 
-## Install
+## Install (as a library)
 
 For detailed installation instructions of WISDEM modules see <https://github.com/WISDEM/WISDEM> or to install pyFrame3DD by itself do:
 
     $ pip install WISDEM-pyFrame3DD
+
+
+## Install (from source)
+
+If you would like to build the project locally from source for easier access to the underlying methods and tests, do:
+
+    $ git clone https://github.com/WISDEM/pyFrame3DD.git
+    $ cd pyFrame3DD
+    $ pip install .
+
+If developer/editable mode, do the same `git clone` step, but on install do:
+
+    $ pip install --no-build-isolation -e .
+
+The `--no-build-isolation` option is important per [Meson guidelines](https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html).
+
 
 ## Unit Tests
 
