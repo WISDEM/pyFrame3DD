@@ -9,7 +9,7 @@ Copyright (c) NREL. All rights reserved.
 
 import numpy as np
 
-from frame3dd import Frame, NodeData, ReactionData, ElementData, Options, \
+from pyframe3dd import Frame, NodeData, ReactionData, ElementData, Options, \
     StaticLoadCase
 
 
