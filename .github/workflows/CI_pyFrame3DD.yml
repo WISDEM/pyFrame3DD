@@ -40,6 +40,8 @@ jobs:
                   CC: '${{ steps.install_cc.outputs.cc }}'
                   CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pip install --upgrade pip
+                  '${{ steps.cp.outputs.python-path }}' -m pip install meson-python meson numpy ninja wheel
                   '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .[test]
 
             - name: Editable Test run
