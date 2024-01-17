@@ -33,7 +33,10 @@ If you would like to build the project locally from source for easier access to 
 
 If developer/editable mode, do the same `git clone` step, but on install do:
 
-    $ pip install -e --no-build-isolation .
+    $ pip install --no-build-isolation -e .
+
+The `--no-build-isolation` option is important per [Meson guidelines](https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html).
+
 
 ## Unit Tests
 

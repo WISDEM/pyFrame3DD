@@ -58,7 +58,7 @@ jobs:
                   CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
-                  '${{ steps.cp.outputs.python-path }}' -m pip install -e --no-build-isolation .
+                  '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .
 
             - name: Editable Test run
               run: |
@@ -125,7 +125,7 @@ jobs:
                   MESON_ARGS: ""
               run: |
                   python -m pip uninstall pyframe3dd
-                  python -m pip install -e --no-build-isolation . -v
+                  python -m pip install --no-build-isolation -e . -v
 
             - name: Editable Test run
               run: |
