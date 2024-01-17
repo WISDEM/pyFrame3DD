@@ -37,11 +37,10 @@ jobs:
               
             - name: Pip Install pyFrame3DD
               env:
-                  MESON_ARGS: -Dpython_target=${{ steps.cp.outputs.python-path }}
                   CC: '${{ steps.install_cc.outputs.cc }}'
                   CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
-                  '${{ steps.cp.outputs.python-path }}' -m pip install -vv .[test]
+                  '${{ steps.cp.outputs.python-path }}' -m pip install -v .[test]
 
             #- name: Setup tmate session
             #  uses: mxschmitt/action-tmate@v3
@@ -105,7 +104,7 @@ jobs:
               env:
                   MESON_ARGS: ""
               run: |
-                  python -m pip install .
+                  python -m pip install . -v
 
             - name: Test run
               run: |
