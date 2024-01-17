@@ -38,6 +38,7 @@ lib_opt = [os.path.join(pyframe3dd_dir, libname), # pip installs (regular and ed
             os.path.join( sysconfig.get_config_var("userbase"), "lib", "python", "site-packages", "pyframe3dd", libname), # system wide local
             ]
 
+# For Meson's editable installs
 for p in sys.meta_path:
     if "_build_path" in p.__dict__:
         lib_opt += [os.path.join(p._build_path, "pyframe3dd", libname)]

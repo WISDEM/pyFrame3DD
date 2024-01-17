@@ -35,11 +35,23 @@ jobs:
                   python-version: ${{ matrix.python-version }}
                   update-environment: true
               
+            - name: Editable Pip Install pyFrame3DD
+              env:
+                  CC: '${{ steps.install_cc.outputs.cc }}'
+                  CXX: '${{ steps.install_cc.outputs.cxx }}'
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .[test]
+
+            - name: Editable Test run
+              run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pytest test
+                  
             - name: Pip Install pyFrame3DD
               env:
                   CC: '${{ steps.install_cc.outputs.cc }}'
                   CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
+                  '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
                   '${{ steps.cp.outputs.python-path }}' -m pip install -v .[test]
 
             #- name: Setup tmate session
@@ -49,18 +61,6 @@ jobs:
             #  if: contains( matrix.os, 'ubuntu')
 
             - name: Test run
-              run: |
-                  '${{ steps.cp.outputs.python-path }}' -m pytest test
-              
-            - name: Editable Pip Install pyFrame3DD
-              env:
-                  CC: '${{ steps.install_cc.outputs.cc }}'
-                  CXX: '${{ steps.install_cc.outputs.cxx }}'
-              run: |
-                  '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
-                  '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .
-
-            - name: Editable Test run
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pytest test
 
