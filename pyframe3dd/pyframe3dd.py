@@ -33,7 +33,7 @@ lib_opt = [os.path.join(pyframe3dd_dir, libname), # pip installs (regular and ed
             os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), libname), # conda installs
             os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), "lib", libname), # conda installs
             os.path.join(os.path.dirname( sysconfig.get_path('stdlib') ), "Library", "lib", libname), # conda installs
-            os.path.join( sysconfig.get_path('platlib'), "pyframe3dd", "lib", libname), # system-wide pip installs
+            os.path.join( sysconfig.get_path('platlib'), "pyframe3dd", libname), # system-wide pip installs
             os.path.join( sysconfig.get_config_var("userbase"), "lib", "python", "site-packages", "pyframe3dd", libname), # system wide local
             ]
 
