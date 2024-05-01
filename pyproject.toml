@@ -4,7 +4,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "WISDEM-pyFrame3DD"
-version = "1.1.0"
+version = "1.1.1"
 description = "Python bindings to Frame3DD, a code for static and dynamic structural analysis of 2D and 3D frames and trusses, with permission from Prof Henri Gavin"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -116,5 +116,15 @@ atomic = true
 #src_paths=isort,test
 
 [tool.cibuildwheel]
-skip = ["cp36-*", "cp37-*", "cp38-*", "*-win32"]
-build-frontend = "build"
+skip = ["pp*", "cp36-*", "cp37-*", "cp38-*", "*-win32", "*-win_arm64"] #, "*-musllinux*"]
+build-frontend = { name = "build", args = ["-w","-n","-x"] }
+before-build = "pip install numpy ninja meson meson-python"
+build-verbosity = "3"
+
+# https://github.com/pdfo/pdfo
+[[tool.cibuildwheel.overrides]]
+select = "*-win_amd64"
+environment = { PKG_CONFIG_PATH="c:/opt/64/lib/pkgconfig" }
+
+[tool.cibuildwheel.windows]
+repair-wheel-command = "bash .github/tools/cibw_repair_wheel_command_windows.sh {wheel} {dest_dir}"
