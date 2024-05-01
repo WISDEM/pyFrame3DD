@@ -1,5 +1,5 @@
 CC ?= clang #gcc
-CFLAGS = -c -g -O2 -fPIC
+CFLAGS = -c -g -O2 -fPIC -Wall
 
 OBS   = coordtrans.o HPGutil.o NRutil.o 
 PYOBS = py_main.o py_io.o py_frame3dd.o py_eig.o py_HPGmatrix.o 

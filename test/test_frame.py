@@ -917,11 +917,18 @@ class GravityAdd(unittest.TestCase):
 
 
 def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(FrameTestEXA))
-    suite.addTest(unittest.makeSuite(FrameTestEXB))
-    suite.addTest(unittest.makeSuite(GravityAdd))
-    return suite
+    suite = [
+        unittest.TestLoader().loadTestsFromTestCase(FrameTestEXA),
+        unittest.TestLoader().loadTestsFromTestCase(FrameTestEXB),
+        unittest.TestLoader().loadTestsFromTestCase(GravityAdd),
+    ]
+    return unittest.TestSuite(suite)
 
-if __name__ == '__main__':
-    unittest.TextTestRunner().run(suite())
+if __name__ == "__main__":
+    result = unittest.TextTestRunner().run(suite())
+
+    if result.wasSuccessful():
+        exit(0)
+    else:
+        exit(1)
+

@@ -16,42 +16,51 @@ jobs:
             fail-fast: false #true
             matrix:
                 os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-                python-version: ["3.9", "3.10", "3.11"]
+                python-version: ["3.9", "3.10", "3.11", "3.12"]
 
         steps:
             - name: Setup C/C++ Compiler
+              if: false == contains( matrix.os, 'windows')
               id: install_cc
-              uses: rlalik/setup-cpp-compiler@v1.2
+              uses: rlalik/setup-cpp-compiler@master
               with:
-                  compiler: gcc #clang
+                  compiler: clang
+          
+            - name: Install mingw-w64 on Windows
+              if: contains( matrix.os, 'windows')
+              uses: msys2/setup-msys2@v2
+              with:
+                  path-type: inherit
+                  install: |
+                      mingw-w64-x86_64-gcc
 
             - name: checkout repository
               uses: actions/checkout@v4
 
+            - name: Set compilers
+              if: false == contains( matrix.os, 'windows')
+              run: |
+                  echo "CC=${{ steps.install_cc.outputs.cc }}" >> $GITHUB_ENV
+                  echo "CXX=${{ steps.install_cc.outputs.cxx }}" >> $GITHUB_ENV
+                  
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               id: cp
               with:
                   python-version: ${{ matrix.python-version }}
                   update-environment: true
-              
+
             - name: Editable Pip Install pyFrame3DD
-              env:
-                  CC: '${{ steps.install_cc.outputs.cc }}'
-                  CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pip install --upgrade pip
                   '${{ steps.cp.outputs.python-path }}' -m pip install meson-python meson numpy ninja wheel
                   '${{ steps.cp.outputs.python-path }}' -m pip install --no-build-isolation -e .[test]
-
+                  
             - name: Editable Test run
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pytest test
                   
             - name: Pip Install pyFrame3DD
-              env:
-                  CC: '${{ steps.install_cc.outputs.cc }}'
-                  CXX: '${{ steps.install_cc.outputs.cxx }}'
               run: |
                   '${{ steps.cp.outputs.python-path }}' -m pip uninstall pyframe3dd
                   '${{ steps.cp.outputs.python-path }}' -m pip install -v .[test]
@@ -78,7 +87,7 @@ jobs:
             fail-fast: false #true
             matrix:
                 os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-                python-version: ["3.9", "3.10", "3.11"]
+                python-version: ["3.9", "3.10", "3.11", "3.12"]
 
         steps:
             - name: checkout repository
