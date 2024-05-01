@@ -107,13 +107,5 @@ class FrameTestEXA(unittest.TestCase):
         self.assertAlmostEqual(freq[5], anal[2], -2)
     
 
-
-
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(FrameTestEXA))
-    return suite
-
 if __name__ == '__main__':
-    unittest.TextTestRunner().run(suite())
+    unittest.main()
